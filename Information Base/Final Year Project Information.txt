@@ -1,0 +1,63 @@
+Final Year Project Information
+
+4 Milestones
+	1.) Proposal Submission (mid oct)
+		- Convince you have a solid plan
+		- Program Directors(s)
+	2.) Inspection Meeting (mid-nov)
+		- Inspector allocated by school
+		- 2 Meeting with Inspector
+		- Convince inspector that good progress is being made
+	3.) Demonstration Meeting  (late march)
+		- Marked by inspector (towards final grade)
+		- Convince inspector that you have done what is proposed and produced
+		good results
+		- Demonstrate what you have done
+	4.) Final Report Submission (early april)
+		- ~2 weeks after demonstration
+		- Supervisor and Inspector
+		- Put EVERYTHING in writing
+		- Justify decisions made through project
+2 Types of Project
+	1.) Application-Based
+		- "Team Project" but on your own                      
+	2.) Research-Based
+		- Identify a specific research area and conduct a systematic review
+Marking
+- >80: Outstanding
+- 70-79: Excellent
+- 60-69: Very Good
+- 50-59: Good
+- 40-49: Pass
+- 30-39: Fail
+- 00-29: Incomplete
+
+Assessment
+- 30%: Report
+- 20%: Product (Combination of research outcome and prototype)
+- 20%: Process (Explanation of process)
+- 10%: Demonstration/Management
+- 20%: Substantialness of Achievement
+
+Project Proposal
+- General Structure
+	- Introduction
+		: Significance
+		: Motivation
+		: Aims & Objectives
+	- Literature Review
+		: What has been done already
+		: Why previous solutions couldn't address the problem
+	- Methodology
+		: How you are going to address the problem
+	- Planning
+		: Project Plan
+		: Resource Plan (Software, Hardware, Data)
+		: Contingency Plan (Plan B)
+
+Contact Supervisor!!
+	- Organise supervision meeting
+	- Meet with supervisor regularly
+Plan time carefully
+
+		
