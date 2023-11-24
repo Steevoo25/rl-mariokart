@@ -5,10 +5,10 @@ font_dict = {}
 
 def load_dictionary():
     for i in range(len(allowed_characters)):
-        imagePath = f'./characterDictionary/chars_{allowed_characters[i]}.png'
+        imagePath = f'./characterDictionary/char_{allowed_characters[i]}.png'
         print(imagePath)
         try:
-            image = Image.open(imagePath).resize((11,15))
+            image = Image.open(imagePath).resize((11,15)).convert('L')
             font_dict[allowed_characters[i]] = image
             image.save(imagePath)
         except FileNotFoundError:
