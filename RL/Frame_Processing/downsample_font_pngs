@@ -1,0 +1,15 @@
+from PIL import Image
+
+allowed_characters = ['1','2','3','4','5','6','7','8','9','0','.']
+font_dict = {}
+
+def load_dictionary():
+    for i in range(len(allowed_characters)):
+        imagePath = f'./characterDictionary/chars_{allowed_characters[i]}.png'
+        print(imagePath)
+        try:
+            font_dict[allowed_characters[i]] = Image.open(imagePath).resize((11,15))
+            
+        except FileNotFoundError:
+            print(f'File {imagePath} not found')
+            

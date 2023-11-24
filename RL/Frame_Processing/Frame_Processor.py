@@ -10,19 +10,6 @@ imagePath = './framedump_302_bitrate_10000.png'
 # Pixel coordinates of required values printed to screen by gecko code in native resolution
 crop_regions = [(88, 177, 145, 191), (98,251,159,264), (149,269, 160,284)]
 
-allowed_characters = ['1','2','3','4','5','6','7','8','9','0','.']
-font_dict = {}
-def load_dictionary():
-    for i in range(len(allowed_characters)):
-        imagePath = f'./characterDictionary/chars_{allowed_characters[i]}.png'
-        print(imagePath)
-        try:
-            font_dict[allowed_characters[i]] = Image.open(imagePath).resize((11,15))
-        except FileNotFoundError:
-            print(f'File {imagePath} not found')
-            
-load_dictionary()
-print(font_dict)
 # Splits screenshot into seperate images:
 # [0] = XZ Velocity
 # [1] = Race%
@@ -34,7 +21,11 @@ def crop_image(image):
         cropped_images.append(image.crop(crop_regions[i]))
         cropped_images[i].save(f'{i}.png')
     return cropped_images
-    
+
+
+load_dictionary()
+print(font_dict)
+
 # Open image
 frame = Image.open(imagePath)
 # Convert image to black and white
