@@ -8,8 +8,9 @@ def load_dictionary():
         imagePath = f'./characterDictionary/chars_{allowed_characters[i]}.png'
         print(imagePath)
         try:
-            font_dict[allowed_characters[i]] = Image.open(imagePath).resize((11,15))
-            
+            image = Image.open(imagePath).resize((11,15))
+            font_dict[allowed_characters[i]] = image
+            image.save(imagePath)
         except FileNotFoundError:
             print(f'File {imagePath} not found')
             
