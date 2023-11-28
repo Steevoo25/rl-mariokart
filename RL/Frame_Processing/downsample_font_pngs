@@ -1,7 +1,6 @@
 from PIL import Image
 
 allowed_characters = ['1','2','3','4','5','6','7','8','9','0','.']
-font_dict = {}
 
 def load_dictionary():
     for i in range(len(allowed_characters)):
@@ -9,8 +8,6 @@ def load_dictionary():
         print(imagePath)
         try:
             image = Image.open(imagePath).resize((11,15)).convert('L')
-            font_dict[allowed_characters[i]] = image
             image.save(imagePath)
         except FileNotFoundError:
             print(f'File {imagePath} not found')
-            

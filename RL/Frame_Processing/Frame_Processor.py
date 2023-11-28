@@ -1,14 +1,18 @@
 from PIL import Image
 import pytesseract as pt
-# Possible Solution-
-# Dict containing images of each character and corresponding value, essentially mapping font to value
+import cv2
 
-#imagePath = './framedump_325_bitrate_250000.png'
+#cv2 template matching
+# load images in bw
+#cv2.imread(path, 0)
 
-imagePath = './framedump_302_bitrate_10000.png'
+#imagePath = './framedump_325_bitrate_25000.png'
+imagePath = './framedump_23_cropped.png'
+
+#imagePath = './framedump_302_bitrate_10000.png'
 
 # Pixel coordinates of required values printed to screen by gecko code in native resolution
-crop_regions = [(88, 177, 145, 191), (98,251,159,264), (149,269, 160,284)]
+crop_regions = [(88, 177, 150, 191), (98,251,159,264), (149,269, 160,284)]
 
 # Splits screenshot into seperate images:
 # [0] = XZ Velocity
@@ -22,10 +26,6 @@ def crop_image(image):
         cropped_images[i].save(f'{i}.png')
     return cropped_images
 
-
-load_dictionary()
-print(font_dict)
-
 # Open image
 frame = Image.open(imagePath)
 # Convert image to black and white
@@ -33,15 +33,12 @@ frame = Image.open(imagePath)
 
 frame = frame.convert('L')
 # Crop into sections
-cropped_images = crop_image(frame)
+#cropped_images = crop_image(frame)
 # Extract text
 #print('pyTesseract')
-text = []
-for i in range(3):
-    text = pt.image_to_string(cropped_images[i], config='--psm 6 -c tessedit_char_whitelist=0123456789.')
-    print(text)
+print(pt.image_to_data(frame, config='--psm 6 -c tessedit_char_whitelist=0123456789.'))
 
-# SYmbol matching
-# Use high threshold so only exact matches are accepted
-# define all characters 0-9 and .
-
+# for i in range(3):
+#     print(i)
+#     text = pt.image_to_string(cropped_images[i], config='--psm 6 -c tessedit_char_whitelist=0123456789.')
+#     print(text)
