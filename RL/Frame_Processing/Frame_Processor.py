@@ -40,7 +40,11 @@ def format_completion(completion:str):
 print(format_completion('101850'))
 
 def format_mt(mt:str):
-    return 1
+    # from 0 to 270
+    if mt.isnumeric():
+        return int(mt)
+     # TODO: Add error checking
+print(format_mt('150'))
 
 def process_frame(frame_index: int):
     # Append index to file name
