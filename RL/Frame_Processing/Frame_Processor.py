@@ -20,6 +20,17 @@ def crop_image(image: Image):
         cropped_images.append(image.crop(region))
         cropped_images[i].save(f'{i}.png')
     return cropped_images 
+# Wrapper function for value formatting
+def format_race_info(index:int, info:str):
+    match index:
+        case 0:
+            return format_velocity(info)
+        case 1: 
+            return format_completion(info)
+        case 2: 
+            return format_mt(info)
+        case _:
+            raise IndexError("Race Info index out of range")
 
 def format_velocity(vel:str):
     # from 0.00 to 999.99
@@ -57,13 +68,11 @@ def process_frame(frame_index: int):
 
     # For each cropped image
     for i, cropped_image in enumerate(cropped_images):
-        # Us
+        # Use tesseract to extract strings from each cropped image
         text = pt.image_to_string(cropped_image, config=tesseract_config)
-        raceInfo.append(text.strip())
+        # add the formatted info to the array
+        raceInfo.append(format_race_info(i, text.strip()))
     
-    raceInfo[0] = format_velocity(raceInfo[0])
-    raceInfo[1] = format_completion(raceInfo[1])
-    raceInfo[2] = format_mt(raceInfo[2])
     return raceInfo
 
 print(process_frame(0))
