@@ -1,5 +1,6 @@
 from PIL import Image
 import pytesseract as pt
+import os
 
 path_to_framedumps = 'C:/Users/steve/OneDrive/Documents/Dolphin Emulator/Dump/Frames/framedump_'
 tesseract_config = '--psm 6 -c tessedit_char_whitelist=0123456789'
@@ -54,26 +55,27 @@ def format_mt(mt:str):
 def process_frame(frame_index: int):
     # Append index to file name
     imagePath = path_to_framedumps + str(frame_index) + '.png'
-    imagePath = './framedump_178.png'
-    print(f'read frame {frame_index}')
+    # imagePath = './framedump_178.png'
     raceInfo = []
     # Open image
-    frame = Image.open(imagePath)
-
-    # Convert image to black and white
-    frame = frame.convert('L')
-
-    # Crop into sections
-    cropped_images = crop_image(frame)
-
-    # For each cropped image
-    for i, cropped_image in enumerate(cropped_images):
-        # Use tesseract to extract strings from each cropped image
-        text = pt.image_to_string(cropped_image, config=tesseract_config)
-        # add the formatted info to the array
-        raceInfo.append(format_race_info(i, text.strip()))
     
-    return raceInfo
+    try:
+        frame = Image.open(imagePath)
+        # Convert image to black and white
+        frame = frame.convert('L')
 
-print(process_frame(0))
+        # Crop into sections
+        cropped_images = crop_image(frame)
+        # For each cropped image
+        for i, cropped_image in enumerate(cropped_images):
+            # Use tesseract to extract strings from each cropped image
+            text = pt.image_to_string(cropped_image, config=tesseract_config)
+            # add the formatted info to the array
+            raceInfo.append(format_race_info(i, text.strip()))
+        # Remove image after extracting data
+        os.remove(imagePath)
+    except FileNotFoundError:
+        print(f'Could not find file {imagePath}')
+        
+    return raceInfo
 
