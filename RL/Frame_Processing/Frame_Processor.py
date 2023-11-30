@@ -1,15 +1,12 @@
 from PIL import Image
 import pytesseract as pt
-import re
 
 path_to_framedumps = 'C:/Users/steve/OneDrive/Documents/Dolphin Emulator/Dump/Frames/framedump_'
+tesseract_config = '--psm 6 -c tessedit_char_whitelist=0123456789'
 
 # Pixel coordinates of required values printed to screen by gecko code in 2xnative resolution
 # Left, Upper, Right, Lower
 crop_regions = [(176, 354, 248, 384), (185, 500, 286, 531), (290, 537, 312, 567)]
-
-completion_pattern = re.compile(r'^\d\.\d{5}$')
-mt_pattern = re.compile(r'^(?:\d{1,2}|1\d{2}|2[0-6]\d|27[0-0])$')
 
 # Splits screenshot into seperate images:
 # [0] = XZ Velocity
@@ -21,9 +18,9 @@ def crop_image(image: Image):
     cropped_images = []
     for i,region in enumerate(crop_regions):
         cropped_images.append(image.crop(region))
-        #cropped_images[i].save(f'{i}.png')
-    return cropped_images
-    
+        cropped_images[i].save(f'{i}.png')
+    return cropped_images 
+
 def format_velocity(vel:str):
     # from 0.00 to 999.99
     # as there is no decimal point, convert it to a float and divide by 100
@@ -31,26 +28,23 @@ def format_velocity(vel:str):
         return float(vel)/100
     # TODO: Add error checking
 
-print(format_velocity('3740'))
 def format_completion(completion:str):
     # from 1.00000 to 4.00000
     if completion.isnumeric():
         return float(completion) / 100000
-     # TODO: Add error checking
-print(format_completion('101850'))
+    # TODO: Add error checking
 
 def format_mt(mt:str):
     # from 0 to 270
     if mt.isnumeric():
         return int(mt)
-     # TODO: Add error checking
-print(format_mt('150'))
+    # TODO: Add error checking
 
 def process_frame(frame_index: int):
     # Append index to file name
-    imagePath = path_to_framedumps + frame_index
+    imagePath = path_to_framedumps + str(frame_index) + '.png'
+    imagePath = './framedump_178.png'
     print(f'read frame {frame_index}')
-    # Initialise empty array for storing race values
     raceInfo = []
     # Open image
     frame = Image.open(imagePath)
@@ -61,9 +55,16 @@ def process_frame(frame_index: int):
     # Crop into sections
     cropped_images = crop_image(frame)
 
-    # Extract text from images
-    for i in range(3):
-        text = pt.image_to_string(cropped_images[i], config='--psm 6 -c tessedit_char_whitelist=0123456789')
-        raceInfo[i] = text
+    # For each cropped image
+    for i, cropped_image in enumerate(cropped_images):
+        # Us
+        text = pt.image_to_string(cropped_image, config=tesseract_config)
+        raceInfo.append(text.strip())
     
+    raceInfo[0] = format_velocity(raceInfo[0])
+    raceInfo[1] = format_completion(raceInfo[1])
+    raceInfo[2] = format_mt(raceInfo[2])
     return raceInfo
+
+print(process_frame(0))
+
