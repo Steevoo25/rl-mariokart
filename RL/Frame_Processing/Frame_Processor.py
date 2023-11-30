@@ -26,14 +26,19 @@ def crop_image(image: Image):
     
 def format_velocity(vel:str):
     # from 0.00 to 999.99
-    # if there is no decimal point, convert it to a float and divide by 100
+    # as there is no decimal point, convert it to a float and divide by 100
     if vel.isnumeric():
-        vel = float(vel)/100
-    return vel
+        return float(vel)/100
+    # TODO: Add error checking
 
 print(format_velocity('3740'))
 def format_completion(completion:str):
-    return 1
+    # from 1.00000 to 4.00000
+    if completion.isnumeric():
+        return float(completion) / 100000
+     # TODO: Add error checking
+print(format_completion('101850'))
+
 def format_mt(mt:str):
     return 1
 
