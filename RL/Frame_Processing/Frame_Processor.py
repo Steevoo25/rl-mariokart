@@ -74,8 +74,8 @@ def process_frame(frame_index: int):
             raceInfo.append(format_race_info(i, text.strip()))
         # Remove image after extracting data
         os.remove(imagePath)
+        
     except FileNotFoundError:
         print(f'Could not find file {imagePath}')
-        
     return raceInfo
 
