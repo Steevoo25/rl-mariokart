@@ -1,46 +1,41 @@
 
 class Controller:
-    a_button: bool
-    b_button: bool
-    d_pad_up: bool
-    stick_angle: int
+    __a_button: bool
+    __b_button: bool
+    __d_pad_up: bool
+    __stick_angle: int
     
-    ALLOWED_STICK_ANGLES = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
+    ALLOWED___stick_angleS = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
     
     # Initialise controller with no inputs
     def __init__(self):
-        self.a_button = False
-        self.b_button = False
-        self.d_pad_up = False
-        self.stick_angle = 7
+        self.reset()
     
     # Return state of controller
     def __str__(self):
-        return f'A:{self.a_button}\nB:{self.b_button}\nD-Pad Up:{self.d_pad_up}\nStick Angle:{self.stick_angle}\n'
+        return f'A:{self.__a_button}\nB:{self.__b_button}\nD-Pad Up:{self.__d_pad_up}\nStick Angle:{self.__stick_angle}'
 
     # Reset controller to no inputs
     def reset(self):
-        self.__init__
+        self.__a_button = False
+        self.__b_button = False
+        self.__d_pad_up = False
+        self.__stick_angle = 7
 
     # Press a given button
     def press_button(self, button:str):
         if button == 'A':
-            self.a_button = True
+            self.__a_button = True
         elif button == 'B':
-            self.b_button = True
+            self.__b_button = True
         elif button == 'D-Pad Up':
-            self.d_pad_up = True
+            self.__d_pad_up = True
         else:
             raise Exception(f"Button not recognised: {button}")
 
     # Tilt the main stick a certain angle
     def tilt_stick(self, angle:int):
-        if angle in self.ALLOWED_STICK_ANGLES:
-            self.stick_angle = angle
+        if angle in self.ALLOWED___stick_angleS:
+            self.__stick_angle = angle
         else:
             raise Exception(f"Stick angle out of range: {angle}")
-
-controller = Controller()
-controller.press_button('A')
-controller.tilt_stick(10)
-print(controller)
