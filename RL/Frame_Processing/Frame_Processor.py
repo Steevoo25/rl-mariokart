@@ -19,7 +19,7 @@ def crop_image(image: Image):
     cropped_images = []
     for i,region in enumerate(crop_regions):
         cropped_images.append(image.crop(region))
-        cropped_images[i].save(f'{i}.png')
+        #cropped_images[i].save(f'{i}.png')
     return cropped_images 
 # Wrapper function for value formatting
 def format_race_info(index:int, info:str):
