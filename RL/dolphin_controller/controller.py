@@ -5,7 +5,7 @@ class Controller:
     __d_pad_up: bool
     __stick_angle: int
     
-    ALLOWED___stick_angleS = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
+    ALLOWED_STICK_ANGLES = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]
     
     # Initialise controller with no inputs
     def __init__(self):
@@ -35,7 +35,7 @@ class Controller:
 
     # Tilt the main stick a certain angle
     def tilt_stick(self, angle:int):
-        if angle in self.ALLOWED___stick_angleS:
+        if angle in self.ALLOWED_STICK_ANGLES:
             self.__stick_angle = angle
         else:
             raise Exception(f"Stick angle out of range: {angle}")
