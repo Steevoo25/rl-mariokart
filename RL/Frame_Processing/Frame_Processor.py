@@ -37,7 +37,10 @@ def format_velocity(vel:str):
     # from 0.00 to 999.99
     # as there is no decimal point, convert it to a float and divide by 100
     if vel.isnumeric():
-        return float(vel)/100
+        vel = float(vel)/100
+        if vel > 120:
+            print(f"Error in ")
+        return 
     # TODO: Add error checking
 
 def format_completion(completion:str):
@@ -61,21 +64,23 @@ def process_frame(frame_index: int):
     
     try:
         frame = Image.open(imagePath)
-        # Convert image to black and white
-        frame = frame.convert('L')
-
-        # Crop into sections
-        cropped_images = crop_image(frame)
-        # For each cropped image
-        for i, cropped_image in enumerate(cropped_images):
-            # Use tesseract to extract strings from each cropped image
-            text = pt.image_to_string(cropped_image, config=tesseract_config)
-            # add the formatted info to the array
-            raceInfo.append(format_race_info(i, text.strip()))
-        # Remove image after extracting data
-        os.remove(imagePath)
-        
     except FileNotFoundError:
         print(f'Could not find file {imagePath}')
+        return
+
+        # Convert image to black and white
+    frame = frame.convert('L')
+
+    # Crop into sections
+    cropped_images = crop_image(frame)
+    # For each cropped image
+    for i, cropped_image in enumerate(cropped_images):
+        # Use tesseract to extract strings from each cropped image
+        text = pt.image_to_string(cropped_image, config=tesseract_config)
+        # add the formatted info to the array
+    # Remove image after extracting data
+    #os.remove(imagePath)
+    raceInfo.append(text)
+    
     return raceInfo
 
