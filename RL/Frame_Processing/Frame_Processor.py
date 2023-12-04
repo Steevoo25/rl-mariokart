@@ -85,7 +85,10 @@ def process_frame(frame_index: int):
         # Use tesseract to extract strings from each cropped image
         text = pt.image_to_string(cropped_image, config=tesseract_config).strip()
         # add the formatted info to the array
-        raceInfo.append(format_race_info(i,text))
+        try:
+            raceInfo.append(format_race_info(i,text))
+        except ValueError:
+            print(f"Error in frame {i}")
     # Remove image after extracting data
     #os.remove(imagePath)
     return raceInfo
