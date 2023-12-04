@@ -1,3 +1,4 @@
+import pyautogui as pag
 
 class Controller:
     __a_button: bool
@@ -26,10 +27,13 @@ class Controller:
     def press_button(self, button:str):
         if button == 'A':
             self.__a_button = True
+            pag.press('X')
         elif button == 'B':
             self.__b_button = True
+            pag.press('Z')
         elif button == 'D-Pad Up':
             self.__d_pad_up = True
+            pag.press('T')
         else:
             raise Exception(f"Button not recognised: {button}")
 
