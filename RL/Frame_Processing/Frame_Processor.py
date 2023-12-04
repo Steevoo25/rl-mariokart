@@ -3,7 +3,7 @@ import pytesseract as pt
 import os
 
 path_to_framedumps = 'C:/Users/steve/OneDrive/Documents/Dolphin Emulator/Dump/Frames/framedump_'
-tesseract_config = '--psm 6 -c tessedit_char_whitelist=0123456789'
+tesseract_config = '--psm 6 -c tessedit_char_whitelist=0123456789.'
 
 # Pixel coordinates of required values printed to screen by gecko code in 2xnative resolution
 # Left, Upper, Right, Lower
@@ -19,7 +19,7 @@ def crop_image(image: Image):
     cropped_images = []
     for i,region in enumerate(crop_regions):
         cropped_images.append(image.crop(region))
-        #cropped_images[i].save(f'{i}.png')
+        cropped_images[i].save(f'{i}.png')
     return cropped_images 
 # Wrapper function for value formatting
 def format_race_info(index:int, info:str):
@@ -36,11 +36,11 @@ def format_race_info(index:int, info:str):
 def format_velocity(vel:str):
     # from 0.00 to 999.99
     # as there is no decimal point, convert it to a float and divide by 100
-    if vel.isnumeric():
-        vel = float(vel)/100
-        if vel > 120:
-            print(f"Error in ")
-        return 
+    vel = float(vel)/100
+    if vel > 120:
+        raise ValueError(f"Error in Speed value :{vel}")
+    else:
+        return vel
     # TODO: Add error checking
 
 def format_completion(completion:str):
@@ -76,11 +76,12 @@ def process_frame(frame_index: int):
     # For each cropped image
     for i, cropped_image in enumerate(cropped_images):
         # Use tesseract to extract strings from each cropped image
-        text = pt.image_to_string(cropped_image, config=tesseract_config)
+        text = pt.image_to_string(cropped_image, config=tesseract_config).strip()
         # add the formatted info to the array
+        raceInfo.append(format_race_info(i,text))
     # Remove image after extracting data
     #os.remove(imagePath)
-    raceInfo.append(text)
+    
     
     return raceInfo
 
