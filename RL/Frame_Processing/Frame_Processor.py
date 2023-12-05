@@ -25,7 +25,11 @@ def crop_image(image: Image):
 # Inititalise empty array
     cropped_images = []
     for i,region in enumerate(crop_regions):
-        cropped_images.append(image.crop(region))
+        # This line crops the frame
+        # converts to grayscale
+        # then converts to true BW using the lambda
+        
+        cropped_images.append(image.crop(region).convert('L').point(lambda x: 0 if x > 200 else 255))
         #cropped_images[i].save(f'{i}.png')
     return cropped_images 
     
@@ -75,11 +79,9 @@ def process_frame(frame_index: int):
     except FileNotFoundError:
         print(f'Could not find file {imagePath}')
         return
-    finally:
-    # Convert image to black and white
-        frame = ImageOps.invert(frame.convert('L').point(lambda x: 255 if x > 200 else 0))
-    # Crop into sections
-        cropped_images = crop_image(frame)
+    
+    # Crop into sections and BW
+    cropped_images = crop_image(frame)
     # For each cropped image
     for i, cropped_image in enumerate(cropped_images):
         # Use tesseract to extract strings from each cropped image
