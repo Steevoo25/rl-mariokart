@@ -26,11 +26,10 @@ def crop_image(image: Image):
     cropped_images = []
     for i,region in enumerate(crop_regions):
         # This line crops the frame
-        # converts to grayscale
         # then converts to true BW using the lambda
-        
-        cropped_images.append(image.crop(region).convert('L').point(lambda x: 0 if x > 200 else 255))
-        #cropped_images[i].save(f'{i}.png')
+        # and appends to list
+        cropped_images.append(image.crop(region).point(lambda x: 0 if x > 200 else 255))
+        cropped_images[i].save(f'{i}.png')
     return cropped_images 
     
 # Wrapper function for value formatting
