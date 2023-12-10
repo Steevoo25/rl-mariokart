@@ -1,7 +1,7 @@
 from PIL import Image, ImageOps
 import pytesseract as pt
 import os
-
+#TODO : Path will be different for different systems, get default path from dolphin
 path_to_framedumps = 'C:/Users/steve/OneDrive/Documents/Dolphin Emulator/Dump/Frames/framedump_'
 tesseract_config = '--psm 6 -c tessedit_char_whitelist=0123456789'
 

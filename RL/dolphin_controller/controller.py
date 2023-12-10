@@ -43,3 +43,10 @@ class Controller:
             self.__stick_angle = angle
         else:
             raise Exception(f"Stick angle out of range: {angle}")
+    
+    def output_controller_state(self):
+        # Looking at the current state of the controller,
+        # Send the appropriate controller inputs to dolphin
+        # Using PAG or WSL pipes
+        return
+
