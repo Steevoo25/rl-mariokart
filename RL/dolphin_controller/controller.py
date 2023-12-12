@@ -26,14 +26,11 @@ class Controller:
     # Press a given button
     def press_button(self, button:str):
         if button == 'A':
-            self.__a_button = True
-            pag.press('X')
+            self.__a_button = True           
         elif button == 'B':
-            self.__b_button = True
-            pag.press('Z')
+            self.__b_button = True            
         elif button == 'D-Pad Up':
             self.__d_pad_up = True
-            pag.press('T')
         else:
             raise Exception(f"Button not recognised: {button}")
 
@@ -46,7 +43,14 @@ class Controller:
     
     def output_controller_state(self):
         # Looking at the current state of the controller,
-        # Send the appropriate controller inputs to dolphin
-        # Using PAG or WSL pipes
+        # Press the mapped keys on the keyboard
+        if self.__a_button :
+            pag.press('X')
+        if self.__b_button :
+            pag.press('Z')
+        if self.__d_pad_up :
+            pag.press('T')
+        # TODO: Handle Stick angle
+        
         return
 

@@ -2,7 +2,10 @@ from PIL import Image, ImageOps
 import pytesseract as pt
 import os
 #TODO : Path will be different for different systems, get default path from dolphin
+# For my laptop
 path_to_framedumps = 'C:/Users/steve/OneDrive/Documents/Dolphin Emulator/Dump/Frames/framedump_'
+# For my PC
+path_to_framedumps = 'Z:/Users/Harry Stevenson/Documents/OneDrive - University of Birmingham/Documents/Dolphin Emulator/Dump/Frames/framedump_'
 tesseract_config = '--psm 6 -c tessedit_char_whitelist=0123456789'
 
 # Pixel coordinates of required values printed to screen by gecko code in 2xnative resolution
@@ -90,7 +93,7 @@ def process_frame(frame_index: int):
             raceInfo.append(format_race_info(i,text))
         except ValueError:
             print(f"Error in frame {i}")
-    # Remove image after extracting data
+    # Delete image after extracting data so no warning popup for next episode
     #os.remove(imagePath)
     return raceInfo
 
