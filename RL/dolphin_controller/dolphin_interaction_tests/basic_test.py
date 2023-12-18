@@ -1,4 +1,5 @@
-from dolphin import event, gui
+import dolphin.event as event
+import dolphin.gui as gui
 
 red = 0xffff0000
 
