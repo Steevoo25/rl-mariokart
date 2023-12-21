@@ -11,5 +11,5 @@
 *.png
 *.avi
 # Ignore dolphin build
-*/Dolphin/*
+Dolphin/*
 !Dolphin/Config/Config/*
