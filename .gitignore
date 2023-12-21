@@ -1,8 +1,15 @@
+#   compiled pytohn files
 *.pyc
 *.pyo
+# temp office files
 *.tmp
 ~$oject Notes.docx
+# literature
 *.pdf
 *.pptx
+# dumps from dolphin
 *.png
 *.avi
+# Ignore dolphin build
+*/Dolphin/*
+!Dolphin/Config/Config/*
