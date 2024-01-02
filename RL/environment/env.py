@@ -5,10 +5,20 @@
 
 # -- OTHER IMPORTS --
 from sys import path
-
+from pynput import Controller, Key
 
 # Current issue with dolphin causing a deadlock when loading savestetes from scripts
 # https:\\github.com/TASLabz/dolphin/issues/123
+
+# Loads the savestate in the first slot by pressing the default hotkey (F1)
+def load_savestate():  
+    # status message
+    message = "loading savestate using f-key"
+    print(message)
+    # Using pynput to press hotkey for loading savestate in first slot
+    virtual_keyboard = Controller()
+    virtual_keyboard.press(Key.f1)
+    virtual_keyboard.release(Key.f1)
 
 def init():
 # Running dolphin in command line causes some issues, 
