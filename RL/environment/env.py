@@ -1,43 +1,33 @@
-from dolphin import savestate # for loading savestates
-# from dolphin import event # for resetting emulation
-from dolphin import gui # for status messages
-from pyautogui import press
+# -- DOLHPIN IMPORTS --
+#from dolphin import savestate # for loading savestates
+#from dolphin import event # for resetting emulation
+#from dolphin import gui # for status messages
 
+# -- OTHER IMPORTS --
+from pyautogui import press
 from os import system  # for running dolphin from command line
 
 #TODO : Insert wrapper script here
-SCRIPT_PATH = '' 
+SCRIPT_PATH = ''
 # path to dolphin config files
-CONFIG_PATH = 'Z://project//hjs115//Dolphin//Config'
+CONFIG_PATH = 'Z:\\project\\hjs115\\Dolphin\\Config'
 # path to ISO game file
-ISO_PATH = 'Z://ISO//MarioKartWii.rvz'
+ISO_PATH = 'Z:\\ISO\\MarioKartWii.rvz'
 # Command line options for Dolphin
-DOLPHIN_CONFIG = f'-e {ISO_PATH} -u {CONFIG_PATH}' #--script {SCRIPT_PATH}'
+DOLPHIN_CONFIG = f' -e {ISO_PATH} -u {CONFIG_PATH}' #--script {SCRIPT_PATH}'
 # path to dolphin executable - use no GUI
-DOLPHIN_PATH = 'Z://project//hjs115//Dolphin//Build//Dolphin.exe'
+DOLPHIN_PATH = 'Z:\\Users\\Harry Stevenson\\Documents\\project\\dolphin-scripting\\repo\\dolphin\\Binary\\x64\\Dolphin.exe'
 
     # Default savestate will be in slot 1,
     # Current issue with dolphin causing a deadlock when loading savestetes from scripts
-    # https://github.com/TASLabz/dolphin/issues/123
-    # savestate.load_from_slot(1)
-    # Instead we use the load state hotkey
-    # TODO: Change config so 'load state' button is on the gamecube controller and use
-    # controller.set_gc_buttons() to load the state
-    
-
+    # https:\\github.com/TASLabz/dolphin/issues/123
 
 def init():
-
-    # 1.) Open MKWii in Dolphin
-    # TODO: Dolphin resolution configs
-    command = f'{DOLPHIN_PATH} {DOLPHIN_CONFIG}'
+# Running dolphin in command line causes some issues, so I will have to open dolphin and run the script through the gui OR use the 
+    command = DOLPHIN_PATH + DOLPHIN_CONFIG
     print(command)
-    system(command)
-
     # 2.)Load dolphin configs
     # 3.)Load Savestate
-    gui.add_osd_message("Loading state from slot 1")
-    press('f1')
     # 4.) Pause Emulation
     return
 
