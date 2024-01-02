@@ -8,13 +8,13 @@ from os import system  # for running dolphin from command line
 #TODO : Insert wrapper script here
 SCRIPT_PATH = '' 
 # path to dolphin config files
-CONFIG_PATH = 'Z:/project/hjs115/Dolphin/Config'
+CONFIG_PATH = 'Z://project//hjs115//Dolphin//Config'
 # path to ISO game file
-ISO_PATH = 'Z:/ISO/MarioKartWii.rvz'
+ISO_PATH = 'Z://ISO//MarioKartWii.rvz'
 # Command line options for Dolphin
 DOLPHIN_CONFIG = f'-e {ISO_PATH} -u {CONFIG_PATH}' #--script {SCRIPT_PATH}'
 # path to dolphin executable - use no GUI
-DOLPHIN_PATH = 'Z:/project/hjs115/Dolphin/Build/Dolphin.exe'
+DOLPHIN_PATH = 'Z://project//hjs115//Dolphin//Build//Dolphin.exe'
 
     # Default savestate will be in slot 1,
     # Current issue with dolphin causing a deadlock when loading savestetes from scripts
@@ -30,9 +30,9 @@ def init():
 
     # 1.) Open MKWii in Dolphin
     # TODO: Dolphin resolution configs
-    #command = f'{DOLPHIN_PATH} {DOLPHIN_CONFIG}'
-    #print(command)
-    #system(command)
+    command = f'{DOLPHIN_PATH} {DOLPHIN_CONFIG}'
+    print(command)
+    system(command)
 
     # 2.)Load dolphin configs
     # 3.)Load Savestate
