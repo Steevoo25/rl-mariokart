@@ -3,13 +3,13 @@ from time import sleep
 
 # As the script is run within the dolphin executable, 
 # Append the true path of scripts to import
-from os import getcwd
+
 from sys import path
 
-current_dir = getcwd()
-venv_dir = current_dir + '/venv/Lib/site-packages'
+venv_dir ='Z:\\project\\hjs115\\venv\\Lib\\site-packages'
 path.append(venv_dir)
-
+for dir in path:
+    gui.add_osd_message(dir)
 # now import required package
 from pyautogui import press
 # used for osd msg
