@@ -13,3 +13,4 @@
 # Ignore dolphin build
 Dolphin/*
 !Dolphin/Config/Config/*
+venv/*
