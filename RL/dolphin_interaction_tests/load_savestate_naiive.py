@@ -3,8 +3,13 @@ from time import sleep
 
 # As the script is run within the dolphin executable, 
 # Append the true path of scripts to import
+from os import getcwd
 from sys import path
-path.append("C:\\Users\\Harry Stevenson\\AppData\\Local\\Programs\\Python\\Python311")
+
+current_dir = getcwd()
+venv_dir = current_dir + '/venv/Lib/site-packages'
+path.append(venv_dir)
+
 # now import required package
 from pyautogui import press
 # used for osd msg
@@ -22,6 +27,6 @@ def load_using_fkey():
     gui.add_osd_message(message, 2000,red)
     # sleep for 1 second to avoid deadlock
     sleep(1)
-    #press('f1')
+    press('f1')
 
 load_using_fkey()
