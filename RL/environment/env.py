@@ -14,6 +14,10 @@ from pynput import Controller, Key
 # Current issue with dolphin causing a deadlock when loading savestetes from scripts
 # https:\\github.com/TASLabz/dolphin/issues/123
 
+#Okay cheeky plan:
+# Main training loop lives in function
+# Function is called on_frameadvance
+
 # Loads the savestate in the first slot by pressing the default hotkey (F1)
 def load_savestate():  
     # status message
