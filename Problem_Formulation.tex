@@ -1,0 +1,191 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{amsmath}
+
+\title{Problem Formulation}
+\author{Harry Stevenson}
+\date{December 2023}
+
+\begin{document}
+
+\maketitle
+\begin{abstract}
+    This document outlines the problem formulation for my Final Year Project: Reinforcement Learning in Mario Kart Wii
+\end{abstract}
+\section{Environment}
+The game environment has these properties:
+\begin{enumerate}
+    \item Deterministic.
+    \item Fully Observable.
+    \item Discrete.
+    \item Episodic.
+    \item Single-Agent.
+\end{enumerate}
+The environment I have chosen uses Dolphin Emulator, a free, open source Wii and GameCube Emulator to run the game. It has many additional features to help with my project:
+\begin{itemize}
+    \item \textbf{Framedumping} - To capture the current state
+    \item \textbf{Savestate Loading and Saving} - To reset the episode
+    \item \textbf{Input Recording and Replaying} - To show the AI's progress at different stages
+\end{itemize}
+I have decided to simplify the gameplay in a few ways to streamline the training process and remove many external factors:
+\begin{itemize}
+    \item The agent will be alone on the track
+    \item The agent will not be able to use items
+    \item The agent will train on a simple circuit (SNES Mario Circuit 3)
+    \item The agent will use the kart/character combination of Funky Kong and the Flame Runner
+\end{itemize}
+After initial training and evaluation, I may experiment with these limitations to allow for more exploration, for example by how much a more complex track would increase the training time by.
+\subsection{State Space}
+
+The state space of the game consists of the character's \textbf{speed}, \textbf{rotation}  and \textbf{position}. Each represented by 3 numbers for the \textit{X}, \textit{Y} and \textit{Z} dimensions respectively. 
+\subsubsection{Speed}
+The maximum speed possible\footnote{There are some techniques that can technically exceed this limit, but the setup and execution of such techniques is so precise and specific that I highly doubt the agent will execute them, especially given the reward function} on the track is 120, achieved by running over a boost panel at the end of the track during a wheelie. The current speed of the kart is represented as the velocity in all 3 dimensions, 
+\subsubsection{Position}
+The position of the agent can be anywhere on the track or the off-road areas. Upon entering the off-road the kart's speed will greatly decrease, resulting in the episode finishing. There are out of bounds areas on the track, but as they are surrounded by walls, they are unreachable. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics{Images/snes_mc3.png}
+    \caption{SNES Mario Circuit 3 Track layout}
+    \label{fig:enter-label}
+\end{figure}
+
+\subsubsection{Rotation}
+The rotation of the kart is represented by 3 numbers from 0 to 360. For the horizontal axes, a value of 0 corresponds to the kart facing forwards with no tilt. For the vertical axis, a value of 180 represents the kart is upright. The game has a system in place to try and keep the kart upright, meaning the wheels always stay on the track. This means that most of the rotation happens in the horizontal axes. For example when turning a corner, the kart will rotate and tilt slightly in the direction of the corner.
+\subsubsection{Additional State Information}
+There are additional values that help represent the state in more detail. These include:
+\begin{itemize}
+    \item \textbf{Miniturbo charge} - How long a drift has been held in the direction of the turn.
+    \item \textbf{Airtime} - How long the agent has been in the air (This is not required for this project as the chosen track does not have any ramps).
+    \item \textbf{Trick boost} - This is updated if the agent performs a \textit{trick} when going off a ramp, resulting in a speed boost upon landing (Again not required as there are no ramps to gain a trick boost from).
+    \item \textbf{Mushroom boost} - This is used as a timer when using a mushroom (an item which grants a speed boost on use, also not required as items are disabled).
+\end{itemize}
+
+\subsection{Action Space}
+The action space consists of 4 controller elements:
+\begin{itemize}
+    \item \textbf{A Button} - Accelerates the kart
+    \item \textbf{B Button} - Starts a drift if held with a analog stick direction
+    \item \textbf{D-Pad Up} - Performs a wheelie, increasing top speed but decreasing handling
+    \item \textbf{Analog Stick} - Controls the direction of the kart. This has 15 stick angles in the horizontal axis, with 0 being full left, 7 neutral and 14 full right. I have decided to simplify this to 5 angles
+\end{itemize}
+\subsubsection{Analog Stick Angles}
+\begin{itemize}
+    \item \textbf{0} - Hard Left
+    \item \textbf{3} - Soft Left
+    \item \textbf{7} - Neutral
+    \item \textbf{11} - Soft Right
+    \item \textbf{14} - Hard Right
+\end{itemize}
+
+\section{Reward Function}
+My reward function will take the following as inputs:
+\begin{itemize}
+    \item \textbf{Velocity} - To ensure the agent completes laps quickly
+    \item \textbf{Race Percentage} - To ensure the agent makes its way around the track
+    \item \textbf{Miniturbo} - To encourage the agent to perform miniturbos, temporarily increasing the top speed
+\end{itemize}
+In order to obtain these values I have used a cheat code within the emulator that prints them to the screen. Each frame is then dumped as a png file. To extract the values from the image I am using Google's Tesseract Optical Character Recognition (OCR).
+To help with getting an accurate and effective reward function, I will keep track of the previous frame's input values. This will help the agent to increase the reward through each episode
+
+\subsection{Velocity}
+To encourage the agent to navigate the track quickly, and considering the agent is starting from a standstill, I have chosen these rewards for the velocity:
+\begin{itemize}
+    \item \textbf{Acceleration} - Small Reward
+    \item \textbf{Reaching Top Speed} - Medium Reward
+    \item \textbf{Exceeding Normal Top Speed} - Large Reward
+\end{itemize}
+
+\[
+R_{v}(S) =
+\begin{cases}
+  0.8 & \text{if } S_{Current} > 84 \\
+  0.5 & \text{if } S_{Current} > 70 \\
+  0.2 & \text{if } Race\% < 1.073 \And S_{Current} > S_{Previous} \\
+  0 & \text{otherwise }
+\end{cases}
+\]
+\\
+\textbf{Where:}\\ $R_{v}(S)$ is the reward gained from speed$S$,
+\\$S_{Current}$ is the speed of the agent in the current frame,
+\\$S_{Previous}$ is the speed of the agent in the previous frame,
+\\$Race\%$ is the percentage of the race completed.
+\\
+\begin{itemize}
+    \item \textbf{First Condition:}
+    84 is the normal top speed of the kart, so exceeding this must mean the agent has performed a wheelie or a Miniturbo, which we want to encourage, therefore it has the highest reward.
+    \item \textbf{Second Condition:}
+    I wanted to give the agent a bit of leeway, so I set the minimum speed at 70. This will help in the early stages of the training process where exploration is very important. If I set it higher, then letting go of accelerate for even one frame would end the episode, which I want to avoid.
+    \item \textbf{Third Condition:} As the agent is starting from standstill I need to give it time to accelerate up to full speed, this condition allows the speed to be low only at the start of the race. To ensure the agent gets up to speed quickly, this only grants a reward if the agent is accelerating.
+\end{itemize}
+ 
+\subsection{Race Percentage}
+The Race Percentage very accurately shows how much of the race that has been completed, ranging from 1 (the start of the first lap) to 4 (the end of the final lap). A higher value means more completion and each whole number represents a new lap. To encourage lap completion I will simply give small rewards for low values, and high rewards for high values
+
+\[
+R_{Race\%}(p) = \Delta Race\%  - \Delta Race\%_{Average}
+\]
+\textbf{Where:}\\ $R_{Race\%}(p)$ is the reward gained from percentage $p$,
+\\$\Delta Race\%$ = $\text{Race\%}_{Current} - \text{Race\%}_{Previous}$,
+\\$\Delta Race\%_{Average}$ is the average increase in Race\% for a single frame, calculated by:
+\begin{itemize}
+    \renewcommand{\labelitemi}{-}
+    \item Driving a lap of the circuit with framedumping enabled
+    \item Calculating the $\Delta$ Race\% value for each frame
+    \item Taking an average of this value
+    \item Scaling the average appropriately
+\end{itemize}
+
+\subsection{Miniturbo}
+Fully charging a Miniturbo grants a speed boost when the drift button is released, but decreases the speed during charging. The miniturbo value increases from 0 to 270 while drifting, representing milliseconds the drift has been held for. To encourage the agent to drift around corners and perform Miniturbos I will give these rewards:
+\begin{itemize}
+    \item \textbf{Starting a Miniturbo} - Small Reward
+    \item \textbf{Completing a Miniturbo} - Large Reward
+    \item \textbf{Starting a Miniturbo but Not Completing It} - Medium Punishment
+\end{itemize}
+\[
+R_{MT}(mt) =
+\begin{cases}
+  0.5 & \text{if } mt_{Previous} = 270 \text{ \& } mt_{Current} < mt_{Previous}\\ % released full mt
+  0.05 & \text{if } mt_{Current} > mt_{Previous}\\ % charging
+  0 & \text{if } mt_{Current} = 0\\ % no mt
+  -0.7 & \text{if } mt_{Previous} \neq 270 \text{ \& } mt_{Current} < mt_{Previous}  % released non charged mt
+\end{cases}
+\]
+\\
+\textbf{Where:}\\ $R_{MT}(mt)$ is the reward gained from miniturbo charge $mt$,
+\\$mt_{Current}$ is the miniturbo charge of the agent in the current frame,
+\\$mt_{Previous}$ is the miniturbo charge of the agent in the previous frame,
+\\A value of 270 means a miniturbo is fully charged
+
+\begin{itemize}
+    \item \textbf{First Condition:}
+    The miniturbo value only decreases when it is released, so if the value of the current frame is lower than the previous then a miniturbo has been released. If the value on the previous frame was 270, then it was fully charged, granting a speed boost. This is the behaviour that I want to encourage
+    \item \textbf{Second Condition:}
+    I want to encourage the agent to start charging miniturbos, there fore I am giving a small reward for starting a miniturbo
+    \item \textbf{Third Condition:} 
+    If no miniturbo has been started then no reward is given. The miniturbo reward is intended as a bonus, so it does not need to be giving rewards all the time.
+    \item \textbf{Fourth Condition:} 
+    If a miniturbo has been started but not fully completed, then speed has been lost as this time could have been spent in a wheelie. This is bad behaviour and results in a penalty
+\end{itemize}
+
+\subsection{Final Reward Function}
+Combining the 3 reward functions, we get the total reward for a given frame
+\[
+R_{Total}(S,p,mt) = R_{v}(S) + R_{Race\%}(p) + R_{MT}(mt)
+\]
+
+\section{Objectives}
+Due to the wide scope of this project I have identified a few independent objectives, I have ranked them according to how realistic/achievable I think they will be, starting with the most realistic:
+\begin{enumerate}
+    \item Complete a Lap
+    \item Complete a Full Race (3 Laps)
+    \item Beat a Human-Set Lap Time
+    \item Beat a Human-Set Race Time
+    \item Beat the Staff Ghost Race Time - \textit{This time uses Mushrooms, an item that gives a significant speed boost so will most likely not be possible.}
+\end{enumerate}
+\section{Learning Algorithm}
+The learning algorithm that I have chosen to use is a Deep-Q Network. This is well suited to the large search space of my problem. The Q-function is updated every step of the process, allowing for improvements to be made within episodes.
+\subsection{Exploration vs. Exploitation}
+To balance exploration and exploitation, I will use a dynamic epsilon value based on the rewards of the previous episode. If a higher reward has been earned in the previous episode then some improvement has been made, therefore the agent has found a successful action and it would be a good idea to exploit it. In the opposite case, the agent has not found a successful action and therefore exploration would be a more effective decision.
+\end{document}
