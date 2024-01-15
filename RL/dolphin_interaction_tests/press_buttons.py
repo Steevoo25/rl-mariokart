@@ -1,4 +1,4 @@
-from dolphin import controller, gui
+from dolphin import controller
 from time import sleep
 red = 0xffff0000
 
