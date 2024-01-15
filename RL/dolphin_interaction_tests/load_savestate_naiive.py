@@ -4,9 +4,9 @@ from time import sleep
 # As the script is run within the dolphin executable, 
 # Append the true path of scripts to import
 from sys import path
-venv_dir ='Z:\\project\\hjs115\\venv\\Lib\\site-packages'
+venv_dir ='C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\venv\\Lib\\site-packages'
 path.append(venv_dir)
-path.append('Z:\\project\\hjs115\\RL\\dolphin_interaction_tests')
+path.append('C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\RL\\dolphin_interaction_tests')
 
 # now import required package
 from pynput.keyboard import Controller, Key
