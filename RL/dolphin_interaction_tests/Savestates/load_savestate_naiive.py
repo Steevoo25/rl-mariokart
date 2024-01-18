@@ -34,3 +34,4 @@ def load_using_fkey():
         
         # Unregister listener
         event.on_frameadvance(None)
+        print("Unregistering frameadvance listener for loading state")
