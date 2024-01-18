@@ -1,11 +1,12 @@
 from PIL import Image, ImageOps
 import pytesseract as pt
 import os
+
 #TODO : Path will be different for different systems, get default path from dolphin
 # For my laptop
 path_to_framedumps = 'C:/Users/steve/OneDrive/Documents/Dolphin Emulator/Dump/Frames/framedump_'
 # For my PC
-path_to_framedumps = 'Z:/Users/Harry Stevenson/Documents/OneDrive - University of Birmingham/Documents/Dolphin Emulator/Dump/Frames/framedump_'
+#path_to_framedumps = 'Z:/Users/Harry Stevenson/Documents/OneDrive - University of Birmingham/Documents/Dolphin Emulator/Dump/Frames/framedump_'
 tesseract_config = '--psm 6 -c tessedit_char_whitelist=0123456789'
 
 # Pixel coordinates of required values printed to screen by gecko code in 2xnative resolution
@@ -17,14 +18,7 @@ crop_regions = [(176, 354, 248, 384), (185, 500, 286, 531), (290, 537, 312, 567)
 # [1] = Race%
 # [2] = MT
 
-# def image_preprocessing(image:Image):
-#     processed_images = []
-#     for i,cropped_image in crop_image(image):
-#         processed_images.append = ImageOps.invert(cropped_image.convert('L').point(lambda x: 255 if x > 254 else 0))
-#         
-#     return processed_images
-
-def crop_image(image: Image):
+def process_image(image: Image):
 # Inititalise empty array
     cropped_images = []
     for i,region in enumerate(crop_regions):
@@ -32,20 +26,20 @@ def crop_image(image: Image):
         # then converts to true BW using the lambda
         # and appends to list
         cropped_images.append(image.crop(region).point(lambda x: 0 if x > 200 else 255))
-        cropped_images[i].save(f'{i}.png')
+        # Save cropped and processed images locally
+        #cropped_images[i].save(f'{i}.png')
     return cropped_images 
     
 # Wrapper function for value formatting
 def format_race_info(index:int, info:str):
-    match index:
-        case 0:
-            return format_velocity(info)
-        case 1: 
-            return format_completion(info)
-        case 2: 
-            return format_mt(info)
-        case _:
-            raise IndexError("Race Info index out of range")
+    if index == 0:
+        return format_velocity(info)
+    elif index == 1:
+        return format_completion(info)
+    elif index == 2:
+        return format_mt(info)
+    else:
+        raise IndexError("Race Info index out of range")
 
 def format_velocity(vel:str):
     # from 0.00 to 999.99
@@ -83,7 +77,8 @@ def process_frame(frame_index: int):
         return
     
     # Crop into sections and BW
-    cropped_images = crop_image(frame)
+    cropped_images = process_image(frame)
+    
     # For each cropped image
     for i, cropped_image in enumerate(cropped_images):
         # Use tesseract to extract strings from each cropped image
