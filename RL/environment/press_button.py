@@ -12,6 +12,7 @@ class myGCInputs(TypedDict, total=False):
     # D-Pad Up
     Up: bool
     # Control stick Horizontal Axis
+    # Ranges from -1 to 1
     StickX: float
 
 def press_button(buttons : myGCInputs):
