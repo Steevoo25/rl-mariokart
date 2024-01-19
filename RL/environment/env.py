@@ -19,9 +19,12 @@ path.append(this_dir)
 # -- OTHER IMPORTS --
 from load_savestate import load_using_fkey as load_savestate
 from press_button import press_button as set_controller
-# Current issue with dolphin causing a deadlock when loading savestetes from scripts
-# https:\\github.com/TASLabz/dolphin/issues/123
+from frame_processor import process_frame
+from calculate_reward import calculate_reward
 
+# Initialise empty frame info
+# Savestate has 1 frame of pressing accelerating so learning does not terminate immediately
+previousFrameInfo = [0,0,0]
 
 def init():
 # Running dolphin in command line causes some issues, 
@@ -34,7 +37,8 @@ def init():
     # 4.) Pause Emulation
     
 
-def step():
+def step(step_index):
+    
     # Read Frame
     # Calculate rewards
     # update q network
