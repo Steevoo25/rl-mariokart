@@ -31,7 +31,7 @@ def init():
 # so I will have to open dolphin and run the script through the gui,
 # making sure to use the correct config
     # 3.) Load Savestate
-    load_savestate()
+    event.on_frameadvance(load_savestate)
     # 4.) Reset Controller
     set_controller(default_controller)
     # 4.) Pause Emulation
@@ -52,3 +52,4 @@ def reset():
     # Reset Controller
     # wipe framedumps folder
     return
+init()
