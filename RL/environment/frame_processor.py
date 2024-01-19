@@ -1,5 +1,9 @@
-from PIL import Image
-from pytesseract import image_to_string
+from sys import path
+venv_dir ='C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\venv\\Lib\\site-packages'
+path.append(venv_dir)
+
+import PIL
+import pytesseract as pt
 from os import remove
 
 #TODO : Path will be different for different systems, get default path from dolphin
@@ -50,7 +54,7 @@ def format_velocity(vel:str):
         return vel
 
 def format_completion(completion:str):
-    # from 1.00000 to 4.00000
+    # from 0.00000 to 4.00000
     if completion.isnumeric():
         return float(completion) / 100000
     else:
