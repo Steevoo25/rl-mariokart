@@ -19,7 +19,6 @@ path.append(this_dir)
 # -- OTHER IMPORTS --
 from load_savestate import load_using_fkey as load_savestate
 from press_button import press_button as set_controller
-from frame_processor import process_frame
 from calculate_reward import calculate_reward
 
 # Initialise empty frame info
@@ -38,18 +37,16 @@ def init():
     
 
 def step(step_index):
-    
     # Read Frame
     # Calculate rewards
+    reward = calculate_reward(previousFrameInfo)
     # update q network
     # identify input with highest estimated reward
     # update controller
-    # advance frame?
-    return
+    
 # Assumes dolphin is already open
 def reset():
     # Load Default savestate
     # Reset Controller
+    set_controller(default_controller)
     # wipe framedumps folder
-    return
-init()
