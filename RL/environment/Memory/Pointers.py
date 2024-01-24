@@ -1,5 +1,6 @@
 from dolphin import memory
-# This script contains
+# This script contains modified versions of functions from Ben Middleton's MKW AI Environment
+# https://github.com/benjaminjmiddleton/mkw_ai_env
 
 def getGameID():
     # 6-byte string at address 0x80000000
@@ -22,6 +23,11 @@ def getCurrentCheckpointPointer(Offset):
     pointer = 0x80000000
     pointer += 0x9B8F70
     return getPointerChain(pointer, [0xC, Offset, 0x24])
-    
-print(getGameID())
+
+def getCurrentRaceCompletionPointer(Offset):
+    pointer = 0x80000000
+    pointer += 0x809b8f70
+    return getPointerChain(pointer, [Offset])
+
+
 print(memory.read_u16(getCurrentCheckpointPointer(0x0)))
