@@ -3,6 +3,7 @@ from dolphin import memory
 # https://github.com/benjaminjmiddleton/mkw_ai_env
 
 RACE_COMPLETION_LOCATION = 0x80E43708
+MT_LOCATION = 0x80E4C756
 
 def getGameID():
     # 6-byte string at address 0x80000000
@@ -21,14 +22,20 @@ def getPointerChain(pointer, offsets):
             break
     return pointer
 
-# returns the pointer value of the current checkpoint the player is in
+# returns the pointer to the current checkpoint the player is in
 def getCurrentCheckpointPointer(Offset):
     pointer = 0x80000000
     pointer += 0x9B8F70
     return getPointerChain(pointer, [0xC, Offset, 0x24])
 
+# returns the value of the checkpoint the player is in
 def getCurrentCheckpoint() -> float:
     return memory.read_u16(getCurrentCheckpointPointer(0x0))
+
+# returns the value of the player's current miniturbo charge
+def getCurrentMT() -> int:
+    return memory.read_u16(MT_LOCATION)
+
 
 def getCurrentRaceCompletion() -> float:
     return memory.read_f32(RACE_COMPLETION_LOCATION)
