@@ -16,3 +16,7 @@ Type = float (f32)
 Location = 0x80E4C756
 Type = 2 bytes integer (halfword)
 
+### Speed
+Location = 0x80E4C678
+Type = 
+
