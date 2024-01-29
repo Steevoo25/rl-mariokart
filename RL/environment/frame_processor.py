@@ -2,7 +2,7 @@ from sys import path
 venv_dir ='C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\venv\\Lib\\site-packages'
 path.append(venv_dir)
 
-import PIL
+from PIL import Image
 import pytesseract as pt
 from os import remove
 
