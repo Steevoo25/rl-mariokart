@@ -33,6 +33,7 @@ def init():
     event.on_frameadvance(load_savestate)
     # 4.) Reset Controller
     set_controller(default_controller)
+    calculate_reward(previousFrameInfo)
     # 4.) Pause Emulation
     
 

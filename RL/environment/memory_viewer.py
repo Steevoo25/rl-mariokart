@@ -2,6 +2,7 @@ from dolphin import memory, event
 
 # Memory locations of required values, found using Dolphin Memory Engine
 # https://github.com/aldelaro5/Dolphin-memory-engine
+
 RACE_COMPLETION_LOCATION = 0x80E43708
 MT_LOCATION = 0x80E4C756
 SPEED_LOCATION = 0x80E4C678
