@@ -19,5 +19,5 @@ def press_button(buttons : myGCInputs):
 
     print(f"Controller State: {buttons}")
     
-    controller.set_gc_buttons(0, {buttons})
+    controller.set_gc_buttons(0, buttons)
     controller.get_gc_buttons(0)
