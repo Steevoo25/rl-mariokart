@@ -18,5 +18,4 @@ Type = 2 bytes integer (halfword)
 
 ### Speed
 Location = 0x80E4C678
-Type = 
-
+Type = float f32
