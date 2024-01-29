@@ -3,6 +3,7 @@ from Memory.memory_viewer import getRaceInfo
 # [0] = XZ Velocity
 # [1] = Race%
 # [2] = MT
+
 # --- Constants --- 
 NORMAL_MAX_SPEED = 84
 ABSOLUTE_MAX_VELOCITY = 120
@@ -14,15 +15,27 @@ NOT_CHARGING = 0
 def calculate_reward(frameInfo_previous):
     # Get current frame values
     frameInfo_current = getRaceInfo()
-    # Calculate Rewards for each value
-    R_v = calculate_velocity_reward(frameInfo_current[0], frameInfo_previous[0], frameInfo_current[1])
-    R_racepercent = calculate_race_percent_reward(frameInfo_current[1])
-    R_mt = calculate_miniturbo_reward(frameInfo_current[2], frameInfo_previous[2])
+    
+    #-- Velocity --
+    # Need: Current speed, Previous speed, Current Race%
+    velocity_calculation_info = frameInfo_current[0], frameInfo_previous[0], frameInfo_current[1]
+    R_v = calculate_velocity_reward(velocity_calculation_info)
+    
+    #-- Race % --
+    # Need: current and previous Race&
+    racePercent_calculation_info = frameInfo_current[1], frameInfo_previous[1]
+    R_racepercent = calculate_race_percent_reward(racePercent_calculation_info)
+    
+    #-- Miniturbo --
+    # Need: Current and Previous MT
+    mt_calculation_info = frameInfo_current[2], frameInfo_previous[2]
+    R_mt = calculate_miniturbo_reward(mt_calculation_info)
+    
     # Print rewards to log
     print_rewards(R_v,R_racepercent,R_mt, frameInfo_current)
     return R_v + R_racepercent + R_mt
     
-def calculate_velocity_reward(S_current: float,S_previous:float, racePercent: float):
+def calculate_velocity_reward(S_current: float, S_previous:float, racePercent: float):
     # Scale velocity to value between 1 and 2
     S_scaled = S_current / ABSOLUTE_MAX_VELOCITY
     # if a boost has been performed
@@ -39,8 +52,8 @@ def calculate_velocity_reward(S_current: float,S_previous:float, racePercent: fl
     # A return value of 0 results in the episode resetting
         return 0
 
-def calculate_race_percent_reward(racePercent: float):
-
+def calculate_race_percent_reward(racePercent_current: float, racePercent_previous: float):
+    
     return 1
     
 def calculate_miniturbo_reward(mt_current: int, mt_previous:int):
