@@ -33,11 +33,10 @@ def init():
     event.on_frameadvance(load_savestate)
     # 4.) Reset Controller
     set_controller(default_controller)
-    calculate_reward(previousFrameInfo)
     # 4.) Pause Emulation
     
 
-def step(step_index):
+def step():
     # Read Frame
     # Calculate rewards
     reward = calculate_reward(previousFrameInfo)
@@ -51,3 +50,5 @@ def reset():
     # Reset Controller
     set_controller(default_controller)
     # wipe framedumps folder
+
+event.on_frameadvance(step)
