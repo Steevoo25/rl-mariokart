@@ -18,18 +18,15 @@ def calculate_reward(frameInfo_previous):
     
     #-- Velocity --
     # Need: Current speed, Previous speed, Current Race%
-    velocity_calculation_info = frameInfo_current[0], frameInfo_previous[0], frameInfo_current[1]
-    R_v = calculate_velocity_reward(velocity_calculation_info)
+    R_v = calculate_velocity_reward(frameInfo_current[0], frameInfo_previous[0], frameInfo_current[1])
     
     #-- Race % --
     # Need: current and previous Race&
-    racePercent_calculation_info = frameInfo_current[1], frameInfo_previous[1]
-    R_racepercent = calculate_race_percent_reward(racePercent_calculation_info)
+    R_racepercent = calculate_race_percent_reward(frameInfo_current[1], frameInfo_previous[1])
     
     #-- Miniturbo --
     # Need: Current and Previous MT
-    mt_calculation_info = frameInfo_current[2], frameInfo_previous[2]
-    R_mt = calculate_miniturbo_reward(mt_calculation_info)
+    R_mt = calculate_miniturbo_reward(frameInfo_current[2], frameInfo_previous[2])
     
     # Print rewards to log
     print_rewards(R_v,R_racepercent,R_mt, frameInfo_current)
@@ -71,9 +68,9 @@ def calculate_miniturbo_reward(mt_current: int, mt_previous:int):
         return -0.2
     
 def print_rewards(R_v,R_racepercent,R_mt, frameInfo):
-    print(f'Velocity:{frameInfo[0]}, Reward:{R_v}')
-    print(f'Race Percent:{frameInfo[1]}, Reward:{R_racepercent}')
-    print(f'Miniturbo:{frameInfo[2]}, Reward:{R_mt}')
+    print(f'Velocity: {frameInfo[0]}, Reward: {R_v}')
+    print(f'Race Percent: {frameInfo[1]}, Reward: {R_racepercent}')
+    print(f'Miniturbo: {frameInfo[2]}, Reward: {R_mt}')
     print(f'Total: {R_v + R_racepercent + R_mt}')
     
 
