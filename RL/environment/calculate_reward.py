@@ -49,9 +49,16 @@ def calculate_velocity_reward(S_current: float, S_previous:float, racePercent: f
     # A return value of 0 results in the episode resetting
         return 0
 
+# Options
+# 1. return fixed amount if race% has increased
+# 2. return a scaled percentage increase
+#       -- This will decrease as race% increases
+# 3. return a scaled flat difference
+#       -- This will be most effective
 def calculate_race_percent_reward(racePercent_current: float, racePercent_previous: float):
-
-    return 1
+    
+    difference = racePercent_current - racePercent_previous
+    return difference
     
 def calculate_miniturbo_reward(mt_current: int, mt_previous:int):
     # miniturbo has been fully charged and released
