@@ -1,4 +1,4 @@
-from Memory.memory_viewer import getRaceInfo
+from memory_viewer import getRaceInfo
 
 # [0] = XZ Velocity
 # [1] = Race%
@@ -53,7 +53,7 @@ def calculate_velocity_reward(S_current: float, S_previous:float, racePercent: f
         return 0
 
 def calculate_race_percent_reward(racePercent_current: float, racePercent_previous: float):
-    
+
     return 1
     
 def calculate_miniturbo_reward(mt_current: int, mt_previous:int):
@@ -76,19 +76,21 @@ def print_rewards(R_v,R_racepercent,R_mt, frameInfo):
     print(f'Miniturbo:{frameInfo[2]}, Reward:{R_mt}')
     print(f'Total: {R_v + R_racepercent + R_mt}')
     
-    
+
 # -- TESTING --
-# Speed is greater than normal -> bonus Reward
-print(f"Speed greater than normal Reward: {calculate_velocity_reward(90,90,1)}")
 
-# Speed is normal (top speed) -> Normal reward
-print(f"Speed as expected Reward: {calculate_velocity_reward(84,84,1)}")
+def test_speed():
+    # Speed is greater than normal -> bonus Reward
+    print(f"Speed greater than normal Reward: {calculate_velocity_reward(90,90,1)}")
 
-# Speed is low and not accelerating at start of race -> no reward (end)
-print(f"Speed low but start of race (not accelerating) Reward: {calculate_velocity_reward(50,50,1)}")
+    # Speed is normal (top speed) -> Normal reward
+    print(f"Speed as expected Reward: {calculate_velocity_reward(84,84,1)}")
 
-# Speed is low and accelerating at start of race -> normal reward
-print(f"Speed low but start of race (accelerating) Reward: {calculate_velocity_reward(50,40,1)}")
+    # Speed is low and not accelerating at start of race -> no reward (end)
+    print(f"Speed low but start of race (not accelerating) Reward: {calculate_velocity_reward(50,50,1)}")
 
-# Speed is low and it is not the start of the race -> no reward (end)
-print(f"Speed low and not start of race: {calculate_velocity_reward(50,50,2)}")
+    # Speed is low and accelerating at start of race -> normal reward
+    print(f"Speed low but start of race (accelerating) Reward: {calculate_velocity_reward(50,40,1)}")
+
+    # Speed is low and it is not the start of the race -> no reward (end)
+    print(f"Speed low and not start of race: {calculate_velocity_reward(50,50,2)}")
