@@ -37,14 +37,19 @@ def reset():
     set_controller(DEFAULT_CONTROLLER)
 
 def step():
-    #Stores the current frames raceInfo in previousFrameInfo
-    previousFrameInfo = getRaceInfo()
+    previousFrameInfo = 0
     # Read Frame
     # Calculate rewards
-    reward = calculate_reward(previousFrameInfo)
+    if previousFrameInfo == 0:
+        reward, previousFrameInfo = calculate_reward()
+    else:
+        previousFrameInfo = 0
     print(reward)
+    
+    #Stores the current frames raceInfo in previousFrameInfo
     # update q network
     # identify input with highest estimated reward
     return reward
+
 
 event.on_frameadvance(step)
