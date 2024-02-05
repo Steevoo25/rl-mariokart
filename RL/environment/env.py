@@ -21,9 +21,8 @@ from load_savestate import load_using_fkey as load_savestate
 from press_button import press_button as set_controller
 from calculate_reward import calculate_reward
 from memory_viewer import getRaceInfo
-# Initialise empty frame info
+
 # Savestate has 1 frame of pressing accelerating so learning does not terminate immediately
-previousFrameInfo = [0,0,0]
 
 
 def reset():
@@ -42,11 +41,10 @@ def step():
     previousFrameInfo = getRaceInfo()
     # Read Frame
     # Calculate rewards
-    total_reward = 0
     reward = calculate_reward(previousFrameInfo)
-    total_reward = total_reward + reward
-    print(total_reward)
-    
+    print(reward)
     # update q network
     # identify input with highest estimated reward
-    return total_reward
+    return reward
+
+event.on_frameadvance(step)
