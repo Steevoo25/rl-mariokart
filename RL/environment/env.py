@@ -3,7 +3,7 @@
 from dolphin import event # for resetting emulation
 from press_button import myGCInputs
 
-default_controller = {"A":False,"B":False,"Up":False,"StickX":128}
+DEFAULT_CONTROLLER = {"A":False,"B":False,"Up":False,"StickX":128}
 
 # As the script is run within the dolphin executable, 
 # Append the true path of scripts to import
@@ -13,7 +13,7 @@ from sys import path
 venv_dir ='C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\venv\\Lib\\site-packages'
 path.append(venv_dir)
 # Add this dir to path to allow imports from other scripts
-this_dir = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\RL\\dolphin_interaction_tests'
+this_dir = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\RL'
 path.append(this_dir)
 
 # -- OTHER IMPORTS --
@@ -26,15 +26,16 @@ from calculate_reward import calculate_reward
 previousFrameInfo = [0,0,0]
 
 
-def init():
+def reset():
 # Running dolphin in command line causes some issues, 
 # so I will have to open dolphin and run the script through the gui,
 # making sure to use the correct config
     # 1.) Load Savestate
     # Because init() will be called in a frameadvance, I dont need it now
-    event.on_frameadvance(load_savestate)
+    total_reward = 0
+    load_savestate()
     # 2.) Reset Controller
-    set_controller({"A":False,"B":False,"Up":False,"StickX":7})
+    set_controller(DEFAULT_CONTROLLER)
 
 
 def step():
@@ -46,38 +47,4 @@ def step():
     print(total_reward)
     # update q network
     # identify input with highest estimated reward
-    # update controller
-    
-# Assumes dolphin is already open
-def reset():
-    total_reward = 0
-    # Load Default savestate
-    # Reset Controller
-    set_controller()
-    # wipe framedumps folder
-    
-# I want to :
-# Load savestate
-# reset controller
-# start episode
-# 
-init()
-step()
-
-
-# Running
-# init()
-# step()
-# gives this log
-# 35:59:604 Scripting\Python\Modules\doliomodule.cpp:26 N[Scripting]: Script stdout: Controller State: {'A': False, 'B': False, 'Up': False, 'StickX': 7}
-# 35:59:604 Scripting\Python\Modules\doliomodule.cpp:26 N[Scripting]: Script stdout: Velocity: 0.010605193674564362, Reward: 8.837661395470302e-05
-# 35:59:604 Scripting\Python\Modules\doliomodule.cpp:26 N[Scripting]: Script stdout: Race Percent: 0.9938051104545593, Reward: 0.9938051104545593
-# 35:59:604 Scripting\Python\Modules\doliomodule.cpp:26 N[Scripting]: Script stdout: Miniturbo: 0, Reward: 0
-# 35:59:604 Scripting\Python\Modules\doliomodule.cpp:26 N[Scripting]: Script stdout: Total: 0.993893487068514
-# 35:59:604 Scripting\Python\Modules\doliomodule.cpp:26 N[Scripting]: Script stdout: 0.993893487068514
-# 35:59:609 Scripting\Python\Modules\doliomodule.cpp:26 N[Scripting]: Script stdout: loading savestate using f-key
-# 35:59:717 Scripting\Python\Modules\doliomodule.cpp:26 N[Scripting]: Script stdout: Unregistering frameadvance listener for loading state
-# Meaning the frameadvance listener is working after step() has finished. Adding a small delay inbetween and putting step in the event listener do not
-# fix the issue
-
-# PUT ALL IN LISTENER AS IT OVERWRITES OLD ONES WHEN A NEW ONE IS REGISTERED
+    return total_reward
