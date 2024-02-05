@@ -16,7 +16,7 @@ def calculate_reward(frameInfo_previous):
     # Get current frame values
     frameInfo_current = getRaceInfo()
     
-    prev_vel, prev_racepercent, prev_mt = frameInfo_previous[0]
+    prev_vel, prev_racepercent, prev_mt = frameInfo_previous
     #-- Velocity --
     # Need: Current speed, Previous speed, Current Race%
     R_v = calculate_velocity_reward(frameInfo_current[0], prev_vel, frameInfo_current[1])
@@ -40,10 +40,10 @@ def calculate_velocity_reward(S_current: float, S_previous:float, racePercent: f
     if S_current > NORMAL_MAX_SPEED:
         return S_scaled * 1.2
     # Normal driving
-    if S_current >= MIN_ACCEPTABLE_SPEED:
+    elif S_current >= MIN_ACCEPTABLE_SPEED:
         return S_scaled
     # Speed is low but we are at the start of the episode so dont reset
-    if racePercent < END_OF_FIRST_STRAIGHT and S_current > S_previous:
+    elif racePercent < END_OF_FIRST_STRAIGHT and S_current > S_previous:
         return S_scaled
     # Speed is low after start of race OR speed is low and not accelerating at start of race
     else:
@@ -62,11 +62,12 @@ def calculate_race_percent_reward(racePercent_current: float, racePercent_previo
     return difference * 100
     
 def calculate_miniturbo_reward(mt_current: int, mt_previous:int):
+    print(f"Current MT: {mt_current}      Prev MT: {mt_previous}")
     # miniturbo has been fully charged and released
     if mt_previous == CHARGED_MINITURBO:
         return 0.2
     # miniturbo is charging
-    if mt_current > mt_previous:
+    if mt_current >= mt_previous >= 0:
         return 0.01
     # no miniturbo being performed
     if mt_current == NOT_CHARGING:
