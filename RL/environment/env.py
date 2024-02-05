@@ -30,6 +30,7 @@ def init():
 # so I will have to open dolphin and run the script through the gui,
 # making sure to use the correct config
     # 1.) Load Savestate
+    # Because init() will be called in a frameadvance, I dont need it now
     event.on_frameadvance(load_savestate)
     # 2.) Reset Controller
     set_controller({"A":False,"B":False,"Up":False,"StickX":7})
@@ -77,3 +78,5 @@ step()
 # 35:59:717 Scripting\Python\Modules\doliomodule.cpp:26 N[Scripting]: Script stdout: Unregistering frameadvance listener for loading state
 # Meaning the frameadvance listener is working after step() has finished. Adding a small delay inbetween and putting step in the event listener do not
 # fix the issue
+
+# PUT ALL IN LISTENER AS IT OVERWRITES OLD ONES WHEN A NEW ONE IS REGISTERED
