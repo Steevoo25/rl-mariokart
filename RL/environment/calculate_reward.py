@@ -31,19 +31,21 @@ def calculate_reward(frameInfo_previous):
     
     # Print rewards to log
     #print_rewards(R_v,R_racepercent,R_mt, frameInfo_current)
-    return R_v + R_racepercent + R_mt
+    return (R_v + R_racepercent + R_mt), frameInfo_current
     
 def calculate_velocity_reward(S_current: float, S_previous:float, racePercent: float):
     # Scale velocity to value between 1 and 2
+    print(f'curent: {S_current}, prev: {S_previous}, r%:{racePercent}')
     S_scaled = S_current / ABSOLUTE_MAX_VELOCITY
     # if a boost has been performed
     if S_current > NORMAL_MAX_SPEED:
         return S_scaled * 1.2
-    # Normal driving
-    elif S_current >= MIN_ACCEPTABLE_SPEED:
-        return S_scaled
     # Speed is low but we are at the start of the episode so dont reset
-    elif racePercent < END_OF_FIRST_STRAIGHT and S_current > S_previous:
+    if (racePercent < END_OF_FIRST_STRAIGHT) and (S_current > S_previous):
+
+        return S_scaled
+    # Normal driving
+    if S_current >= MIN_ACCEPTABLE_SPEED:
         return S_scaled
     # Speed is low after start of race OR speed is low and not accelerating at start of race
     else:
