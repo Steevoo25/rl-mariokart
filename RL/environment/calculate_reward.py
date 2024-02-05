@@ -30,7 +30,7 @@ def calculate_reward(frameInfo_previous):
     R_mt = calculate_miniturbo_reward(frameInfo_current[2], prev_mt)
     
     # Print rewards to log
-    print_rewards(R_v,R_racepercent,R_mt, frameInfo_current)
+    #print_rewards(R_v,R_racepercent,R_mt, frameInfo_current)
     return R_v + R_racepercent + R_mt
     
 def calculate_velocity_reward(S_current: float, S_previous:float, racePercent: float):
@@ -62,12 +62,11 @@ def calculate_race_percent_reward(racePercent_current: float, racePercent_previo
     return difference * 100
     
 def calculate_miniturbo_reward(mt_current: int, mt_previous:int):
-    print(f"Current MT: {mt_current}      Prev MT: {mt_previous}")
     # miniturbo has been fully charged and released
     if mt_previous == CHARGED_MINITURBO:
         return 0.2
     # miniturbo is charging
-    if mt_current >= mt_previous >= 0:
+    if mt_current >= mt_previous > 0:
         return 0.01
     # no miniturbo being performed
     if mt_current == NOT_CHARGING:
