@@ -3,7 +3,8 @@
 from dolphin import event # for resetting emulation
 from press_button import myGCInputs
 
-default_controller = ({"A":False,"B":False,"Up":False,"StickX":7})
+default_controller = {"A":False,"B":False,"Up":False,"StickX":128}
+
 # As the script is run within the dolphin executable, 
 # Append the true path of scripts to import
 from sys import path
