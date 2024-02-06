@@ -11,30 +11,34 @@ path.append(this_dir)
 from random import choice
 from environment.press_button import press_button as set_controller
 from environment.env import reset, step
+from action_space import action_dict as action_space
 
-def random_button() -> bool:
-    return choice([True, False])
+CONTROLLER_PERMUTATIONS = 39
+# STICK_ANGLES = [0,64,128,192,256]
 
-# Technically should be int but dolphin is expecting a float
-def random_stick() -> float:
-    return choice(range(255))
+# def random_button() -> bool:
+#     return choice([True, False])
 
-# Creates a dictionary containing random controller inputs
-def generate_random_controller_state():
+# # Technically should be int but dolphin is expecting a float
+# def random_stick() -> float:
+#     return choice(STICK_ANGLES)
 
-    default_controller = {"A":False,"B":False,"Up":False,"StickX":128}
+# # Creates a dictionary containing random controller inputs
+# def generate_random_controller_state():
+
+#     default_controller = {"A":False,"B":False,"Up":False,"StickX":128}
     
-    default_controller["A"] = random_button()
-    default_controller["B"] = random_button()
-    default_controller["Up"] = random_button()
-    default_controller["StickX"] = random_stick()
+#     default_controller["A"] = random_button()
+#     default_controller["B"] = random_button()
+#     default_controller["Up"] = random_button()
+#     default_controller["StickX"] = random_stick()
     
-    return default_controller
+#     return default_controller
 
 def run_agent():
 
-    set_controller(generate_random_controller_state())
-    step()
+    set_controller(action_space[choice(range(CONTROLLER_PERMUTATIONS))])
+    #step()
 
 # When the script is first ran, emulation needs to be reset
 needs_reset = True
