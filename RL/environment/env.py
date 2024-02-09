@@ -51,5 +51,13 @@ def step():
     # identify input with highest estimated reward
     return reward
 
+frame_counter = 0
 
-event.on_frameadvance(step)
+### Main Training Loop ###
+just_reset = False
+
+while True:
+    event_data = await event.frameadvance()
+    frame_counter +=1
+    print(f"Frame: {frame_counter}")
+    print(f"Event await data: {event_data}")
