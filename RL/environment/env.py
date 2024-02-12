@@ -62,7 +62,7 @@ HOST = socket.gethostname()
 PORT = 5555
 print(f'Host : {HOST}')
 env_socket = socket.socket()
-#env_socket.connect((HOST,PORT)) # Uncomment when training
+env_socket.connect((HOST,PORT)) # Uncomment when training
 
 ## Initialisations
 previous_frame_info = 0
@@ -76,3 +76,7 @@ while True:
     await event.frameadvance()
     frame_counter +=1
     print(f"Frame: {frame_counter}")
+    # 4 bytes, big-endian
+    data_to_send = frame_counter.to_bytes(4, byteorder="big")
+    # Send data to external process
+    env_socket.sendall(data_to_send)
