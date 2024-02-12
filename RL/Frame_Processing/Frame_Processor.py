@@ -1,6 +1,7 @@
 from PIL import Image, ImageOps
 import pytesseract as pt
 import os
+import numpy as np
 
 #TODO : Path will be different for different systems, get default path from dolphin
 # For my laptop
@@ -91,4 +92,29 @@ def process_frame(frame_index: int):
     # Delete image after extracting data so no warning popup for next episode
     #os.remove(imagePath)
     return raceInfo
+    
+# A function that returns the downsampled and grayscaled pixel data of a given framedump by index
+def dump_pixel_data(frame_index: int) :
+    # Append frame index to framedumps path
+    imagePath = path_to_framedumps + str(frame_index) + '.png'
+    # Open Image    
+    try:
+        frame = Image.open(imagePath)
+    except FileNotFoundError:
+        print(f'Could not find file {imagePath}')
+        return []
 
+    # -- Downsample Image --
+    DOWNSAMPLE_FACTOR = 4
+    width, height = frame.size
+    downsampled_width = width // DOWNSAMPLE_FACTOR
+    downsampled_height = height // DOWNSAMPLE_FACTOR
+    frame = frame.resize((downsampled_width, downsampled_height))
+    # -- Greyscale Image --
+    frame = frame.convert("L")
+    # -- Get Raw Data --
+    frame_data = np.array(frame.getdata())
+    print(frame_data)
+    return frame_data
+    
+dump_pixel_data(90)
