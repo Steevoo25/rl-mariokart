@@ -117,4 +117,3 @@ def dump_pixel_data(frame_index: int) :
     print(frame_data)
     return frame_data
     
-dump_pixel_data(90)
