@@ -1,3 +1,7 @@
+from sys import path
+# Add this dir to path to allow imports from other scripts
+this_dir = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\RL'
+path.append(this_dir)
 from memory_viewer import getRaceInfo
 
 # [0] = XZ Velocity
