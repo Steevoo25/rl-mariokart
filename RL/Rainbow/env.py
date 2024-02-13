@@ -5,12 +5,12 @@ import socket
 import json
 import torch
 
-from ..action_space import generate_action_space
+from action_space import generate_action_space
 
 class Env():
   def __init__(self, args):
     self.device = args.device
-    self.actions = generate_action_space
+    self.actions = generate_action_space()
     self.window = args.history_length  # Number of frames to concatenate
     self.state_buffer = deque([], maxlen=args.history_length)
     # Wait to make initial connection to dolphin client
