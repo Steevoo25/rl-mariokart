@@ -114,6 +114,4 @@ def dump_pixel_data(frame_index: int) :
     frame = frame.convert("L")
     # -- Get Raw Data --
     frame_data = np.array(frame.getdata())
-    print(frame_data)
     return frame_data
-    
