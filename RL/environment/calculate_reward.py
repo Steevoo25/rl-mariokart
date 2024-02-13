@@ -27,7 +27,7 @@ def calculate_reward(frameInfo_current, frameInfo_previous):
     
     # Print rewards to log
     #print_rewards(R_v,R_racepercent,R_mt, frameInfo_current)
-    return (R_v + R_racepercent + R_mt)
+    return round(R_v + R_racepercent + R_mt, 5)
     
 def calculate_velocity_reward(S_current: float, S_previous:float, racePercent: float):
     # Scale velocity to value between 1 and 2
