@@ -1,5 +1,6 @@
 import socket
-
+import json
+from socket_test_frame_proc import dump_pixel_data
 # A test script to connect to dolphin and accept a message (the current value of frame counter)
 # -- set up Host socket
 HOST = socket.gethostname()
@@ -14,6 +15,10 @@ connection, address = sock.accept()
 print("Connected by ", address)
 while True:
     #recieve bytes
-    message = connection.recv(4)
+    message = json.loads(connection.recv(100).decode("utf-8"))
+    reward = message[0]
+    done = message[1]
+    frame = message[2]
+    observation = dump_pixel_data(frame)
     # print recieved value
-    print(int.from_bytes(message, byteorder="big"))
+    print(f"{message},{observation[1]}")
