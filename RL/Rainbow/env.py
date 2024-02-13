@@ -5,7 +5,8 @@ import socket
 import json
 import torch
 
-from action_space import generate_action_space
+from AdditionalScripts.action_space import generate_action_space
+from AdditionalScripts.frame_processor import dump_pixel_data
 
 class Env():
   def __init__(self, args):
@@ -23,10 +24,10 @@ class Env():
 
   def _get_state(self):
     message = json.loads(self.client_socket.recv(131072).decode('utf-8'))
-    observation = message[0] #pixel values
     reward = message[1] #reward function value
     done = message[2] # termination flag
     frame = message[3] # frame counter
+    observation = dump_pixel_data(frame_index=frame) #pixel values
     return torch.tensor(observation, dtype=torch.float32, device=self.device).div_(255), reward, done, frame
 
   def _reset_buffer(self):
