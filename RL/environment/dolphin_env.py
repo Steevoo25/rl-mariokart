@@ -18,6 +18,7 @@ path.append(this_dir)
 
 # -- OTHER IMPORTS --
 import socket
+import json
 
 from load_savestate import load_using_fkey as load_savestate
 from press_button import press_button as set_controller
@@ -53,6 +54,8 @@ def step():
     # identify input with highest estimated reward
     return reward
 
+def print_state_to_dolphin_log(frame, speed, racePercent, mt):
+    print(f"Frame: {frame}\nSpeed: {speed}\nRace%: {racePercent}\nMiniturbo: {mt}")
 
 ## Socket Initialisation
 # This script will be running within Dolphin's embedded python, meaning it has a lot of limitations
@@ -65,18 +68,41 @@ env_socket = socket.socket()
 env_socket.connect((HOST,PORT)) # Uncomment when training
 
 ## Initialisations
-previous_frame_info = 0
+frameInfo_previous = 0
 reward = 0
 frame_counter = 0
-
+termination_flag = False
 ### Main Training Loop ###
 just_reset = False
 
 while True:
     await event.frameadvance()
     frame_counter +=1
-    print(f"Frame: {frame_counter}")
-    # 4 bytes, big-endian
-    data_to_send = frame_counter.to_bytes(4, byteorder="big")
-    # Send data to external process
-    env_socket.sendall(data_to_send)
+    # Get frameInfo
+    frameInfo_current = getRaceInfo()
+    
+    # Print state to dolphin log
+    # print_state_to_dolphin_log(frame_counter, *frameInfo_current)
+    # Check termination
+    
+    # Get response from previous frame
+    # -----
+    
+    
+    
+    # calculate reward
+    reward = calculate_reward(frameInfo_current, frameInfo_previous)
+    # update previous_frame_info 
+    frameInfo_previous = getRaceInfo()
+    
+    # Rainbow is configured to take 4 things
+    # pixel Value - this is done within the rainbow process
+    
+    # Reward Value
+    # termination flag
+    # frame counter
+    # encode data as json object and send to agent process
+    data_to_send = json.dumps((reward, termination_flag, frame_counter)).encode("utf-8")
+    print(data_to_send)
+    # Send data to Rainbow
+    # env_socket.sendall(data_to_send)

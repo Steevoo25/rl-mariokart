@@ -23,10 +23,10 @@ class Env():
 
   def _get_state(self):
     message = json.loads(self.client_socket.recv(131072).decode('utf-8'))
-    observation = message[0]
-    reward = message[1]
-    done = message[2]
-    frame = message[3]
+    observation = message[0] #pixel values
+    reward = message[1] #reward function value
+    done = message[2] # termination flag
+    frame = message[3] # frame counter
     return torch.tensor(observation, dtype=torch.float32, device=self.device).div_(255), reward, done, frame
 
   def _reset_buffer(self):
