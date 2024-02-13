@@ -12,7 +12,8 @@ sock.listen(1)
 connection, address = sock.accept()
 # -- print connection address
 print("Connected by ", address)
-#recieve bytes
-message = connection.recv(4)
-# print recieved value
-print(int.from_bytes(message, byteorder="big"))
+while True:
+    #recieve bytes
+    message = connection.recv(4)
+    # print recieved value
+    print(int.from_bytes(message, byteorder="big"))
