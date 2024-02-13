@@ -1,4 +1,4 @@
-from Frame_Processor import process_frame
+from RL.Frame_Processing.Frame_Processor_old import process_frame
 # A short script that gets frame data from every framedump in the dolphin framedumps folder
 movieInfo = []
 

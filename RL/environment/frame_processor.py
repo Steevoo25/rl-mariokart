@@ -1,15 +1,13 @@
-from sys import path
-venv_dir ='C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\venv\\Lib\\site-packages'
-path.append(venv_dir)
-
-from PIL import Image
+from PIL import Image, ImageOps
 import pytesseract as pt
-from os import remove
+import os
+import numpy as np
 
 #TODO : Path will be different for different systems, get default path from dolphin
 # For my laptop
 path_to_framedumps = 'C:/Users/steve/OneDrive/Documents/Dolphin Emulator/Dump/Frames/framedump_'
-
+# For my PC
+#path_to_framedumps = 'Z:/Users/Harry Stevenson/Documents/OneDrive - University of Birmingham/Documents/Dolphin Emulator/Dump/Frames/framedump_'
 tesseract_config = '--psm 6 -c tessedit_char_whitelist=0123456789'
 
 # Pixel coordinates of required values printed to screen by gecko code in 2xnative resolution
@@ -54,7 +52,7 @@ def format_velocity(vel:str):
         return vel
 
 def format_completion(completion:str):
-    # from 0.00000 to 4.00000
+    # from 1.00000 to 4.00000
     if completion.isnumeric():
         return float(completion) / 100000
     else:
@@ -72,7 +70,6 @@ def process_frame(frame_index: int):
     imagePath = path_to_framedumps + str(frame_index) + '.png'
     # imagePath = './framedump_178.png'
     raceInfo = []
-
     # Open image
     try:
         frame = Image.open(imagePath)
@@ -95,4 +92,28 @@ def process_frame(frame_index: int):
     # Delete image after extracting data so no warning popup for next episode
     #os.remove(imagePath)
     return raceInfo
+    
+# A function that returns the downsampled and grayscaled pixel data of a given framedump by index
+def dump_pixel_data(frame_index: int) :
+    # Append frame index to framedumps path
+    imagePath = path_to_framedumps + str(frame_index) + '.png'
+    # Open Image    
+    try:
+        frame = Image.open(imagePath)
+    except FileNotFoundError:
+        print(f'Could not find file {imagePath}')
+        return []
 
+    # -- Downsample Image --
+    DOWNSAMPLE_FACTOR = 4
+    width, height = frame.size
+    downsampled_width = width // DOWNSAMPLE_FACTOR
+    downsampled_height = height // DOWNSAMPLE_FACTOR
+    frame = frame.resize((downsampled_width, downsampled_height))
+    # -- Greyscale Image --
+    frame = frame.convert("L")
+    # -- Get Raw Data --
+    frame_data = np.array(frame.getdata())
+    print(frame_data)
+    return frame_data
+    
