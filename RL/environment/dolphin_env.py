@@ -35,11 +35,12 @@ HOST = socket.gethostname()
 PORT = 5555
 print(f'Host : {HOST}')
 env_socket = socket.socket()
-env_socket.connect((HOST,PORT)) # Uncomment when training
+#env_socket.connect((HOST,PORT)) # Uncomment when training
 
 ## Initialisations
 frameInfo_previous = [0,0,0]
 reward = 0
+total_reward = 0
 frame_counter = 0
 termination_flag = False
 
@@ -56,28 +57,36 @@ while True:
         frameInfo_current = getRaceInfo()
     
     # Print state to dolphin log
-    # print_state_to_dolphin_log(frame_counter, *frameInfo_current)
+    print_state_to_dolphin_log(frame_counter, *frameInfo_current)
     # Check termination
     # -----
+    # Termination Conditions
+    # Low speed
+    # Race is complete
     
     # Get response from previous frame
     # -----
-    # 
+    # action
+    action = DEFAULT_CONTROLLER
+    # reset
     
-    
-    # calculate reward
+    # -- Calculate reward
     reward = calculate_reward(frameInfo_current, frameInfo_previous)
     # update previous_frame_info 
     frameInfo_previous = getRaceInfo()
-    
+    # update total reward
+    total_reward = total_reward + reward
     # Rainbow is configured to take 4 things
     # pixel Value - this is done within the rainbow process
     
     # Reward Value
     # termination flag
     # frame counter
+    # -- Send data to Rainbow
     # encode data as json object and send to agent process
+
     data_to_send = json.dumps((reward, termination_flag, frame_counter)).encode("utf-8")
-    print(data_to_send)
-    # Send data to Rainbow
+    
     # env_socket.sendall(data_to_send)
+    # -- Send inputs to Dolphin
+    set_controller(action)
