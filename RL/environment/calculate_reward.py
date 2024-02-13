@@ -1,9 +1,3 @@
-from sys import path
-# Add this dir to path to allow imports from other scripts
-this_dir = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\RL'
-path.append(this_dir)
-from memory_viewer import getRaceInfo
-
 # [0] = XZ Velocity
 # [1] = Race%
 # [2] = MT
@@ -16,9 +10,7 @@ END_OF_FIRST_STRAIGHT = 1.073
 CHARGED_MINITURBO = 270
 NOT_CHARGING = 0
 
-def calculate_reward(frameInfo_previous):
-    # Get current frame values
-    frameInfo_current = getRaceInfo()
+def calculate_reward(frameInfo_current, frameInfo_previous):
     
     prev_vel, prev_racepercent, prev_mt = frameInfo_previous
     #-- Velocity --
@@ -35,15 +27,15 @@ def calculate_reward(frameInfo_previous):
     
     # Print rewards to log
     #print_rewards(R_v,R_racepercent,R_mt, frameInfo_current)
-    return (R_v + R_racepercent + R_mt), frameInfo_current
+    return (R_v + R_racepercent + R_mt)
     
 def calculate_velocity_reward(S_current: float, S_previous:float, racePercent: float):
     # Scale velocity to value between 1 and 2
-    print(f'curent: {S_current}, prev: {S_previous}, r%:{racePercent}')
+    #print(f'curent: {S_current}, prev: {S_previous}, r%:{racePercent}')
     S_scaled = S_current / ABSOLUTE_MAX_VELOCITY
     # if a boost has been performed
     if S_current > NORMAL_MAX_SPEED:
-        return S_scaled * 1.2
+        return S_scaled * 1.6
     # Speed is low but we are at the start of the episode so dont reset
     if (racePercent < END_OF_FIRST_STRAIGHT) and (S_current > S_previous):
 
@@ -70,9 +62,9 @@ def calculate_race_percent_reward(racePercent_current: float, racePercent_previo
 def calculate_miniturbo_reward(mt_current: int, mt_previous:int):
     # miniturbo has been fully charged and released
     if mt_previous == CHARGED_MINITURBO:
-        return 0.2
+        return 0.1
     # miniturbo is charging
-    if mt_current >= mt_previous > 0:
+    if mt_current > 0:
         return 0.01
     # no miniturbo being performed
     if mt_current == NOT_CHARGING:
