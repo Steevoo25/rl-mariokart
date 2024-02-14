@@ -44,11 +44,12 @@ env_socket = socket.socket()
 #env_socket.connect((HOST,PORT)) # Uncomment when training
 
 ## Initialisations
-frameInfo_previous = [0,0,0]
 reward = 0
 total_reward = 0
 frame_counter = 0
 termination_flag = False
+action = DEFAULT_CONTROLLER
+frameInfo_previous = [0,0,0]
 
 
 ### Main Training Loop ###
@@ -59,6 +60,8 @@ while True:
     # Get frameInfo
     if frame_counter == 1:
         frameInfo_current = [0,0,0]
+        termination_flag = False
+        total_reward = 0
     else:
         frameInfo_current = getRaceInfo()
         
@@ -73,14 +76,13 @@ while True:
         accelerating = frameInfo_current[0] > frameInfo_previous[0]
         termination_flag = check_termination(frameInfo_current, accelerating)
 
-    if termination_flag:
-        load_savestate()
-        frame_counter = 0
-        just_reset = True
-        continue
-    else:
-        just_reset = False
-        termination_flag = False
+        if termination_flag:
+            load_savestate()
+            frame_counter = 0
+            just_reset = True
+            continue
+        else:
+            just_reset = False
     
     # -- Calculate reward
     reward = calculate_reward(frameInfo_current, frameInfo_previous)
@@ -102,4 +104,4 @@ while True:
     
     # env_socket.sendall(data_to_send)
     # -- Send inputs to Dolphin
-    set_controller(action)
+    #set_controller(action)
