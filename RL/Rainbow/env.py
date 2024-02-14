@@ -28,6 +28,7 @@ class Env():
     done = message[1] # termination flag
     frame = message[2] # frame counter
     observation = dump_pixel_data(frame_index=frame) #pixel values
+    # REMEMBER TO DELETE FRAME FROM FOLDER FOR NEXT EPISODE
     return torch.tensor(observation, dtype=torch.float32, device=self.device).div_(255), reward, done, frame
 
   def _reset_buffer(self):
