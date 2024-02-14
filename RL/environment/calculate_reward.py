@@ -36,17 +36,8 @@ def calculate_velocity_reward(S_current: float, S_previous:float, racePercent: f
     # if a boost has been performed
     if S_current > NORMAL_MAX_SPEED:
         return S_scaled * 1.6
-    # Speed is low but we are at the start of the episode so dont reset
-    if (racePercent < END_OF_FIRST_STRAIGHT) and (S_current > S_previous):
-
-        return S_scaled
-    # Normal driving
-    if S_current >= MIN_ACCEPTABLE_SPEED:
-        return S_scaled
-    # Speed is low after start of race OR speed is low and not accelerating at start of race
     else:
-    # A return value of 0 results in the episode resetting
-        return 0
+        return S_scaled
 
 # Options
 # 1. return fixed amount if race% has increased
