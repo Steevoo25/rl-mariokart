@@ -23,6 +23,7 @@ from load_savestate import load_using_fkey as load_savestate
 from press_button import press_button as set_controller
 from calculate_reward import calculate_reward
 from memory_viewer import getRaceInfo
+from termination_check import check_termination
 
 def print_state_to_dolphin_log(frame, speed, racePercent, mt):
     print(f"Frame: {frame}\nSpeed: {speed}\nRace%: {racePercent}\nMiniturbo: {mt}")
@@ -61,6 +62,8 @@ while True:
     # Check termination
     # -----
     # Termination Conditions
+    accelerating = frameInfo_current[0] > frameInfo_previous[0]
+    termination_flag = check_termination(frameInfo_current, accelerating)
     # Low speed
     # Race is complete
     
