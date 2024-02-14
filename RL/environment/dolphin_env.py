@@ -1,12 +1,11 @@
 # -- DOLHPIN IMPORTS --
-#from dolphin import savestate # for loading savestates
-from dolphin import event # for resetting emulation
+from dolphin import event # gives awaitable routine that returns when a frame is drawn
 
 DEFAULT_CONTROLLER = {"A":False,"B":False,"Up":False,"StickX":128}
 
 # As the script is run within the dolphin executable, 
 # Append the true path of scripts to import
-from sys import path, getsizeof
+from sys import path
 
 # Add venv dir to path to allow external packages
 venv_dir ='C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\venv\\Lib\\site-packages'
@@ -51,8 +50,8 @@ total_reward = 0
 frame_counter = 0
 termination_flag = False
 
+
 ### Main Training Loop ###
-just_reset = False
 
 while True:
     await event.frameadvance()
@@ -62,20 +61,26 @@ while True:
         frameInfo_current = [0,0,0]
     else:
         frameInfo_current = getRaceInfo()
-    
-    # Check termination
-    # -----
-    # Termination Conditions
-    accelerating = frameInfo_current[0] > frameInfo_previous[0]
-    termination_flag = check_termination(frameInfo_current, accelerating)
-    # Low speed
-    # Race is complete
-    
+        
     # Get response from previous frame
     # -----
     # action
-    action = DEFAULT_CONTROLLER
-    # reset
+    
+        # recieve action from Rainbow
+        action = DEFAULT_CONTROLLER
+    # Check termination
+    # -----
+        accelerating = frameInfo_current[0] > frameInfo_previous[0]
+        termination_flag = check_termination(frameInfo_current, accelerating)
+
+    if termination_flag:
+        load_savestate()
+        frame_counter = 0
+        just_reset = True
+        continue
+    else:
+        just_reset = False
+        termination_flag = False
     
     # -- Calculate reward
     reward = calculate_reward(frameInfo_current, frameInfo_previous)
@@ -86,7 +91,7 @@ while True:
     # Rainbow is configured to take 4 things
     # pixel Value - this is done within the rainbow process
         # Print state to dolphin log
-    print_state_to_dolphin_log(frame_counter, *frameInfo_current, termination_flag, reward, total_reward )
+    print_state_to_dolphin_log(frame_counter, *frameInfo_current, termination_flag, reward, total_reward)
     # Reward Value
     # termination flag
     # frame counter
