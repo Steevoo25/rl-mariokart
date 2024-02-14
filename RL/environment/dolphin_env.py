@@ -25,8 +25,14 @@ from calculate_reward import calculate_reward
 from memory_viewer import getRaceInfo
 from termination_check import check_termination
 
-def print_state_to_dolphin_log(frame, speed, racePercent, mt):
-    print(f"Frame: {frame}\nSpeed: {speed}\nRace%: {racePercent}\nMiniturbo: {mt}")
+def print_state_to_dolphin_log(frame, speed, racePercent, mt, terminate, reward, total_reward):
+    print(f'''Frame: {frame}
+    Speed: {speed}
+    Race%: {racePercent}
+    Miniturbo: {mt}
+    Termination Flag: {terminate}
+    Reward: {reward}
+    Total Reward: {total_reward}''')
 
 ## Socket Initialisation
 # This script will be running within Dolphin's embedded python, meaning it has a lot of limitations
@@ -57,8 +63,6 @@ while True:
     else:
         frameInfo_current = getRaceInfo()
     
-    # Print state to dolphin log
-    print_state_to_dolphin_log(frame_counter, *frameInfo_current)
     # Check termination
     # -----
     # Termination Conditions
@@ -81,7 +85,8 @@ while True:
     total_reward = total_reward + reward
     # Rainbow is configured to take 4 things
     # pixel Value - this is done within the rainbow process
-    
+        # Print state to dolphin log
+    print_state_to_dolphin_log(frame_counter, *frameInfo_current, termination_flag, )
     # Reward Value
     # termination flag
     # frame counter
