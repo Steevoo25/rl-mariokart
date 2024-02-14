@@ -86,7 +86,7 @@ while True:
     # Rainbow is configured to take 4 things
     # pixel Value - this is done within the rainbow process
         # Print state to dolphin log
-    print_state_to_dolphin_log(frame_counter, *frameInfo_current, termination_flag, )
+    print_state_to_dolphin_log(frame_counter, *frameInfo_current, termination_flag, reward, total_reward )
     # Reward Value
     # termination flag
     # frame counter
