@@ -50,7 +50,7 @@ frame_counter = 0
 termination_flag = False
 action = DEFAULT_CONTROLLER
 frameInfo_previous = [0,0,0]
-
+reward_set = False
 
 ### Main Training Loop ###
 
@@ -77,15 +77,19 @@ while True:
         termination_flag = check_termination(frameInfo_current, accelerating)
 
         if termination_flag:
-            load_savestate()
+            reward = -10
+            reward_set = True
             frame_counter = 0
             just_reset = True
+            load_savestate()
             continue
         else:
             just_reset = False
     
     # -- Calculate reward
-    reward = calculate_reward(frameInfo_current, frameInfo_previous)
+    if not reward_set:
+        reward = calculate_reward(frameInfo_current, frameInfo_previous)
+        reward_set = True
     # update previous_frame_info 
     frameInfo_previous = getRaceInfo()
     # update total reward
