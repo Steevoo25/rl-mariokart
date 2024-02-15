@@ -92,7 +92,7 @@ while True:
             continue
         else:
             just_reset = False
-    
+
     # -- Calculate reward
     if not reward_set:
         reward = calculate_reward(frameInfo_current, frameInfo_previous)
@@ -100,13 +100,14 @@ while True:
         frameInfo_previous = frameInfo_current
         # update total reward
         total_reward = total_reward + reward
+
     if logging:
     # Print state to dolphin log
         print_state_to_dolphin_log(frame_counter, *frameInfo_current, termination_flag, reward, total_reward)
     # -- Send data to Rainbow
     # encode data as json object and send to agent process
     data_to_send = json.dumps((reward, termination_flag, frame_counter)).encode("utf-8")
-    
+
     # env_socket.sendall(data_to_send)
     # -- Send inputs to Dolphin
     #set_controller(action)
