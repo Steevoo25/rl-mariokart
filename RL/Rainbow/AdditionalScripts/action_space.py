@@ -1,5 +1,7 @@
 # A script to generate all permutations of the abstracted controller
+
 from itertools import product
+# Returns and indexed dictionary of all controller permutations
 def generate_action_space():
     # Define the possible states for the buttons and analog stick
     buttons = [True, False]
