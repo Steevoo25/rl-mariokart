@@ -10,27 +10,28 @@ END_OF_FIRST_STRAIGHT = 1.073
 CHARGED_MINITURBO = 270
 NOT_CHARGING = 0
 
-def calculate_reward(frameInfo_current, frameInfo_previous):
+def calculate_reward(curr_vel, frameInfo_previous):
     
+    curr_vel, curr_racepercent, curr_mt = curr_vel
     prev_vel, prev_racepercent, prev_mt = frameInfo_previous
     #-- Velocity --
     # Need: Current speed, Previous speed, Current Race%
-    R_v = calculate_velocity_reward(frameInfo_current[0], prev_vel, frameInfo_current[1])
+    R_v = calculate_velocity_reward(curr_vel, prev_vel, curr_racepercent)
     
     #-- Race % --
     # Need: current and previous Race&
-    R_racepercent = calculate_race_percent_reward(frameInfo_current[1], prev_racepercent)
+    R_racepercent = calculate_race_percent_reward(curr_racepercent, prev_racepercent)
     
     #-- Miniturbo --
     # Need: Current and Previous MT
-    R_mt = calculate_miniturbo_reward(frameInfo_current[2], prev_mt)
+    R_mt = calculate_miniturbo_reward(curr_mt, prev_mt)
     
     # Print rewards to log
     #print_rewards(R_v,R_racepercent,R_mt, frameInfo_current)
     return round(R_v + R_racepercent + R_mt, 5)
     
-def calculate_velocity_reward(S_current: float, S_previous:float, racePercent: float):
-    # Scale velocity to value between 1 and 2
+def calculate_velocity_reward(S_current: float):
+    # Scale velocity to value between 0 and 1
     #print(f'curent: {S_current}, prev: {S_previous}, r%:{racePercent}')
     S_scaled = S_current / ABSOLUTE_MAX_VELOCITY
     # if a boost has been performed
@@ -51,6 +52,7 @@ def calculate_race_percent_reward(racePercent_current: float, racePercent_previo
     return difference * 100
     
 def calculate_miniturbo_reward(mt_current: int, mt_previous:int):
+
     # miniturbo has been fully charged and released
     if mt_previous == CHARGED_MINITURBO:
         return 0.1
@@ -64,7 +66,7 @@ def calculate_miniturbo_reward(mt_current: int, mt_previous:int):
     if mt_previous < CHARGED_MINITURBO and mt_current < mt_previous:
         return -0.2
     
-def print_rewards(R_v,R_racepercent,R_mt, frameInfo):
+def print_rewards(R_v, R_racepercent, R_mt, frameInfo):
     print(f'Velocity: {frameInfo[0]}, Reward: {R_v}')
     print(f'Race Percent: {frameInfo[1]}, Reward: {R_racepercent}')
     print(f'Miniturbo: {frameInfo[2]}, Reward: {R_mt}')
