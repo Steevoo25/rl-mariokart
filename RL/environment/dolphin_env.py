@@ -61,7 +61,7 @@ episode_counter = 0
 while True:
     await event.frameadvance()
     frame_counter += 1
-    
+    reward_set = False
     # Get frameInfo
     if frame_counter == 1:
     # If episode has jsut started don't reset
@@ -94,7 +94,7 @@ while True:
             just_reset = True
             print(f"Episode {episode_counter} ended with return value: {total_reward}")
             episode_counter += 1
-            load_savestate()
+            await load_savestate()
             continue
         else:
             just_reset = False
