@@ -53,13 +53,14 @@ frameInfo_previous = [0,0,0]
 reward_set = False
 logging = True
 reset_requested = False
+episode_counter = 0
 
 
 ### Main Training Loop ###
 
 while True:
     await event.frameadvance()
-    frame_counter +=1
+    frame_counter += 1
     
     # Get frameInfo
     if frame_counter == 1:
@@ -69,25 +70,30 @@ while True:
         total_reward = 0
     else:
         frameInfo_current = getRaceInfo()
+
         # --- Get response from Rainbow based on previous frame
-        response = json.loads(env_socket.recv(131702).decode("utf-8"))
-        action = response[0]
-        reset_requested = response[1]
+        #response = json.loads(env_socket.recv(131702).decode("utf-8"))
+        #response = [DEFAULT_CONTROLLER, True]
+        #action = response[0]
+        #reset_requested = response[1]
+        
         # --- Check termination
-        if not reset_requested: 
+        #if not reset_requested: 
         # If rainbow hasnt requested reset then check my own conditions
-            accelerating = frameInfo_current[0] > frameInfo_previous[0]
-            termination_flag = check_termination(frameInfo_current, accelerating)
-        else:
+        accelerating = frameInfo_current[0] > frameInfo_previous[0]
+        termination_flag = check_termination(frameInfo_current, accelerating)
+        #else:
         # If rainbow has requested reset then reset
-            termination_flag = True
+            #termination_flag = True
 
         if termination_flag:
         # Reset
-            total_reward = -1000 # Tweak number
+            #total_reward = -1000 # Tweak number
             reward_set = True
             frame_counter = 0
             just_reset = True
+            print(f"Episode {episode_counter} ended with return value: {total_reward}")
+            episode_counter += 1
             load_savestate()
             continue
         else:
