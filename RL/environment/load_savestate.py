@@ -12,9 +12,6 @@ from pynput import keyboard
 
 # Loads the savestate in the first slot by pressing the default hotkey (F1)
 async def load_using_fkey():
-        # status message
-        message = "Resetting Episode"
-        print(message)
         # Using pynput to press hotkey for loading savestate in first slot
         virtual_keyboard = keyboard.Controller()
 
