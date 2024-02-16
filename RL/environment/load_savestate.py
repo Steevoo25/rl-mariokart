@@ -11,7 +11,7 @@ path.append(venv_dir)
 from pynput import keyboard
 
 # Loads the savestate in the first slot by pressing the default hotkey (F1)
-def load_using_fkey():
+async def load_using_fkey():
         # status message
         message = "Resetting Episode"
         print(message)
@@ -19,7 +19,7 @@ def load_using_fkey():
         virtual_keyboard = keyboard.Controller()
 
         virtual_keyboard.press(keyboard.Key.f1)
-        #sleep(0.1)
+        sleep(0.1)
         virtual_keyboard.release(keyboard.Key.f1)
         # savestate has been loaded, now next episode can begin
         # Unregister listener
