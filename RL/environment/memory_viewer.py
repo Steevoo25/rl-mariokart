@@ -1,4 +1,4 @@
-from dolphin import memory, event
+from dolphin import memory
 
 # Memory locations of required values, found using Dolphin Memory Engine
 # https://github.com/aldelaro5/Dolphin-memory-engine
@@ -9,11 +9,11 @@ SPEED_LOCATION = 0x80E4C678
 
 # Returns the current speed of the kart
 def getCurrentSpeed() -> float:
-    return memory.read_f32(SPEED_LOCATION)
+    return round(memory.read_f32(SPEED_LOCATION), 3)
 
 # Returns the value of the players current race completion (Race%)
 def getCurrentRaceCompletion() -> float:
-    return memory.read_f32(RACE_COMPLETION_LOCATION)
+    return round(memory.read_f32(RACE_COMPLETION_LOCATION), 3)
 
 # Returns the value of the player's current miniturbo charge (MT)
 def getCurrentMT() -> int:
