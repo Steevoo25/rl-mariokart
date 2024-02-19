@@ -9,14 +9,16 @@ MIN_ACCEPTABLE_SPEED = 65
 END_OF_FIRST_STRAIGHT = 1.073
 CHARGED_MINITURBO = 270
 NOT_CHARGING = 0
+LAP_COMPLETE = 2
 
 def calculate_reward(curr_vel, frameInfo_previous):
     
     curr_vel, curr_racepercent, curr_mt = curr_vel
     prev_vel, prev_racepercent, prev_mt = frameInfo_previous
+    
     #-- Velocity --
     # Need: Current speed, Previous speed, Current Race%
-    R_v = calculate_velocity_reward(curr_vel, prev_vel, curr_racepercent)
+    R_vel = calculate_velocity_reward(curr_vel, prev_vel, curr_racepercent)
     
     #-- Race % --
     # Need: current and previous Race&
@@ -25,15 +27,14 @@ def calculate_reward(curr_vel, frameInfo_previous):
     #-- Miniturbo --
     # Need: Current and Previous MT
     R_mt = calculate_miniturbo_reward(curr_mt, prev_mt)
-    
-    # Print rewards to log
-    #print_rewards(R_v,R_racepercent,R_mt, frameInfo_current)
-    return round(R_v + R_racepercent + R_mt, 5)
+
+    return round(R_vel + R_racepercent + R_mt, 5)
     
 def calculate_velocity_reward(S_current: float):
+
     # Scale velocity to value between 0 and 1
-    #print(f'curent: {S_current}, prev: {S_previous}, r%:{racePercent}')
     S_scaled = S_current / ABSOLUTE_MAX_VELOCITY
+    
     # if a boost has been performed
     if S_current > NORMAL_MAX_SPEED:
         return S_scaled * 1.6
@@ -49,7 +50,8 @@ def calculate_velocity_reward(S_current: float):
 def calculate_race_percent_reward(racePercent_current: float, racePercent_previous: float):
     
     difference = racePercent_current - racePercent_previous
-    if racePercent_current > 2:
+    # Lap is complete
+    if racePercent_current > LAP_COMPLETE:
         return 10
     else:
         return difference * 100
