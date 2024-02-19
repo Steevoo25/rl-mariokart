@@ -49,7 +49,10 @@ def calculate_velocity_reward(S_current: float):
 def calculate_race_percent_reward(racePercent_current: float, racePercent_previous: float):
     
     difference = racePercent_current - racePercent_previous
-    return difference * 100
+    if racePercent_current > 2:
+        return 10
+    else:
+        return difference * 100
     
 def calculate_miniturbo_reward(mt_current: int, mt_previous:int):
 
