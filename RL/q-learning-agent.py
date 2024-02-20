@@ -21,7 +21,11 @@ sample_state = (24.5, 34.5, 3)
     # Table of Q values for each state-action pair
     # q[(s,a)] = q[((float, float, int), (Bool, Bool, Bool, int))]
 q = {}
+q[(START_STATE), (True, True, True, 64)] = 1
+q[(START_STATE), (True, True, False, 64)] = 5
 
+q[(sample_state), (True, False, True, 0)] = 2
+q[(sample_state), (True, True, False, 256)] = 4
 # Helper function to choose the best action in a given state 
 # As my q-Table would be massive if I fully initialised it, I will check if a value exists in the try clause
 # If it does exist, use that Q-Value
@@ -46,10 +50,22 @@ def epsilon_greedy(state, eps):
         # max() function gives index of best action, based on its q-value
         # action_tuples[] returns the action from its index
 #print(epsilon_greedy(sample_state, eps))
-# Update Rule
+# --- Update Rule
+
+def find_max_q(next_state, action):
+    try:
+        value = q[next_state, action]
+    except KeyError:
+        value = 0
+    finally:
+        return value
 
 def update_q_table(prev_state, action, reward, next_state, alpha, gamma):
-    
-    
-    
-    return "poo"
+    # find a that maximises value of Q in next_state
+    max_future_q = max([find_max_q(next_state, action) for action in action_tuples])
+    print(max_future_q)
+    q[prev_state, action] += alpha * (reward + (gamma * max_future_q) - q[prev_state,action])
+
+# print(q)
+# update_q_table(START_STATE,(True, True, True, 64), 1.5, sample_state, 1, 1)
+# print(q)
