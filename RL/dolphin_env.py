@@ -53,7 +53,7 @@ reward = 0
 total_reward = 0
 frame_counter = 0
 termination_flag = False
-frameInfo_previous = [0,0,0]
+frameInfo_previous = list(START_STATE)
 logging = True
 reset_requested = False
 episode_counter = 0
@@ -70,7 +70,7 @@ while True:
     # Get frameInfo
     if frame_counter == 1:
     # If episode has jsut started don't reset
-        frameInfo_current = [0,0,0]
+        frameInfo_current = list(START_STATE)
         termination_flag = False
         total_reward = 0
         reward = 0
