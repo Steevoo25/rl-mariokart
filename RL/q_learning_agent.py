@@ -1,11 +1,5 @@
 # An agent that uses Q-Learning
 import random
-# Constants
-class Q_Agent:
-    default = 0
-
-
-START_STATE = (1.128, 0.992, 0)
 
 # Action Space
     # Action tuples contains a list of all possible inputs as tuples
@@ -18,17 +12,11 @@ action_tuples = []
 for dicts in action_space:
     action_tuples.append(tuple(dicts.values()))
     
-# State Space
-sample_state = (24.5, 34.5, 3)
 # Q-Table
     # Table of Q values for each state-action pair
     # q[(s,a)] = q[((float, float, int), (Bool, Bool, Bool, int))]
+    # q-value of unvisited state-action pairs is undefined, meaning i need the helper functions
 q = {}
-q[(START_STATE), (True, True, True, 64)] = 1
-q[(START_STATE), (True, True, False, 64)] = 5
-
-q[(sample_state), (True, False, True, 0)] = 2
-q[(sample_state), (True, True, False, 256)] = 4
 # Helper function to choose the best action in a given state 
 # As my q-Table would be massive if I fully initialised it, I will check if a value exists in the try clause
 # If it does exist, use that Q-Value
