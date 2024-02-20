@@ -18,11 +18,12 @@ path.append(this_dir)
 import socket
 import json
 
-from load_savestate import load_using_fkey as load_savestate
-from press_button import press_button as set_controller
-from calculate_reward import calculate_reward
-from memory_viewer import getRaceInfo
-from termination_check import check_termination
+from environment.load_savestate import load_using_fkey as load_savestate
+from environment.press_button import press_button as set_controller
+from environment.calculate_reward import calculate_reward
+from environment.memory_viewer import getRaceInfo
+from environment.termination_check import check_termination
+from q_learning_agent import update_q_table, epsilon_greedy
 
 def print_state_to_dolphin_log(frame, speed, racePercent, mt, terminate, reward, total_reward):
     print(f'''Frame: {frame}
@@ -80,6 +81,8 @@ while True:
         #action = response[0]
         #reset_requested = response[1]
         
+        action = epsilon_greedy(tuple(frameInfo_current), eps=epsilon)
+        
         # --- Check termination
         #if not reset_requested: 
         # If rainbow hasnt requested reset then check my own conditions
@@ -91,7 +94,6 @@ while True:
 
         if termination_flag:
         # Reset
-            #total_reward = -1000 # Tweak number
             reward_set = True
             frame_counter = 0
             just_reset = True
@@ -106,17 +108,20 @@ while True:
     if not reward_set:
         reward = calculate_reward(frameInfo_current, frameInfo_previous)
         # update previous_frame_info 
-        frameInfo_previous = frameInfo_current
+    update_q_table(tuple(frameInfo_previous), action,reward, tuple(frameInfo_current), alpha, gamma)
+    frameInfo_previous = frameInfo_current
         # update total reward
-        total_reward = total_reward + reward
+    total_reward = total_reward + reward
 
     if logging:
     # Print state to dolphin log
         print_state_to_dolphin_log(frame_counter, *frameInfo_current, termination_flag, reward, total_reward)
     # -- Send data to Rainbow
     # encode data as json object and send to agent process
-    data_to_send = json.dumps((reward, termination_flag, frame_counter)).encode("utf-8")
+    # data_to_send = json.dumps((reward, termination_flag, frame_counter)).encode("utf-8")
 
     # env_socket.sendall(data_to_send)
     # -- Send inputs to Dolphin
+    
+    # Convert action tuple to Dict
     #set_controller(action)
