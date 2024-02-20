@@ -16,10 +16,6 @@ def generate_action_space():
         for analog_state in analog_stick_angles:
             permutation_dict = {"A": button_state[0], "B": button_state[1], "Up": button_state[2], "StickX": analog_state}
             permutations.append(permutation_dict)
-
-    action_dict = {}
-    # Print all possible permutations of the controller as dictionaries
-    for idx, permutation in enumerate(permutations):
-        action_dict[idx] = permutation
-    return action_dict
+    return permutations
+    
 
