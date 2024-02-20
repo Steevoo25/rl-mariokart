@@ -34,28 +34,15 @@ q[(sample_state), (True, True, False, 256)] = 4
 # If it does exist, use that Q-Value
 # If it does not exist then return 0
 
-def choose_best(state, x):
+def handle_unassigned_q_index(state,x ):
     try:
         value = q[(state), (action_tuples[x])]
     except KeyError:
         value = 0
     finally:
         return value
-# Epsilon-Greedy Policy
-def epsilon_greedy(state, eps):
-    # Pick random action with probability epsilon
-    if random.uniform(0,1) < eps:
-        return action_tuples[random.randint(0, ACTION_COUNT)]
-    # Choose best action in current state with probability epsilon
-    else:
-        return action_tuples[max(range(ACTION_COUNT), key= lambda x : choose_best(state, x))]
-        # Explanation of this line:
-        # max() function gives index of best action, based on its q-value
-        # action_tuples[] returns the action from its index
-#print(epsilon_greedy(sample_state, eps))
-# --- Update Rule
 
-def find_max_q(next_state, action):
+def handle_unassigned_q_action(next_state, action):
     try:
         value = q[next_state, action]
     except KeyError:
@@ -63,11 +50,24 @@ def find_max_q(next_state, action):
     finally:
         return value
 
+# --- Epsilon-Greedy Policy
+def epsilon_greedy(state, eps):
+    # Pick random action with probability epsilon
+    if random.uniform(0,1) < eps:
+        return action_tuples[random.randint(0, ACTION_COUNT)]
+    # Choose best action in current state with probability epsilon
+    else:
+        return action_tuples[max(range(ACTION_COUNT), key= lambda x : handle_unassigned_q_index(state, x))]
+        # Explanation of this line:
+        # max() function gives index of best action, based on its q-value
+        # action_tuples[] returns the action from its index
+        
+# --- Update Rule
+
 def update_q_table(prev_state, action, reward, next_state, alpha, gamma):
     # find a that maximises value of Q in next_state
-    max_future_q = max([find_max_q(next_state, action) for action in action_tuples])
-    print(max_future_q)
-    q[prev_state, action] += alpha * (reward + (gamma * max_future_q) - q[prev_state,action])
+    max_future_q = max([handle_unassigned_q_action(next_state, action) for action in action_tuples])
+    q[prev_state, action] += alpha * (reward + (gamma * max_future_q) - q[prev_state, action])
 
 # print(q)
 # update_q_table(START_STATE,(True, True, True, 64), 1.5, sample_state, 1, 1)
