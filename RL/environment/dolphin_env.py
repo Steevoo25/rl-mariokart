@@ -55,6 +55,9 @@ logging = True
 reset_requested = False
 episode_counter = 0
 
+epsilon = 0.2
+gamma = 1
+alpha = 0.4
 
 ### Main Training Loop ###
 
