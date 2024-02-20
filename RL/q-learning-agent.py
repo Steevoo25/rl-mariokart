@@ -1,7 +1,6 @@
 # An agent that uses Q-Learning
 import random
 # Constants
-eps = 0.2
 
 START_STATE = (1.128, 0.992, 0)
 
@@ -22,8 +21,7 @@ sample_state = (24.5, 34.5, 3)
     # Table of Q values for each state-action pair
     # q[(s,a)] = q[((float, float, int), (Bool, Bool, Bool, int))]
 q = {}
-q[(sample_state), (True, True, True, 64)] = 1
-q[(sample_state), (True, True, False, 64)] = 5
+
 # Helper function to choose the best action in a given state 
 # As my q-Table would be massive if I fully initialised it, I will check if a value exists in the try clause
 # If it does exist, use that Q-Value
@@ -47,5 +45,11 @@ def epsilon_greedy(state, eps):
         # Explanation of this line:
         # max() function gives index of best action, based on its q-value
         # action_tuples[] returns the action from its index
+#print(epsilon_greedy(sample_state, eps))
 # Update Rule
 
+def update_q_table(prev_state, action, reward, next_state, alpha, gamma):
+    
+    
+    
+    return "poo"
