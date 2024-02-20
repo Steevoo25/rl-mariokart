@@ -10,7 +10,7 @@ path.append(this_dir)
 
 from random import choice
 from environment.press_button import press_button as set_controller
-from RL.environment.dolphin_env import reset, step
+from RL.dolphin_env import reset, step
 #from RL.Rainbow.AdditionalScripts.action_space import action_dict as action_space
 
 CONTROLLER_PERMUTATIONS = 39
