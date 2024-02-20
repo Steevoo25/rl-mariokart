@@ -18,7 +18,7 @@ def calculate_reward(curr_vel, frameInfo_previous):
     
     #-- Velocity --
     # Need: Current speed, Previous speed, Current Race%
-    R_vel = calculate_velocity_reward(curr_vel, prev_vel, curr_racepercent)
+    R_vel = calculate_velocity_reward(curr_vel)
     
     #-- Race % --
     # Need: current and previous Race&
