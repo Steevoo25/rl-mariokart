@@ -1,6 +1,9 @@
 # An agent that uses Q-Learning
 import random
 # Constants
+class Q_Agent:
+    default = 0
+
 
 START_STATE = (1.128, 0.992, 0)
 
