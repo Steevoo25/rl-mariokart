@@ -1,7 +1,7 @@
 # -- DOLHPIN IMPORTS --
 from dolphin import event # gives awaitable routine that returns when a frame is drawn
 
-DEFAULT_CONTROLLER = {"A":False,"B":False,"Up":False,"StickX":128}
+DEFAULT_CONTROLLER = {"A":True,"B":False,"Up":False,"StickX":128}
 START_STATE = (1.128, 0.992, 0)
 
 # As the script is run within the dolphin executable, 
@@ -26,12 +26,11 @@ from environment.memory_viewer import getRaceInfo
 from environment.termination_check import check_termination
 from q_learning_agent import update_q_table, epsilon_greedy
 
-def print_state_to_dolphin_log(frame, speed, racePercent, mt, terminate, reward, total_reward):
+def print_state_to_dolphin_log(frame, speed, racePercent, mt, reward, total_reward):
     print(f'''Frame: {frame}
     Speed: {speed}
     Race%: {racePercent}
     Miniturbo: {mt}
-    Termination Flag: {terminate}
     Reward: {reward}
     Total Reward: {total_reward}''')
 
@@ -54,14 +53,12 @@ reward = 0
 total_reward = 0
 frame_counter = 0
 termination_flag = False
-action = DEFAULT_CONTROLLER
 frameInfo_previous = [0,0,0]
-reward_set = False
 logging = True
 reset_requested = False
 episode_counter = 0
 
-epsilon = 0.2
+epsilon = 0.8
 gamma = 1
 alpha = 0.4
 
@@ -70,64 +67,54 @@ alpha = 0.4
 while True:
     await event.frameadvance()
     frame_counter += 1
-    reward_set = False
     # Get frameInfo
     if frame_counter == 1:
     # If episode has jsut started don't reset
         frameInfo_current = [0,0,0]
         termination_flag = False
         total_reward = 0
+        reward = 0
     else:
         frameInfo_current = getRaceInfo()
-
+        # --- Check termination
+        accelerating = frameInfo_current[0] > frameInfo_previous[0]
+        termination_flag = check_termination(frameInfo_current, accelerating)
         # --- Get response from Rainbow based on previous frame
         #response = json.loads(env_socket.recv(131702).decode("utf-8"))
         #response = [DEFAULT_CONTROLLER, True]
         #action = response[0]
         #reset_requested = response[1]
         
+    # -- Get action by epsilon-greedy policy
     action = epsilon_greedy(tuple(frameInfo_current), eps=epsilon)
-    print(action)
-        # --- Check termination
-        #if not reset_requested: 
-        # If rainbow hasnt requested reset then check my own conditions
-    accelerating = frameInfo_current[0] > frameInfo_previous[0]
-    termination_flag = check_termination(frameInfo_current, accelerating)
-        #else:
-        # If rainbow has requested reset then reset
-            #termination_flag = True
-
-    if termination_flag:
-    # Reset
-        reward_set = True
-        frame_counter = 0
-        just_reset = True
-        print(f"Episode {episode_counter} ended with return value: {total_reward}")
-        episode_counter += 1
-        await load_savestate()
-        continue
-    else:
-        just_reset = False
-
+    
     # -- Calculate reward
-    if not reward_set:
-        reward = calculate_reward(frameInfo_current, frameInfo_previous)
-        # update previous_frame_info 
+    reward = calculate_reward(frameInfo_current, frameInfo_previous)
+    # -- Update Q-Table
     update_q_table(tuple(frameInfo_previous), action, reward, tuple(frameInfo_current), alpha, gamma)
+    
+    # update previous_frame_info 
     frameInfo_previous = frameInfo_current
-        # update total reward
+    # update total reward
     total_reward = total_reward + reward
 
     if logging:
     # Print state to dolphin log
-        print_state_to_dolphin_log(frame_counter, *frameInfo_current, termination_flag, reward, total_reward)
+        print_state_to_dolphin_log(frame_counter, *frameInfo_current, reward, total_reward)
+
+    if termination_flag:
+    # Reset
+        frame_counter = 0
+        print(f"Episode {episode_counter} ended with return value: {total_reward}")
+        episode_counter += 1
+        await load_savestate()
+        continue
+
     # -- Send data to Rainbow
     # encode data as json object and send to agent process
     # data_to_send = json.dumps((reward, termination_flag, frame_counter)).encode("utf-8")
-
     # env_socket.sendall(data_to_send)
+
     # -- Send inputs to Dolphin
-    
-    # Convert action tuple to Dict
-    action  = convert_actions_to_dict(action)
+    action = convert_actions_to_dict(action)
     set_controller(action)
