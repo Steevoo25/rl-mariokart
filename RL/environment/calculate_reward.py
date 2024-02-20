@@ -11,9 +11,9 @@ CHARGED_MINITURBO = 270
 NOT_CHARGING = 0
 LAP_COMPLETE = 2
 
-def calculate_reward(curr_vel, frameInfo_previous):
+def calculate_reward(frameInfo_current, frameInfo_previous):
     
-    curr_vel, curr_racepercent, curr_mt = curr_vel
+    curr_vel, curr_racepercent, curr_mt = frameInfo_current
     prev_vel, prev_racepercent, prev_mt = frameInfo_previous
     
     #-- Velocity --
@@ -27,7 +27,8 @@ def calculate_reward(curr_vel, frameInfo_previous):
     #-- Miniturbo --
     # Need: Current and Previous MT
     R_mt = calculate_miniturbo_reward(curr_mt, prev_mt)
-
+    
+    print_rewards(R_vel, R_racepercent, R_mt, frameInfo_current)
     return round(R_vel + R_racepercent + R_mt, 5)
     
 def calculate_velocity_reward(S_current: float):
