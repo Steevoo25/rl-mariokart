@@ -2,6 +2,7 @@
 from dolphin import event # gives awaitable routine that returns when a frame is drawn
 
 DEFAULT_CONTROLLER = {"A":False,"B":False,"Up":False,"StickX":128}
+START_STATE = (1.128, 0.992, 0)
 
 # As the script is run within the dolphin executable, 
 # Append the true path of scripts to import
@@ -33,6 +34,10 @@ def print_state_to_dolphin_log(frame, speed, racePercent, mt, terminate, reward,
     Termination Flag: {terminate}
     Reward: {reward}
     Total Reward: {total_reward}''')
+
+# A helper function to convert a tuple of actions (used in the q-learning process) to a dictionary (to send to emulator)
+def convert_actions_to_dict(action):
+    return {"A": action[0],"B": action[1],"Up": action[2],"StickX": action[3]}
 
 ## Socket Initialisation
 # This script will be running within Dolphin's embedded python, meaning it has a lot of limitations
@@ -81,34 +86,34 @@ while True:
         #action = response[0]
         #reset_requested = response[1]
         
-        action = epsilon_greedy(tuple(frameInfo_current), eps=epsilon)
-        
+    action = epsilon_greedy(tuple(frameInfo_current), eps=epsilon)
+    print(action)
         # --- Check termination
         #if not reset_requested: 
         # If rainbow hasnt requested reset then check my own conditions
-        accelerating = frameInfo_current[0] > frameInfo_previous[0]
-        termination_flag = check_termination(frameInfo_current, accelerating)
+    accelerating = frameInfo_current[0] > frameInfo_previous[0]
+    termination_flag = check_termination(frameInfo_current, accelerating)
         #else:
         # If rainbow has requested reset then reset
             #termination_flag = True
 
-        if termination_flag:
-        # Reset
-            reward_set = True
-            frame_counter = 0
-            just_reset = True
-            print(f"Episode {episode_counter} ended with return value: {total_reward}")
-            episode_counter += 1
-            await load_savestate()
-            continue
-        else:
-            just_reset = False
+    if termination_flag:
+    # Reset
+        reward_set = True
+        frame_counter = 0
+        just_reset = True
+        print(f"Episode {episode_counter} ended with return value: {total_reward}")
+        episode_counter += 1
+        await load_savestate()
+        continue
+    else:
+        just_reset = False
 
     # -- Calculate reward
     if not reward_set:
         reward = calculate_reward(frameInfo_current, frameInfo_previous)
         # update previous_frame_info 
-    update_q_table(tuple(frameInfo_previous), action,reward, tuple(frameInfo_current), alpha, gamma)
+    update_q_table(tuple(frameInfo_previous), action, reward, tuple(frameInfo_current), alpha, gamma)
     frameInfo_previous = frameInfo_current
         # update total reward
     total_reward = total_reward + reward
@@ -124,4 +129,5 @@ while True:
     # -- Send inputs to Dolphin
     
     # Convert action tuple to Dict
-    #set_controller(action)
+    action  = convert_actions_to_dict(action)
+    set_controller(action)
