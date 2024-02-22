@@ -18,6 +18,7 @@ path.append(this_dir)
 # -- OTHER IMPORTS --
 import socket
 import json
+import logging
 
 from environment.load_savestate import load_using_fkey as load_savestate
 from environment.press_button import press_button as set_controller
@@ -54,14 +55,16 @@ total_reward = 0
 frame_counter = 0
 termination_flag = False
 frameInfo_previous = list(START_STATE)
-logging = True
+is_logging = False
 reset_requested = False
 episode_counter = 0
+controller_inputs = []
 
 epsilon = 0.8
 gamma = 1
 alpha = 0.4
 
+log = open("C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\Evaluation\\q-learning.log", 'w')
 ### Main Training Loop ###
 
 while True:
@@ -98,14 +101,15 @@ while True:
     # update total reward
     total_reward = total_reward + reward
 
-    if logging:
+    if is_logging:
     # Print state to dolphin log
         print_state_to_dolphin_log(frame_counter, *frameInfo_current, reward, total_reward)
 
     if termination_flag:
     # Reset
+        #print(f"{episode_counter}, {reward}, {frame_counter}, {frameInfo_current}\n")
+        log.write(f"{episode_counter}, {reward}, {frame_counter}, {frameInfo_current}, {controller_inputs}\n")
         frame_counter = 0
-        print(f"Episode {episode_counter} ended with return value: {total_reward}")
         episode_counter += 1
         await load_savestate()
         continue
@@ -117,4 +121,5 @@ while True:
 
     # -- Send inputs to Dolphin
     action = convert_actions_to_dict(action)
+    controller_inputs.append(action)
     set_controller(action)
