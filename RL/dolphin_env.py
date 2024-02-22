@@ -111,6 +111,7 @@ while True:
         log.write(f"{episode_counter}, {reward}, {frame_counter}, {frameInfo_current}, {controller_inputs}\n")
         frame_counter = 0
         episode_counter += 1
+        controller_inputs = []
         await load_savestate()
         continue
 
