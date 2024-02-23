@@ -20,7 +20,7 @@ class myGCInputs(TypedDict, total=False):
 
 def press_button(buttons):
 
-    print(f"Controller State: {buttons}")
+    #print(f"Controller State: {buttons}")
     
     controller.set_gc_buttons(CONTROLLER_INDEX, buttons)
     #controller.get_gc_buttons(CONTROLLER_INDEX)
