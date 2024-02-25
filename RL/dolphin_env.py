@@ -60,9 +60,10 @@ reset_requested = False
 episode_counter = 0
 controller_inputs = []
 
-epsilon = 0.8
-gamma = 1
-alpha = 0.4
+## Q-Learning parameters
+epsilon = 0.8   #Higher = more chance of random action
+gamma = 0.6 # Higher = more focus on future rewards
+alpha = 0.7 # Higher = newer Q-Values will have more impact
 
 log = open("C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\Evaluation\\q-learning.log", 'w')
 ### Main Training Loop ###
@@ -89,8 +90,7 @@ while True:
         #reset_requested = response[1]
         
     # -- Get action by epsilon-greedy policy
-    action = epsilon_greedy(tuple(frameInfo_current), eps=epsilon)
-    
+    action = epsilon_greedy(tuple(frameInfo_current), epsilon)
     # -- Calculate reward
     reward = calculate_reward(frameInfo_current, frameInfo_previous)
     # -- Update Q-Table
