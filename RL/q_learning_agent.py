@@ -22,7 +22,7 @@ q = {}
 # If it does exist, use that Q-Value
 # If it does not exist then return 0
 
-def handle_unassigned_q_index(state,x ):
+def handle_unassigned_q_index(state, x):
     try:
         value = q[(state), (action_tuples[x])]
     except KeyError:
@@ -55,11 +55,8 @@ def epsilon_greedy(state, eps):
 def update_q_table(prev_state, action, reward, next_state, alpha, gamma):
     # find a that maximises value of Q in next_state
     max_future_q = max([handle_unassigned_q_action(next_state, action) for action in action_tuples])
+    
     try:
         q[prev_state, action] += alpha * (reward + (gamma * max_future_q) - q[prev_state, action])
     except KeyError:
         q[prev_state, action] = alpha * (reward + (gamma * max_future_q))
-
-# print(q)
-# update_q_table(START_STATE,(True, True, True, 64), 1.5, sample_state, 1, 1)
-# print(q)
