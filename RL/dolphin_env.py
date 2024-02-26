@@ -94,7 +94,7 @@ while True:
     # -- Calculate reward
     reward = calculate_reward(frameInfo_current, frameInfo_previous)
     # -- Update Q-Table
-    update_q_table(tuple(frameInfo_previous), action, reward, tuple(frameInfo_current), alpha, gamma)
+    q = update_q_table(tuple(frameInfo_previous), action, reward, tuple(frameInfo_current), alpha, gamma)
     
     # update previous_frame_info 
     frameInfo_previous = frameInfo_current
@@ -107,8 +107,8 @@ while True:
 
     if termination_flag:
     # Reset
-        #print(f"{episode_counter}, {reward}, {frame_counter}, {frameInfo_current}\n")
-        log.write(f"{episode_counter}, {reward}, {frame_counter}, {frameInfo_current}, {controller_inputs}\n")
+        #print(f"{episode_counter}, {reward}, {frame_counter}, {q},  {frameInfo_current}\n")
+        log.write(f"{episode_counter}, {reward}, {frame_counter}, {q}, {frameInfo_current}, {controller_inputs}\n")
         frame_counter = 0
         episode_counter += 1
         controller_inputs = []
