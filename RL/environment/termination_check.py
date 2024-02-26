@@ -11,7 +11,7 @@ def check_termination(raceInfo, accelerating : bool):
     # speed is too low
     if vel < MIN_ACCEPTABLE_SPEED:
         # give some leeway at start of race -> dont terminate
-        if racePercent < END_OF_FIRST_STRAIGHT and vel > 0:
+        if racePercent < END_OF_FIRST_STRAIGHT and accelerating:
             return False
         return True
 
