@@ -51,8 +51,8 @@ def epsilon_greedy(state, eps):
         # action_tuples[] returns the action from its index
         
 # --- Update Rule
-
-def update_q_table(prev_state, action, reward, next_state, alpha, gamma):
+# Returns Q-value of action-state pair
+def update_q_table(prev_state, action, reward, next_state, alpha, gamma) -> float:
     # find a that maximises value of Q in next_state
     max_future_q = max([handle_unassigned_q_action(next_state, action) for action in action_tuples])
     
@@ -60,3 +60,5 @@ def update_q_table(prev_state, action, reward, next_state, alpha, gamma):
         q[prev_state, action] += alpha * (reward + (gamma * max_future_q) - q[prev_state, action])
     except KeyError:
         q[prev_state, action] = alpha * (reward + (gamma * max_future_q))
+    finally:
+        return q[prev_state, action]
