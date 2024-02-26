@@ -55,7 +55,7 @@ total_reward = 0
 frame_counter = 0
 termination_flag = False
 frameInfo_previous = list(START_STATE)
-is_logging = False
+is_logging = True
 reset_requested = False
 episode_counter = 0
 controller_inputs = []
@@ -103,7 +103,8 @@ while True:
 
     if is_logging:
     # Print state to dolphin log
-        print_state_to_dolphin_log(frame_counter, *frameInfo_current, reward, total_reward)
+        #print_state_to_dolphin_log(frame_counter, *frameInfo_current, reward, total_reward)
+        print(f"{episode_counter}, {reward}, {frame_counter}, {q}, {action}, {frameInfo_current}\n")
 
     if termination_flag:
     # Reset
