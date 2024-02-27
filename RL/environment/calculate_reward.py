@@ -18,7 +18,7 @@ def calculate_reward(frameInfo_current, frameInfo_previous):
     
     #-- Velocity --
     # Need: Current speed, Previous speed, Current Race%
-    R_vel = calculate_velocity_reward(curr_vel)
+    R_vel = calculate_velocity_reward(curr_vel, prev_vel)
     
     #-- Race % --
     # Need: current and previous Race&
@@ -31,7 +31,7 @@ def calculate_reward(frameInfo_current, frameInfo_previous):
     #print_rewards(R_vel, R_racepercent, R_mt, frameInfo_current)
     return round(R_vel + R_racepercent + R_mt, 5)
     
-def calculate_velocity_reward(S_current: float):
+def calculate_velocity_reward(S_current: float, S_prev: float):
 
     # Scale velocity to value between 0 and 1
     S_scaled = S_current / ABSOLUTE_MAX_VELOCITY
@@ -39,6 +39,8 @@ def calculate_velocity_reward(S_current: float):
     # if a boost has been performed
     if S_current > NORMAL_MAX_SPEED:
         return S_scaled * 1.6
+    elif S_current > S_prev:
+        return S_scaled + 0.1
     else:
         return S_scaled
 
