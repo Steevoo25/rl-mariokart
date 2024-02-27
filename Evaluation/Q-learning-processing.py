@@ -1,7 +1,7 @@
 import pandas as pd
 from matplotlib import pyplot as plt
 
-path = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\Evaluation\\data\\q-learning-17-15--27_02_2024.csv'
+path = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\Evaluation\\data\\q-learning-19-59--27_02_2024.csv'
 # Read into dataframe
 df = pd.read_csv(path)
 # Remove 1st episode (idk why -100 reward)

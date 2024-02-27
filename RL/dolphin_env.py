@@ -56,6 +56,9 @@ reset_requested = False
 episode_counter = 0
 controller_inputs = []
 
+best_actions = []
+best_reward = 0
+
 ## Q-Learning parameters
 epsilon = 0.7  #Higher = more chance of random action
 gamma = 0.6 # Higher = more focus on future rewards
@@ -63,7 +66,7 @@ alpha = 1 # Higher = newer Q-Values will have more impact
 
 ## Logging
 date_and_time = datetime.now().strftime("%H-%M--%d_%m_%Y")
-log_file = f"C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\Evaluation\\q-learning-{date_and_time}.csv"
+log_file = f"C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\Evaluation\\data\\q-learning-{date_and_time}.csv"
 log = open(log_file, 'w')
 # Column Headers
 log.write("Episode,Total_Reward,Frame_Count\n")
@@ -112,6 +115,10 @@ while True:
     # Reset
         print(f"{episode_counter}, {total_reward}, {frame_counter}, {q},  {frameInfo_current}, {controller_inputs}\n")
         log.write(f"{episode_counter}, {total_reward}, {frame_counter}\n") # {q} , {frameInfo_current}\n")
+        # Save best Episode's reward and inputs
+        if total_reward > best_reward:
+            best_reward = total_reward
+            best_actions = controller_inputs
         frame_counter = 0
         episode_counter += 1
         controller_inputs = []
