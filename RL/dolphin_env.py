@@ -67,6 +67,7 @@ log_file = f"C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-projec
 log = open(log_file, 'w')
 # Column Headers
 log.write("Episode,Total_Reward,Frame_Count\n")
+
 ### Main Training Loop ###
 
 while True:
