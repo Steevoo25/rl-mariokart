@@ -19,7 +19,7 @@ path.append(this_dir)
 import socket
 import json
 import logging
-import datetime
+from datetime import datetime
 
 from environment.load_savestate import load_using_fkey as load_savestate
 from environment.press_button import press_button as set_controller
@@ -28,8 +28,8 @@ from environment.memory_viewer import getRaceInfo
 from environment.termination_check import check_termination
 from q_learning_agent import update_q_table, epsilon_greedy
 
-def print_state_to_dolphin_log(episode, frame, speed, racePercent, mt, reward, q, action_choice, controller_state):
-    print(f'''Episode: {episode} Frame: {frame}, Speed: {speed}, Race%: {racePercent}, Miniturbo: {mt}, Reward: {reward}, Q-Value: {q}, Action Choice: {action_choice}, Controller Input: {controller_state}''')
+def print_state_to_dolphin_log(episode, frame, speed, racePercent, mt, reward, q, action_choice):
+    print(f'''Episode: {episode} Frame: {frame}, Speed: {speed}, Race%: {racePercent}, Miniturbo: {mt}, Reward: {reward}, Q-Value: {q}, Action Choice: {action_choice}''')
 
 # A helper function to convert a tuple of actions (used in the q-learning process) to a dictionary (to send to emulator)
 def convert_actions_to_dict(action):
@@ -51,7 +51,7 @@ total_reward = 0
 frame_counter = 0
 termination_flag = False
 frameInfo_previous = list(START_STATE)
-is_logging = False
+is_logging = True
 reset_requested = False
 episode_counter = 0
 controller_inputs = []
@@ -62,7 +62,7 @@ gamma = 0.6 # Higher = more focus on future rewards
 alpha = 1 # Higher = newer Q-Values will have more impact
 
 ## Logging
-date_and_time = datetime.now().strftime("%H:%M-%d/%m/%Y")
+date_and_time = datetime.now().strftime("%H-%M--%d_%m_%Y")
 log_file = f"C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\Evaluation\\q-learning-{date_and_time}.log"
 log = open(log_file, 'w')
 ### Main Training Loop ###
@@ -102,7 +102,7 @@ while True:
 
     if is_logging:
     # Print state to dolphin log
-        print_state_to_dolphin_log(episode_counter, frame_counter, *frameInfo_current, reward, total_reward, q, action_choice, action)
+        print_state_to_dolphin_log(episode_counter, frame_counter, *frameInfo_current, reward, q, action_choice)
         #print(f"{episode_counter}, {reward}, {frame_counter}, {q}, {action}, {frameInfo_current}\n")
 
     if termination_flag:
