@@ -19,6 +19,7 @@ path.append(this_dir)
 import socket
 import json
 import logging
+import datetime
 
 from environment.load_savestate import load_using_fkey as load_savestate
 from environment.press_button import press_button as set_controller
@@ -65,7 +66,10 @@ epsilon = 0.7  #Higher = more chance of random action
 gamma = 0.6 # Higher = more focus on future rewards
 alpha = 1 # Higher = newer Q-Values will have more impact
 
-log = open("C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\Evaluation\\q-learning.log", 'w')
+## Logging
+date_and_time = datetime.now().strftime("%H:%M-%d/%m/%Y")
+log_file = f"C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\Evaluation\\q-learning-{date_and_time}.log"
+log = open(log_file, 'w')
 ### Main Training Loop ###
 
 while True:
