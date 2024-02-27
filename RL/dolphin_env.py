@@ -66,7 +66,7 @@ date_and_time = datetime.now().strftime("%H-%M--%d_%m_%Y")
 log_file = f"C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\Evaluation\\q-learning-{date_and_time}.csv"
 log = open(log_file, 'w')
 # Column Headers
-log.write("Episode, Total Reward, Frame count\n")
+log.write("Episode,Total_Reward,Frame_Count\n")
 ### Main Training Loop ###
 
 while True:
