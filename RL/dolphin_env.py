@@ -63,7 +63,7 @@ alpha = 1 # Higher = newer Q-Values will have more impact
 
 ## Logging
 date_and_time = datetime.now().strftime("%H-%M--%d_%m_%Y")
-log_file = f"C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\Evaluation\\q-learning-{date_and_time}.log"
+log_file = f"C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\Evaluation\\q-learning-{date_and_time}.csv"
 log = open(log_file, 'w')
 ### Main Training Loop ###
 
