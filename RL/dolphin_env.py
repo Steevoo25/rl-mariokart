@@ -107,8 +107,8 @@ while True:
 
     if termination_flag:
     # Reset
-        print(f"{episode_counter}, {reward}, {frame_counter}, {q},  {frameInfo_current}, {controller_inputs}\n")
-        log.write(f"{episode_counter}, {reward}, {frame_counter}, {q}, {frameInfo_current}, {controller_inputs}\n")
+        print(f"{episode_counter}, {total_reward}, {frame_counter}, {q},  {frameInfo_current}, {controller_inputs}\n")
+        log.write(f"{episode_counter}, {total_reward}, {frame_counter}, {q}, {frameInfo_current}, {controller_inputs}\n")
         frame_counter = 0
         episode_counter += 1
         controller_inputs = []
