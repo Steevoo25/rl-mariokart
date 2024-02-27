@@ -65,6 +65,8 @@ alpha = 1 # Higher = newer Q-Values will have more impact
 date_and_time = datetime.now().strftime("%H-%M--%d_%m_%Y")
 log_file = f"C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\Evaluation\\q-learning-{date_and_time}.csv"
 log = open(log_file, 'w')
+# Column Headers
+log.write("Episode, Total Reward, Frame count")
 ### Main Training Loop ###
 
 while True:
@@ -108,7 +110,7 @@ while True:
     if termination_flag:
     # Reset
         print(f"{episode_counter}, {total_reward}, {frame_counter}, {q},  {frameInfo_current}, {controller_inputs}\n")
-        log.write(f"{episode_counter}, {total_reward}, {frame_counter}, {q}, {frameInfo_current}, {controller_inputs}\n")
+        log.write(f"{episode_counter}, {total_reward}, {frame_counter}\n") # {q} , {frameInfo_current}\n")
         frame_counter = 0
         episode_counter += 1
         controller_inputs = []
