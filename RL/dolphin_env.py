@@ -2,7 +2,7 @@
 from dolphin import event # gives awaitable routine that returns when a frame is drawn
 
 DEFAULT_CONTROLLER = {"A":True,"B":False,"Up":False,"StickX":128}
-START_STATE = (1.128, 0.992, 0)
+START_STATE = (76.332, 1.019, 0)
 
 # As the script is run within the dolphin executable, 
 # Append the true path of scripts to import
