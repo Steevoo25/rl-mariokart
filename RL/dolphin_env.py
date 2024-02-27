@@ -28,13 +28,8 @@ from environment.memory_viewer import getRaceInfo
 from environment.termination_check import check_termination
 from q_learning_agent import update_q_table, epsilon_greedy
 
-def print_state_to_dolphin_log(frame, speed, racePercent, mt, reward, total_reward):
-    print(f'''Frame: {frame}
-    Speed: {speed}
-    Race%: {racePercent}
-    Miniturbo: {mt}
-    Reward: {reward}
-    Total Reward: {total_reward}''')
+def print_state_to_dolphin_log(episode, frame, speed, racePercent, mt, reward, q, action_choice, controller_state):
+    print(f'''Episode: {episode} Frame: {frame}, Speed: {speed}, Race%: {racePercent}, Miniturbo: {mt}, Reward: {reward}, Q-Value: {q}, Action Choice: {action_choice}, Controller Input: {controller_state}''')
 
 # A helper function to convert a tuple of actions (used in the q-learning process) to a dictionary (to send to emulator)
 def convert_actions_to_dict(action):
@@ -94,7 +89,7 @@ while True:
         #reset_requested = response[1]
         
     # -- Get action by epsilon-greedy policy
-    action = epsilon_greedy(tuple(frameInfo_current), epsilon)
+    action, action_choice = epsilon_greedy(tuple(frameInfo_current), epsilon)
     # -- Calculate reward
     reward = calculate_reward(frameInfo_current, frameInfo_previous)
     # -- Update Q-Table
@@ -107,8 +102,8 @@ while True:
 
     if is_logging:
     # Print state to dolphin log
-        #print_state_to_dolphin_log(frame_counter, *frameInfo_current, reward, total_reward)
-        print(f"{episode_counter}, {reward}, {frame_counter}, {q}, {action}, {frameInfo_current}\n")
+        print_state_to_dolphin_log(episode_counter, frame_counter, *frameInfo_current, reward, total_reward, q, action_choice, action)
+        #print(f"{episode_counter}, {reward}, {frame_counter}, {q}, {action}, {frameInfo_current}\n")
 
     if termination_flag:
     # Reset
