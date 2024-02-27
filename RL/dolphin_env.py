@@ -55,15 +55,15 @@ total_reward = 0
 frame_counter = 0
 termination_flag = False
 frameInfo_previous = list(START_STATE)
-is_logging = True
+is_logging = False
 reset_requested = False
 episode_counter = 0
 controller_inputs = []
 
 ## Q-Learning parameters
-epsilon = 0.8   #Higher = more chance of random action
+epsilon = 0.7  #Higher = more chance of random action
 gamma = 0.6 # Higher = more focus on future rewards
-alpha = 0.7 # Higher = newer Q-Values will have more impact
+alpha = 1 # Higher = newer Q-Values will have more impact
 
 log = open("C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\Evaluation\\q-learning.log", 'w')
 ### Main Training Loop ###
@@ -81,7 +81,7 @@ while True:
     else:
         frameInfo_current = getRaceInfo()
         # --- Check termination
-        accelerating = frameInfo_current[0] > frameInfo_previous[0]
+        accelerating = frameInfo_current[0] >= frameInfo_previous[0]
         termination_flag = check_termination(frameInfo_current, accelerating)
         # --- Get response from Rainbow based on previous frame
         #response = json.loads(env_socket.recv(131702).decode("utf-8"))
@@ -108,7 +108,7 @@ while True:
 
     if termination_flag:
     # Reset
-        #print(f"{episode_counter}, {reward}, {frame_counter}, {q},  {frameInfo_current}\n")
+        print(f"{episode_counter}, {reward}, {frame_counter}, {q},  {frameInfo_current}, {controller_inputs}\n")
         log.write(f"{episode_counter}, {reward}, {frame_counter}, {q}, {frameInfo_current}, {controller_inputs}\n")
         frame_counter = 0
         episode_counter += 1
