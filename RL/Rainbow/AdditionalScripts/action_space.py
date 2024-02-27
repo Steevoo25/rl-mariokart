@@ -5,7 +5,7 @@ from itertools import product
 def generate_action_space():
     # Define the possible states for the buttons and analog stick
     buttons = [True, False]
-    analog_stick_angles = [0, 64, 128, 192, 256]
+    analog_stick_angles = [0, 64, 128, 192, 255]
 
     # Generate all possible permutations using itertools.product
     button_states = list(product(buttons, repeat=3))  # All possible combinations of 3 buttons
