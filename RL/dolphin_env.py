@@ -35,7 +35,7 @@ def print_state_to_dolphin_log(episode, frame, speed, racePercent, mt, reward, q
 
 # A helper function to convert a tuple of actions (used in the q-learning process) to a dictionary (to send to emulator)
 def convert_actions_to_dict(action):
-    return {"A": action[0],"B": action[1],"Up": action[2],"StickX": action[3]}
+    return {"A": True, "B": action[0],"Up": action[1],"StickX": action[2]}
 
 ## Socket Initialisation
 # This script will be running within Dolphin's embedded python, meaning it has a lot of limitations
