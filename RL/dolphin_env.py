@@ -4,6 +4,7 @@ from dolphin import event # gives awaitable routine that returns when a frame is
 DEFAULT_CONTROLLER = {"A":True,"B":False,"Up":False,"StickX":128}
 START_STATE = (76.332, 1.019, 0)
 PROJECT_DIR = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\'
+MAX_EPISODES = 5000
 
 # As the script is run within the dolphin executable, 
 # Append the true path of scripts to import
@@ -76,7 +77,7 @@ best_inputs_file = f"{PROJECT_DIR}Evaluation\\controller_episodes\\q-learning-{d
 
 ### Main Training Loop ###
 
-while True:
+while episode_counter < MAX_EPISODES:
     await event.frameadvance()
     frame_counter += 1
     # Get frameInfo
