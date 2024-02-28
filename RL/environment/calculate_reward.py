@@ -12,7 +12,7 @@ NOT_CHARGING = 0
 LAP_COMPLETE = 2
 
 VELOCITY_WEIGHT = 1
-RACE_PERCENT_WEIGHT = 1
+RACE_PERCENT_WEIGHT = 6
 MT_WEIGHT = 1
 
 
@@ -58,6 +58,7 @@ def calculate_velocity_reward(S_current: float, S_prev: float):
 def calculate_race_percent_reward(racePercent_current: float, racePercent_previous: float):
     
     difference = racePercent_current - racePercent_previous
+    #print(f"Current: {racePercent_current}, Previous: {racePercent_previous}")
     # Lap is complete
     if racePercent_current > LAP_COMPLETE:
         return 10
