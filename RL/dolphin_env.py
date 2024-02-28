@@ -69,7 +69,7 @@ date_and_time = datetime.now().strftime("%H-%M--%d_%m_%Y")
 log_file = f"{PROJECT_DIR}Evaluation\\data\\q-learning-{date_and_time}.csv"
 log = open(log_file, 'w')
 # Column Headers
-log.write("Episode,Total_Reward,Frame_Count\n")
+log.write("Episode,Total_Reward,Frame_Count,Velocity_Reward,RacePercent_Reward,MT_Reward\n")
 # Controller Inputs 
 best_inputs_file = f"{PROJECT_DIR}Evaluation\\controller_episodes\\q-learning-{date_and_time}.pkl"
 
@@ -100,7 +100,7 @@ while True:
     # -- Get action by epsilon-greedy policy
     action, action_choice = epsilon_greedy(tuple(frameInfo_current), epsilon)
     # -- Calculate reward
-    reward = calculate_reward(frameInfo_current, frameInfo_previous)
+    reward, vel_reward, perc_reward, mt_reward = calculate_reward(frameInfo_current, frameInfo_previous)
     # -- Update Q-Table
     q = update_q_table(tuple(frameInfo_previous), action, reward, tuple(frameInfo_current), alpha, gamma)
     
@@ -116,9 +116,10 @@ while True:
 
     if termination_flag:
     # Reset
-        print(f"{episode_counter}, {total_reward}, {frame_counter}, {q},  {frameInfo_current}, {controller_inputs}\n")
-        log.write(f"{episode_counter}, {total_reward}, {frame_counter}\n") # {q} , {frameInfo_current}\n")
+        q = update_q_table(tuple(frameInfo_previous), action, -10, tuple(frameInfo_current), alpha, gamma)
         
+        print(f"{episode_counter}, {total_reward}, {frame_counter}, {q},  {frameInfo_current}, {controller_inputs}\n")
+        log.write(f"{episode_counter}, {total_reward}, {frame_counter}, {vel_reward}, {perc_reward}, {mt_reward}\n") # {q} , {frameInfo_current}\n")
         # If its the best we've seen
         if total_reward > best_reward:
             # update best reward
