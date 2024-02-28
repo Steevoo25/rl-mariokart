@@ -6,10 +6,15 @@
 NORMAL_MAX_SPEED = 84
 ABSOLUTE_MAX_VELOCITY = 120
 MIN_ACCEPTABLE_SPEED = 65
-END_OF_FIRST_STRAIGHT = 1.073
+
 CHARGED_MINITURBO = 270
 NOT_CHARGING = 0
 LAP_COMPLETE = 2
+
+VELOCITY_WEIGHT = 1
+RACE_PERCENT_WEIGHT = 1
+MT_WEIGHT = 1
+
 
 def calculate_reward(frameInfo_current, frameInfo_previous):
     
@@ -18,15 +23,15 @@ def calculate_reward(frameInfo_current, frameInfo_previous):
     
     #-- Velocity --
     # Need: Current speed, Previous speed, Current Race%
-    R_vel = calculate_velocity_reward(curr_vel, prev_vel)
+    R_vel = calculate_velocity_reward(curr_vel, prev_vel) * VELOCITY_WEIGHT
     
     #-- Race % --
     # Need: current and previous Race&
-    R_racepercent = calculate_race_percent_reward(curr_racepercent, prev_racepercent)
+    R_racepercent = calculate_race_percent_reward(curr_racepercent, prev_racepercent) * RACE_PERCENT_WEIGHT
     
     #-- Miniturbo --
     # Need: Current and Previous MT
-    R_mt = calculate_miniturbo_reward(curr_mt, prev_mt)
+    R_mt = calculate_miniturbo_reward(curr_mt, prev_mt) * MT_WEIGHT
     
     #print_rewards(R_vel, R_racepercent, R_mt, frameInfo_current)
     return round(R_vel + R_racepercent + R_mt, 5)
