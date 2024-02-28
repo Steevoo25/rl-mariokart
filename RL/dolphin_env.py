@@ -53,7 +53,7 @@ total_reward = 0
 frame_counter = 0
 termination_flag = False
 frameInfo_previous = list(START_STATE)
-is_logging = True
+is_logging = False
 reset_requested = False
 episode_counter = 0
 controller_inputs = []
@@ -87,10 +87,10 @@ while True:
         total_reward = 0
         reward = 0
     else:
+        #--- Get current frame info
         frameInfo_current = getRaceInfo()
         # --- Check termination
-        accelerating = frameInfo_current[0] >= frameInfo_previous[0]
-        termination_flag = check_termination(frameInfo_current, accelerating)
+        termination_flag = check_termination(frameInfo_current)
         # --- Get response from Rainbow based on previous frame
         #response = json.loads(env_socket.recv(131702).decode("utf-8"))
         #response = [DEFAULT_CONTROLLER, True]
@@ -101,6 +101,7 @@ while True:
     action, action_choice = epsilon_greedy(tuple(frameInfo_current), epsilon)
     # -- Calculate reward
     reward, vel_reward, perc_reward, mt_reward = calculate_reward(frameInfo_current, frameInfo_previous)
+    #print(vel_reward, perc_reward, mt_reward)
     # -- Update Q-Table
     q = update_q_table(tuple(frameInfo_previous), action, reward, tuple(frameInfo_current), alpha, gamma)
     
@@ -118,7 +119,7 @@ while True:
     # Reset
         q = update_q_table(tuple(frameInfo_previous), action, -10, tuple(frameInfo_current), alpha, gamma)
         
-        print(f"{episode_counter}, {total_reward}, {frame_counter}, {q},  {frameInfo_current}, {controller_inputs}\n")
+        #print(f"{episode_counter}, {total_reward}, {frame_counter}, {q},  {frameInfo_current}, {controller_inputs}\n")
         log.write(f"{episode_counter}, {total_reward}, {frame_counter}, {vel_reward}, {perc_reward}, {mt_reward}\n") # {q} , {frameInfo_current}\n")
         # If its the best we've seen
         if total_reward > best_reward:
