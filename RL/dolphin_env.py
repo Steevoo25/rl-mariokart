@@ -3,22 +3,24 @@ from dolphin import event # gives awaitable routine that returns when a frame is
 
 DEFAULT_CONTROLLER = {"A":True,"B":False,"Up":False,"StickX":128}
 START_STATE = (76.332, 1.019, 0)
+PROJECT_DIR = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\'
 
 # As the script is run within the dolphin executable, 
 # Append the true path of scripts to import
 from sys import path
 
 # Add venv dir to path to allow external packages
-venv_dir ='C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\venv\\Lib\\site-packages'
+venv_dir =f'{PROJECT_DIR}venv\\Lib\\site-packages'
 path.append(venv_dir)
 # Add this dir to path to allow imports from other scripts
-this_dir = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\RL'
+this_dir = f'{PROJECT_DIR}RL'
 path.append(this_dir)
 
 # -- OTHER IMPORTS --
 import socket
 import json
 import logging
+from pickle import dump
 from datetime import datetime
 
 from environment.load_savestate import load_using_fkey as load_savestate
@@ -55,8 +57,6 @@ is_logging = True
 reset_requested = False
 episode_counter = 0
 controller_inputs = []
-
-best_actions = []
 best_reward = 0
 
 ## Q-Learning parameters
@@ -66,10 +66,13 @@ alpha = 1 # Higher = newer Q-Values will have more impact
 
 ## Logging
 date_and_time = datetime.now().strftime("%H-%M--%d_%m_%Y")
-log_file = f"C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\Evaluation\\data\\q-learning-{date_and_time}.csv"
+log_file = f"{PROJECT_DIR}Evaluation\\data\\q-learning-{date_and_time}.csv"
 log = open(log_file, 'w')
 # Column Headers
 log.write("Episode,Total_Reward,Frame_Count\n")
+# Controller Inputs 
+best_inputs_file = f"{PROJECT_DIR}Evaluation\\controller_episodes\\q-learning-{date_and_time}.pkl"
+
 
 ### Main Training Loop ###
 
@@ -115,10 +118,14 @@ while True:
     # Reset
         print(f"{episode_counter}, {total_reward}, {frame_counter}, {q},  {frameInfo_current}, {controller_inputs}\n")
         log.write(f"{episode_counter}, {total_reward}, {frame_counter}\n") # {q} , {frameInfo_current}\n")
-        # Save best Episode's reward and inputs
+        
+        # If its the best we've seen
         if total_reward > best_reward:
+            # update best reward
             best_reward = total_reward
-            best_actions = controller_inputs
+            # save controller inputs to pkl file
+            dump(controller_inputs, open(f'{best_inputs_file}', "wb"))
+            
         frame_counter = 0
         episode_counter += 1
         controller_inputs = []
