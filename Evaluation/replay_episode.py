@@ -5,7 +5,7 @@ import pickle
 
 
 PROJECT_DIR = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\'
-date_and_time = '22-08--27_02_2024'
+date_and_time = '16-28--28_02_2024'
 
 best_inputs_file = f"{PROJECT_DIR}Evaluation\\controller_episodes\\q-learning-{date_and_time}.pkl"
 # Load pickle file
