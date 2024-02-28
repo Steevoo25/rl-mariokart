@@ -23,11 +23,11 @@ def calculate_reward(frameInfo_current, frameInfo_previous):
     
     #-- Velocity --
     # Need: Current speed, Previous speed, Current Race%
-    R_vel = calculate_velocity_reward(curr_vel, prev_vel) * VELOCITY_WEIGHT
+    R_vel = round(calculate_velocity_reward(curr_vel, prev_vel) * VELOCITY_WEIGHT, 5)
     
     #-- Race % --
     # Need: current and previous Race&
-    R_racepercent = calculate_race_percent_reward(curr_racepercent, prev_racepercent) * RACE_PERCENT_WEIGHT
+    R_racepercent = round(calculate_race_percent_reward(curr_racepercent, prev_racepercent) * RACE_PERCENT_WEIGHT, 5)
     
     #-- Miniturbo --
     # Need: Current and Previous MT
@@ -44,8 +44,6 @@ def calculate_velocity_reward(S_current: float, S_prev: float):
     # if a boost has been performed
     if S_current > NORMAL_MAX_SPEED:
         return S_scaled * 1.6
-    elif S_current > S_prev:
-        return S_scaled + 0.1
     else:
         return S_scaled
 
