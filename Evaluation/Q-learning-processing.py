@@ -8,7 +8,8 @@ df = pd.read_csv(path)
 df = df[1:]
 
 # Smooth the data
-smoothing_window = 10
+smoothing_window = len(df) // 100
+
 smoothed_reward = pd.Series(df['Total_Reward']).rolling(window=smoothing_window, min_periods=1, center=True).mean()
 
 # Plotting
@@ -16,15 +17,13 @@ smoothed_reward = pd.Series(df['Total_Reward']).rolling(window=smoothing_window,
 plt.plot(df['Episode'], smoothed_reward, label='Return', linewidth=0.3)
 #plt.plot(df['Episode'], df['Frame_Count'], label='Survival Time')
 
-episode_count = df[-2:-1]['Episode'].values
-
 # Set x axis scale
 plt.ylim(0, 500)
 
 # Lables
 plt.xlabel('Episode number')
 plt.ylabel('Return')
-plt.title(f'Return from each episode after {episode_count} Episodes')
+plt.title(f'Return from each episode after {len(df)} Episodes')
 
 plt.legend()
 
