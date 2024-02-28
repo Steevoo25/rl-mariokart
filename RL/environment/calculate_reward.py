@@ -34,7 +34,7 @@ def calculate_reward(frameInfo_current, frameInfo_previous):
     R_mt = calculate_miniturbo_reward(curr_mt, prev_mt) * MT_WEIGHT
     
     #print_rewards(R_vel, R_racepercent, R_mt, frameInfo_current)
-    return round(R_vel + R_racepercent + R_mt, 5)
+    return round(R_vel + R_racepercent + R_mt, 5), R_vel, R_racepercent, R_mt
     
 def calculate_velocity_reward(S_current: float, S_prev: float):
 
