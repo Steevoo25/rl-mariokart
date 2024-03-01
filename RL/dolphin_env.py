@@ -103,8 +103,11 @@ while episode_counter < MAX_EPISODES:
     # -- Calculate reward
     reward, vel_reward, perc_reward, mt_reward = calculate_reward(frameInfo_current, frameInfo_previous)
     #print(vel_reward, perc_reward, mt_reward)
+    # round statespace values
+    frameInfo_rounded_current = map(lambda x: round(x, 2), frameInfo_current)
+    frameInfo_rounded_previous = map(lambda x: round(x, 2), frameInfo_previous)
     # -- Update Q-Table
-    q = update_q_table(tuple(frameInfo_previous), action, reward, tuple(frameInfo_current), alpha, gamma)
+    q = update_q_table(tuple(frameInfo_rounded_current), action, reward, tuple(frameInfo_rounded_previous), alpha, gamma)
     
     # update previous_frame_info 
     frameInfo_previous = frameInfo_current
