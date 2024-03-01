@@ -5,9 +5,9 @@ import pickle
 
 
 PROJECT_DIR = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\'
-date_and_time = '16-28--28_02_2024'
+filename = 'q-learning-11-11--29_02_2024'
 
-best_inputs_file = f"{PROJECT_DIR}Evaluation\\controller_episodes\\q-learning-{date_and_time}.pkl"
+best_inputs_file = f"{PROJECT_DIR}Evaluation\\controller_episodes\\{filename}.pkl"
 # Load pickle file
 controller_inputs = pickle.load(open(best_inputs_file, "rb"))
 # Loop through file
