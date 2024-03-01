@@ -20,7 +20,7 @@ def getCurrentMT() -> int:
     return memory.read_u16(MT_LOCATION)
     
 # Returns a tuple of the Speed, Race% and MT
-def getRaceInfo() -> (float, float, int):
+def getRaceInfo() -> tuple:
     return getCurrentSpeed(), getCurrentRaceCompletion(), getCurrentMT()
 
 def printRaceInfo():
