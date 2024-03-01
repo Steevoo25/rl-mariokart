@@ -66,7 +66,7 @@ gamma = 0.6 # Higher = more focus on future rewards
 alpha = 1 # Higher = newer Q-Values will have more impact
 
 ## Logging
-date_and_time = datetime.now().strftime("%H-%M--%d_%m_%Y")
+date_and_time = datetime.now().strftime("%d_%m_%Y--%H-%M")
 log_file = f"{PROJECT_DIR}Evaluation\\data\\q-learning-{date_and_time}.csv"
 log = open(log_file, 'w')
 # Column Headers
@@ -120,7 +120,7 @@ while episode_counter < MAX_EPISODES:
     # Reset
         q = update_q_table(tuple(frameInfo_previous), action, -10, tuple(frameInfo_current), alpha, gamma)
         
-        #print(f"{episode_counter}, {total_reward}, {frame_counter}, {q},  {frameInfo_current}, {controller_inputs}\n")
+        print(f"{episode_counter}, {total_reward}, {frame_counter}, {q},  {frameInfo_current}, {controller_inputs}\n")
         log.write(f"{episode_counter}, {total_reward}, {frame_counter}, {vel_reward}, {perc_reward}, {mt_reward}\n") # {q} , {frameInfo_current}\n")
         # If its the best we've seen
         if total_reward > best_reward:
@@ -132,6 +132,7 @@ while episode_counter < MAX_EPISODES:
         frame_counter = 0
         episode_counter += 1
         controller_inputs = []
+        frameInfo_previous = list(START_STATE)
         await load_savestate()
         continue
 
