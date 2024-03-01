@@ -60,20 +60,32 @@ episode_counter = 0
 controller_inputs = []
 best_reward = 0
 
+reward_logging = False
+total_reward_vel = 0
+total_reward_perc = 0
+total_reward_mt = 0
+
 ## Q-Learning parameters
 epsilon = 0.7  #Higher = more chance of random action
 gamma = 0.6 # Higher = more focus on future rewards
 alpha = 1 # Higher = newer Q-Values will have more impact
 
 ## Logging
+
 date_and_time = datetime.now().strftime("%d_%m_%Y--%H-%M")
+
 log_file = f"{PROJECT_DIR}Evaluation\\data\\q-learning-{date_and_time}.csv"
 log = open(log_file, 'w')
+
 # Column Headers
 log.write("Episode,Total_Reward,Frame_Count,Velocity_Reward,RacePercent_Reward,MT_Reward\n")
+
 # Controller Inputs 
 best_inputs_file = f"{PROJECT_DIR}Evaluation\\controller_episodes\\q-learning-{date_and_time}.pkl"
 
+reward_log_file = f"{PROJECT_DIR}Evaluation\\data\\rewards\\q-learning-{date_and_time}.csv"
+reward_log = open(reward_log_file, 'w')
+reward_log.write("total_reward,vel_reward,perc_reward,mt_reward")
 
 ### Main Training Loop ###
 # -------------------------
@@ -93,11 +105,12 @@ while episode_counter < MAX_EPISODES:
         frameInfo_current = getRaceInfo()
         # --- Check termination
         termination_flag = check_termination(frameInfo_current)
-        # --- Get response from Rainbow based on previous frame
-        #response = json.loads(env_socket.recv(131702).decode("utf-8"))
-        #response = [DEFAULT_CONTROLLER, True]
-        #action = response[0]
-        #reset_requested = response[1]
+    
+    # --- Get response from Rainbow based on previous frame
+    #response = json.loads(env_socket.recv(131702).decode("utf-8"))
+    #response = [DEFAULT_CONTROLLER, True]
+    #action = response[0]
+    #reset_requested = response[1]
         
     # -- Get action by epsilon-greedy policy
     action, action_choice = epsilon_greedy(tuple(frameInfo_current), epsilon)
@@ -108,22 +121,32 @@ while episode_counter < MAX_EPISODES:
     frameInfo_rounded_current = map(lambda x: round(x, 2), frameInfo_current)
     frameInfo_rounded_previous = map(lambda x: round(x, 2), frameInfo_previous)
     # -- Update Q-Table
-    q = update_q_table(tuple(frameInfo_rounded_current), action, reward, tuple(frameInfo_rounded_previous), alpha, gamma)
+    q = update_q_table(tuple(frameInfo_rounded_previous), action, reward, tuple(frameInfo_rounded_current), alpha, gamma)
     
     # update previous_frame_info 
     frameInfo_previous = frameInfo_current
     # update total reward
     total_reward = total_reward + reward
 
+    if reward_logging:
+        # log individual reward values
+        total_reward_vel += vel_reward
+        total_reward_perc += perc_reward
+        total_reward_mt += mt_reward
+        
+        reward_log.write(f"{total_reward},{total_reward_vel},{total_reward_perc},{total_reward_mt}")
+        
+        
     if is_logging:
     # Print state to dolphin log
         print_state_to_dolphin_log(episode_counter, frame_counter, *frameInfo_current, reward, q, action_choice)
         #print(f"{episode_counter}, {reward}, {frame_counter}, {q}, {action}, {frameInfo_current}\n")
+        
 
     if termination_flag:
     # Reset
         q = update_q_table(tuple(frameInfo_previous), action, -10, tuple(frameInfo_current), alpha, gamma)
-        
+        # Log episode info
         print(f"{episode_counter}, {total_reward}, {frame_counter}, {q},  {frameInfo_current}, {controller_inputs}\n")
         log.write(f"{episode_counter}, {total_reward}, {frame_counter}, {vel_reward}, {perc_reward}, {mt_reward}\n") # {q} , {frameInfo_current}\n")
         # If its the best we've seen
