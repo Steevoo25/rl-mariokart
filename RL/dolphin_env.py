@@ -29,7 +29,7 @@ from environment.press_button import press_button as set_controller
 from environment.calculate_reward import calculate_reward
 from environment.memory_viewer import getRaceInfo
 from environment.termination_check import check_termination
-from q_learning_agent import update_q_table, epsilon_greedy
+from q_learning_agent import update_q_table, epsilon_greedy, get_q_table
 
 def print_state_to_dolphin_log(episode, frame, speed, racePercent, mt, reward, q, action_choice):
     print(f'''Episode: {episode} Frame: {frame}, Speed: {speed}, Race%: {racePercent}, Miniturbo: {mt}, Reward: {reward}, Q-Value: {q}, Action Choice: {action_choice}''')
@@ -172,3 +172,5 @@ while episode_counter < MAX_EPISODES:
     action = convert_actions_to_dict(action)
     controller_inputs.append(action)
     set_controller(action)
+print(f"Q-Table size: {len(get_q_table())}")
+print(f"Time of completion{datetime.now().strftime("%d_%m_%Y--%H-%M")}")

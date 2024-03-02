@@ -1,10 +1,11 @@
 import pandas as pd
 from matplotlib import pyplot as plt
-filename = 'q-learning-23-26--29_02_2024'
+filename = 'q-learning-02_03_2024--00-17'
 path = f'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\Evaluation\\data\\{filename}.csv'
 # Read into dataframe
-df = pd.read_csv(path)
+df = pd.read_csv(path, )
 # Remove episodes 1 and 3 (idk why -100 reward)
+
 df = df[1:]
 
 # Smooth the data
