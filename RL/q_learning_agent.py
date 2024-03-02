@@ -62,3 +62,6 @@ def update_q_table(prev_state, action, reward, next_state, alpha, gamma) -> floa
         q[prev_state, action] = alpha * (reward + (gamma * max_future_q))
     finally:
         return q[prev_state, action]
+
+def get_q_table():
+    return q
