@@ -82,10 +82,10 @@ log.write("Episode,Total_Reward,Frame_Count,Velocity_Reward,RacePercent_Reward,M
 
 # Controller Inputs 
 best_inputs_file = f"{PROJECT_DIR}Evaluation\\controller_episodes\\q-learning-{date_and_time}.pkl"
-
-reward_log_file = f"{PROJECT_DIR}Evaluation\\data\\rewards\\q-learning-{date_and_time}.csv"
-reward_log = open(reward_log_file, 'w')
-reward_log.write("total_reward,vel_reward,perc_reward,mt_reward")
+if reward_logging:
+    reward_log_file = f"{PROJECT_DIR}Evaluation\\data\\rewards\\q-learning-{date_and_time}.csv"
+    reward_log = open(reward_log_file, 'w')
+    reward_log.write("total_reward,vel_reward,perc_reward,mt_reward")
 
 ### Main Training Loop ###
 # -------------------------
