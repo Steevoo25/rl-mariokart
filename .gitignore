@@ -14,9 +14,8 @@
 *.log
 *.csv
 *.pkl
-# Ignore dolphin build
-Dolphin/*
-!Dolphin/Config/Config/*
 # venv
-venv/*
+venv/
 Information Base/
+RL/Rainbow/rainbow_venv/
+RL/Rainbow/__pycache__/
