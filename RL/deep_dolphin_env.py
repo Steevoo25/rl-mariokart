@@ -49,6 +49,7 @@ env_socket.connect((HOST,PORT)) # Uncomment when training
 reward = 0
 total_reward = 0
 frame_counter = 0
+file_number = -1
 termination_flag = False
 frameInfo_previous = list(START_STATE)
 is_logging = True
@@ -90,6 +91,7 @@ if reward_logging:
 while episode_counter < MAX_EPISODES:
     await event.frameadvance()
     frame_counter += 1
+    file_number +=1
     # Get frameInfo
     if frame_counter == 1:
     # If episode has jsut started don't reset
@@ -118,7 +120,7 @@ while episode_counter < MAX_EPISODES:
     
     # -- Send data to Rainbow
     # encode data as json object and send to agent process
-    data_to_send = json.dumps((reward, termination_flag, frame_counter)).encode("utf-8")
+    data_to_send = json.dumps((reward, termination_flag, frame_counter, file_number)).encode("utf-8")
     env_socket.sendall(data_to_send)
     
     # update previous_frame_info 
