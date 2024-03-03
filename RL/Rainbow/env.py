@@ -30,10 +30,10 @@ class Env():
     reward = message[0] #reward function value
     done = message[1] # termination flag
     frame = message[2] # frame counter
-    observation = dump_pixel_data(frame_index=frame) #pixel values
-    print("length of observation", frame, " ", len(observation))
+    file_number = message[3]
+    observation = dump_pixel_data(frame_index=file_number) #pixel values
     # REMEMBER TO DELETE FRAME FROM FOLDER FOR NEXT EPISODE
-    return torch.tensor(observation, dtype=torch.float32, device=self.device).div_(255), reward, done, frame
+    return torch.tensor(observation, dtype=torch.float32, device=self.device).div_(255), reward, done, frame, file_number
 
   def _reset_buffer(self):
     for _ in range(self.window):
@@ -42,14 +42,13 @@ class Env():
   def reset(self):
     self.client_socket.send( ( json.dumps( (DEFAULT_CONTROLLER, True) ).encode("utf-8") ) )
     self._reset_buffer()
-    observation, reward, done, frame = self._get_state()
+    observation, reward, done, frame, file_number = self._get_state()
     self.state_buffer.append(observation)
     return torch.stack(list(self.state_buffer), 0)
 
   def step(self, action):
     self.client_socket.send( ( json.dumps( (self.actions[action], False) ).encode("utf-8") ) )
-    observation, reward, done, frame = self._get_state() # json.loads(self.client_socket.recv(131072).decode('utf-8'))
-    print("recieved state: ", observation, reward)
+    observation, reward, done, frame, _ = self._get_state() # json.loads(self.client_socket.recv(131072).decode('utf-8'))
     self.state_buffer.append(observation)
     return torch.stack(list(self.state_buffer), 0), reward, done, frame
 
