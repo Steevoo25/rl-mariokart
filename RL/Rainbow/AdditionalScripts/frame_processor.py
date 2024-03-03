@@ -95,17 +95,22 @@ def process_frame(frame_index: int):
     
 # A function that returns the downsampled and grayscaled pixel data of a given framedump by index
 def dump_pixel_data(frame_index: int) :
-
     # Append frame index to framedumps path
     imagePath = path_to_framedumps + str(frame_index) + '.png'
     
     # Open Image    
     try:
         frame = Image.open(imagePath)
-    except FileNotFoundError:
-        print(f'Could not find file {imagePath}')
-        return []
         
+    except FileNotFoundError: # if not exist return all black
+        print(f'Could not find file {imagePath}')
+        return np.zeros((84,84))
+        
+    except PermissionError: # if being accessed by dolphin then take last frame
+        print('Permission denied')
+        return dump_pixel_data(frame_index-1)
+        
+
     # greyscale and downsample
     im = frame.convert("L").resize((84, 84))
     # get raw data
@@ -116,5 +121,6 @@ def dump_pixel_data(frame_index: int) :
     frame_data = [pixels[i * width:(i + 1) * width] for i in range(height)]
     
     # delete frame image once data extracted
-    os.remove(imagePath)
+    
+    
     return frame_data
