@@ -35,10 +35,6 @@ from q_learning_agent import update_q_table, epsilon_greedy, get_q_table
 def print_state_to_dolphin_log(episode, frame, speed, racePercent, mt, reward):
     print(f'''Episode: {episode} Frame: {frame}, Speed: {speed}, Race%: {racePercent}, Miniturbo: {mt}, Reward: {reward}''')
 
-# A helper function to convert a tuple of actions (used in the q-learning process) to a dictionary (to send to emulator)
-def convert_actions_to_dict(action):
-    return {"A": True, "B": action[0],"Up": action[1],"StickX": action[2]}
-
 ## Socket Initialisation
 # This script will be running within Dolphin's embedded python, meaning it has a lot of limitations
 # To get around these I will send the environment data to a seperate Agent script
@@ -167,6 +163,5 @@ while episode_counter < MAX_EPISODES:
 
 
     # -- Send inputs to Dolphin
-    action = convert_actions_to_dict(action)
     controller_inputs.append(action)
     set_controller(action)
