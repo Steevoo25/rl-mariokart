@@ -103,15 +103,14 @@ def dump_pixel_data(frame_index: int) :
     except FileNotFoundError:
         print(f'Could not find file {imagePath}')
         return []
+        
+    # greyscale and downsample
+    im = frame.convert("L").resize((84, 84))
+    # get raw data
+    pixels = list(im.getdata())
+    width, height = im.size
+    # Arrange into rows
+    frame_data = [pixels[i * width:(i + 1) * width] for i in range(height)]
 
-    # -- Downsample Image --
-    DOWNSAMPLE_FACTOR = 4
-    width, height = frame.size
-    downsampled_width = width // DOWNSAMPLE_FACTOR
-    downsampled_height = height // DOWNSAMPLE_FACTOR
-    frame = frame.resize((downsampled_width, downsampled_height))
-    # -- Greyscale Image --
-    frame = frame.convert("L")
-    # -- Get Raw Data --
-    frame_data = np.array(frame.getdata())
     return frame_data
+dump_pixel_data(100)
