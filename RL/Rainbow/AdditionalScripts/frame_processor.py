@@ -95,8 +95,10 @@ def process_frame(frame_index: int):
     
 # A function that returns the downsampled and grayscaled pixel data of a given framedump by index
 def dump_pixel_data(frame_index: int) :
+
     # Append frame index to framedumps path
     imagePath = path_to_framedumps + str(frame_index) + '.png'
+    
     # Open Image    
     try:
         frame = Image.open(imagePath)
@@ -109,8 +111,10 @@ def dump_pixel_data(frame_index: int) :
     # get raw data
     pixels = list(im.getdata())
     width, height = im.size
+    
     # Arrange into rows
     frame_data = [pixels[i * width:(i + 1) * width] for i in range(height)]
-
+    
+    # delete frame image once data extracted
+    os.remove(imagePath)
     return frame_data
-dump_pixel_data(100)
