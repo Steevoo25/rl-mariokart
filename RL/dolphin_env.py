@@ -18,7 +18,6 @@ this_dir = f'{PROJECT_DIR}RL'
 path.append(this_dir)
 
 # -- OTHER IMPORTS --
-import socket
 import json
 import logging
 from pickle import dump
@@ -38,16 +37,6 @@ def print_state_to_dolphin_log(episode, frame, speed, racePercent, mt, reward, q
 def convert_actions_to_dict(action):
     return {"A": True, "B": action[0],"Up": action[1],"StickX": action[2]}
 
-## Socket Initialisation
-# This script will be running within Dolphin's embedded python, meaning it has a lot of limitations
-# To get around these I will send the environment data to a seperate Agent script
-
-HOST = socket.gethostname()
-PORT = 5555
-print(f'Host : {HOST}')
-env_socket = socket.socket()
-#env_socket.connect((HOST,PORT)) # Uncomment when training
-
 ## Initialisations
 reward = 0
 total_reward = 0
@@ -61,9 +50,6 @@ controller_inputs = []
 best_reward = 0
 
 reward_logging = False
-total_reward_vel = 0
-total_reward_perc = 0
-total_reward_mt = 0
 
 ## Q-Learning parameters
 epsilon = 0.7  #Higher = more chance of random action
@@ -71,7 +57,7 @@ gamma = 0.6 # Higher = more focus on future rewards
 alpha = 1 # Higher = newer Q-Values will have more impact
 
 ## Logging
-
+## ---
 date_and_time = datetime.now().strftime("%d_%m_%Y--%H-%M")
 
 log_file = f"{PROJECT_DIR}Evaluation\\data\\q-learning-{date_and_time}.csv"
@@ -83,6 +69,11 @@ log.write("Episode,Total_Reward,Frame_Count,Velocity_Reward,RacePercent_Reward,M
 # Controller Inputs 
 best_inputs_file = f"{PROJECT_DIR}Evaluation\\controller_episodes\\q-learning-{date_and_time}.pkl"
 if reward_logging:
+
+    total_reward_vel = 0
+    total_reward_perc = 0
+    total_reward_mt = 0    
+    
     reward_log_file = f"{PROJECT_DIR}Evaluation\\data\\rewards\\q-learning-{date_and_time}.csv"
     reward_log = open(reward_log_file, 'w')
     reward_log.write("total_reward,vel_reward,perc_reward,mt_reward")
@@ -105,12 +96,6 @@ while episode_counter < MAX_EPISODES:
         frameInfo_current = getRaceInfo()
         # --- Check termination
         termination_flag = check_termination(frameInfo_current)
-    
-    # --- Get response from Rainbow based on previous frame
-    #response = json.loads(env_socket.recv(131702).decode("utf-8"))
-    #response = [DEFAULT_CONTROLLER, True]
-    #action = response[0]
-    #reset_requested = response[1]
         
     # -- Get action by epsilon-greedy policy
     action, action_choice = epsilon_greedy(tuple(frameInfo_current), epsilon)
@@ -163,14 +148,10 @@ while episode_counter < MAX_EPISODES:
         await load_savestate()
         continue
 
-    # -- Send data to Rainbow
-    # encode data as json object and send to agent process
-    # data_to_send = json.dumps((reward, termination_flag, frame_counter)).encode("utf-8")
-    # env_socket.sendall(data_to_send)
-
     # -- Send inputs to Dolphin
     action = convert_actions_to_dict(action)
     controller_inputs.append(action)
     set_controller(action)
+
 print(f"Q-Table size: {len(get_q_table())}")
 print(f"Time of completion{datetime.now().strftime("%d_%m_%Y--%H-%M")}")
