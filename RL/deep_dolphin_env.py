@@ -143,9 +143,8 @@ while episode_counter < MAX_EPISODES:
 
     if termination_flag:
     # Reset
-        q = update_q_table(tuple(frameInfo_previous), action, -10, tuple(frameInfo_current), alpha, gamma)
         # Log episode info
-        print(f"{episode_counter}, {total_reward}, {frame_counter}, {q},  {frameInfo_current}, {controller_inputs}\n")
+        print(f"{episode_counter}, {total_reward}, {frame_counter},  {frameInfo_current}, {controller_inputs}\n")
         log.write(f"{episode_counter}, {total_reward}, {frame_counter}, {vel_reward}, {perc_reward}, {mt_reward}\n") # {q} , {frameInfo_current}\n")
         # If its the best we've seen
         if total_reward > best_reward:
