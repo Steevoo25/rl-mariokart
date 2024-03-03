@@ -8,6 +8,8 @@ import torch
 from AdditionalScripts.action_space import generate_action_space
 from AdditionalScripts.frame_processor import dump_pixel_data
 
+DEFAULT_CONTROLLER = {"B":False,"Up":False,"StickX":128}
+
 class Env():
   def __init__(self, args):
     self.device = args.device
@@ -21,6 +23,7 @@ class Env():
     sock.bind((host, port))
     sock.listen(1)
     self.client_socket, _ = sock.accept()
+    print(f"Connected with host: {host}")
 
   def _get_state(self):
     message = json.loads(self.client_socket.recv(131072).decode('utf-8'))
@@ -28,23 +31,25 @@ class Env():
     done = message[1] # termination flag
     frame = message[2] # frame counter
     observation = dump_pixel_data(frame_index=frame) #pixel values
+    print("length of observation", frame, " ", len(observation))
     # REMEMBER TO DELETE FRAME FROM FOLDER FOR NEXT EPISODE
     return torch.tensor(observation, dtype=torch.float32, device=self.device).div_(255), reward, done, frame
 
   def _reset_buffer(self):
     for _ in range(self.window):
-      self.state_buffer.append(torch.zeros(84, 84, device=self.device))
+      self.state_buffer.append(torch.zeros(84,84, device=self.device))
 
   def reset(self):
-    self.client_socket.send( ( json.dumps( (_, True) ).encode("utf-8") ) )
+    self.client_socket.send( ( json.dumps( (DEFAULT_CONTROLLER, True) ).encode("utf-8") ) )
     self._reset_buffer()
-    observation, _, _, _ = self._get_state()
+    observation, reward, done, frame = self._get_state()
     self.state_buffer.append(observation)
     return torch.stack(list(self.state_buffer), 0)
 
   def step(self, action):
     self.client_socket.send( ( json.dumps( (self.actions[action], False) ).encode("utf-8") ) )
     observation, reward, done, frame = self._get_state() # json.loads(self.client_socket.recv(131072).decode('utf-8'))
+    print("recieved state: ", observation, reward)
     self.state_buffer.append(observation)
     return torch.stack(list(self.state_buffer), 0), reward, done, frame
 
