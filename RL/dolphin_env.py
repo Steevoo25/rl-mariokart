@@ -60,21 +60,21 @@ alpha = 1 # Higher = newer Q-Values will have more impact
 ## ---
 date_and_time = datetime.now().strftime("%d_%m_%Y--%H-%M")
 
-log_file = f"{PROJECT_DIR}Evaluation\\data\\q-learning-{date_and_time}.csv"
+log_file = f"{PROJECT_DIR}Evaluation\\data\\q-learning\\episodes\\q-learning-{date_and_time}.csv"
 log = open(log_file, 'w')
 
 # Column Headers
 log.write("Episode,Total_Reward,Frame_Count,Velocity_Reward,RacePercent_Reward,MT_Reward\n")
 
 # Controller Inputs 
-best_inputs_file = f"{PROJECT_DIR}Evaluation\\controller_episodes\\q-learning-{date_and_time}.pkl"
+best_inputs_file = f"{PROJECT_DIR}Evaluation\\data\\q-learning\\controller_episodes\\q-learning-{date_and_time}.pkl"
 if reward_logging:
 
     total_reward_vel = 0
     total_reward_perc = 0
     total_reward_mt = 0    
     
-    reward_log_file = f"{PROJECT_DIR}Evaluation\\data\\rewards\\q-learning-{date_and_time}.csv"
+    reward_log_file = f"{PROJECT_DIR}Evaluation\\data\\q-learning\\rewards\\q-learning-{date_and_time}.csv"
     reward_log = open(reward_log_file, 'w')
     reward_log.write("total_reward,vel_reward,perc_reward,mt_reward")
 
