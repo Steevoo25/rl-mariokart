@@ -103,11 +103,11 @@ def dump_pixel_data(frame_index: int) :
         frame = Image.open(imagePath)
         
     except FileNotFoundError: # if not exist return all black
-        print(f'Could not find file {imagePath}')
+        #print(f'Could not find file {imagePath}')
         return np.zeros((84,84))
         
     except PermissionError: # if being accessed by dolphin then take last frame
-        print('Permission denied')
+        #print('Permission denied')
         return dump_pixel_data(frame_index-1)
         
 
