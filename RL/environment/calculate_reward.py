@@ -59,7 +59,7 @@ def calculate_race_percent_reward(racePercent_current: float, racePercent_previo
     #print(f"Current: {racePercent_current}, Previous: {racePercent_previous}, Difference: {difference}")
     # Lap is complete
     if racePercent_current > LAP_COMPLETE:
-        return 10
+        return 500
     else:
         return difference * 100
     
