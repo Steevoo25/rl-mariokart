@@ -30,7 +30,7 @@ from environment.calculate_reward import calculate_reward
 from environment.memory_viewer import getRaceInfo
 from environment.termination_check import check_termination
 
-def print_state_to_dolphin_log(episode, frame, frameInfo reward):
+def print_state_to_dolphin_log(episode, frame, frameInfo:tuple, reward):
     print(f'''Episode: {episode} Frame: {frame}, FrameInfo: {frameInfo}, Reward: {reward}''')
 
 ## Socket Initialisation
@@ -99,7 +99,8 @@ while episode_counter < MAX_EPISODES:
         response = json.loads(env_socket.recv(131702).decode("utf-8"))
         
         action = response[0]
-        #print("action ", action)
+        controller_inputs.append(action)
+        print("action ", action)
         reset_requested = response[1]
         print("reset_requested", reset_requested)
         # -- Calculate reward
@@ -143,5 +144,5 @@ while episode_counter < MAX_EPISODES:
             continue
 
     # -- Send inputs to Dolphin
-    controller_inputs.append(action)
+    
     set_controller(action)
