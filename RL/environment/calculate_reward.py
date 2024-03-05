@@ -13,7 +13,7 @@ LAP_COMPLETE = 2
 
 VELOCITY_WEIGHT = 1
 RACE_PERCENT_WEIGHT = 15
-MT_WEIGHT = 1
+MT_WEIGHT = 200
 
 
 def calculate_reward(frameInfo_current, frameInfo_previous):
