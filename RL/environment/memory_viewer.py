@@ -6,6 +6,7 @@ from dolphin import memory
 SPEED_LOCATION = 0x80E4C8B8
 RACE_COMPLETION_LOCATION = 0x80E43748
 MT_LOCATION = 0x80E4C796
+CP_LOCATION = 0X80E43746
 
 # Returns the current speed of the kart
 def getCurrentSpeed() -> float:
@@ -19,9 +20,13 @@ def getCurrentRaceCompletion() -> float:
 def getCurrentMT() -> int:
     return memory.read_u16(MT_LOCATION)
     
+# Returns the current CP value
+def getCurrentCP() -> float:
+    return memory.read_u16(CP_LOCATION)
+    
 # Returns a tuple of the Speed, Race% and MT
 def getRaceInfo() -> tuple:
-    return getCurrentSpeed(), getCurrentRaceCompletion(), getCurrentMT()
+    return getCurrentSpeed(), getCurrentRaceCompletion(), getCurrentMT(), getCurrentCP()
 
 def printRaceInfo():
     print(f'MT: {getCurrentMT()}')
