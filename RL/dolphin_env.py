@@ -3,7 +3,7 @@ from dolphin import event # gives awaitable routine that returns when a frame is
 
 DEFAULT_CONTROLLER = {"A":True,"B":False,"Up":False,"StickX":128}
 DEFAULT_CONTROLLER_LIST = [False, False, 128]
-START_STATE = (76.332, 0.98, 0)
+START_STATE = (76.332, 0.98, 0, 0)
 PROJECT_DIR = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\'
 MAX_EPISODES = 5000
 
@@ -44,8 +44,7 @@ total_reward = 0
 frame_counter = 0
 termination_flag = False
 frameInfo_previous = list(START_STATE)
-is_logging = False
-reset_requested = False
+is_logging = True
 episode_counter = 0
 controller_inputs = []
 best_reward = 0
@@ -82,7 +81,7 @@ if reward_logging:
 
 ### Main Training Loop ###
 # -------------------------
-await load_savestate()
+
 while episode_counter < MAX_EPISODES:
     await event.frameadvance()
     
@@ -134,19 +133,14 @@ while episode_counter < MAX_EPISODES:
                 
                 reward_log.write(f"{total_reward},{total_reward_vel},{total_reward_perc},{total_reward_mt},{total_reward_cp}\n")
                 
-                
-            if is_logging:
-            # Print state to dolphin log
-                print_state_to_dolphin_log(episode_counter, frame_counter, *frameInfo_current, reward, q, action_choice)
-                #print(f"{episode_counter}, {reward}, {frame_counter}, {q}, {action}, {frameInfo_current}\n")
-                
 
             if termination_flag:
             # Reset
                 q = update_q_table(tuple(frameInfo_previous), action, -10, tuple(frameInfo_current), alpha, gamma)
                 # Log episode info
-                print(f"{episode_counter}, {total_reward}, {frame_counter}, {frameInfo_current}, {controller_inputs}\n")
-                log.write(f"{episode_counter}, {total_reward}, {frame_counter}")# {vel_reward}, {perc_reward}, {mt_reward}\n") # {q} , {frameInfo_current}\n")
+                if is_logging:
+                    print(f"{episode_counter}, {total_reward}, {frame_counter}, {frameInfo_current}, {controller_inputs}\n")
+                    log.write(f"{episode_counter}, {total_reward}, {frame_counter}")# {vel_reward}, {perc_reward}, {mt_reward}\n") # {q} , {frameInfo_current}\n")
                 # If its the best we've seen
                 if total_reward > best_reward:
                     # update best reward
