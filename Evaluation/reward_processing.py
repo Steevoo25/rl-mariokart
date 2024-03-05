@@ -15,6 +15,3 @@ for column in column_names:
     
 plt.legend()
 plt.show()
-# plt.plot(x_axis, , label='Speed Reward' )
-# plt.plot(x_axis, , label='Race% Reward')
-# plt.plot(x_axis, , label='MT Reward')
