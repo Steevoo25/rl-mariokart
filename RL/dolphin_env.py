@@ -82,7 +82,7 @@ if reward_logging:
 
 ### Main Training Loop ###
 # -------------------------
-
+await load_savestate()
 while episode_counter < MAX_EPISODES:
     await event.frameadvance()
     
