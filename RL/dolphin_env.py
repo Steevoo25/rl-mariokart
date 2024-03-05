@@ -65,7 +65,7 @@ log_file = f"{PROJECT_DIR}Evaluation\\data\\q-learning\\episodes\\q-learning-{da
 log = open(log_file, 'w')
 
 # Column Headers
-log.write("Episode,Total_Reward,Frame_Count,Velocity_Reward,RacePercent_Reward,MT_Reward\n")
+log.write("Episode,Total_Reward,Frame_Count\n")
 
 # Controller Inputs 
 best_inputs_file = f"{PROJECT_DIR}Evaluation\\data\\q-learning\\controller_episodes\\q-learning-{date_and_time}.pkl"
@@ -74,10 +74,11 @@ if reward_logging:
     total_reward_vel = 0
     total_reward_perc = 0
     total_reward_mt = 0    
+    total_reward_cp = 0
     
     reward_log_file = f"{PROJECT_DIR}Evaluation\\data\\q-learning\\rewards\\q-learning-{date_and_time}.csv"
     reward_log = open(reward_log_file, 'w')
-    reward_log.write("total_reward,vel_reward,perc_reward,mt_reward\n")
+    reward_log.write("total_reward,vel_reward,perc_reward,mt_reward,cp_reward\n")
 
 ### Main Training Loop ###
 # -------------------------
@@ -92,6 +93,10 @@ while episode_counter < MAX_EPISODES:
         frameInfo_current = list(START_STATE)
         termination_flag = False
         total_reward = 0
+        total_reward_vel = 0
+        total_reward_perc = 0
+        total_reward_mt = 0
+        total_reward_cp = 0
         reward = 0
     else:
         if frame_counter % 8 == 0 : 
@@ -104,11 +109,14 @@ while episode_counter < MAX_EPISODES:
             action, action_choice = epsilon_greedy(tuple(frameInfo_current), epsilon)
             controller_inputs.append(action)
             # -- Calculate reward
-            reward, vel_reward, perc_reward, mt_reward = calculate_reward(frameInfo_current, frameInfo_previous)
-            #print(vel_reward, perc_reward, mt_reward)
-            # round statespace values
-            frameInfo_rounded_current = map(lambda x: round(x, 2), frameInfo_current)
-            frameInfo_rounded_previous = map(lambda x: round(x, 2), frameInfo_previous)
+            # TODO: Implement Checkpoint rewards
+            reward, vel_reward, perc_reward, mt_reward, cp_reward = calculate_reward(frameInfo_current, frameInfo_previous)
+            #print(vel_reward, perc_reward, mt_reward, cp_reward)
+            
+            # round float statespace values and remove cp
+            frameInfo_rounded_current = map(lambda x: round(x, 2), frameInfo_current[:-1])
+            frameInfo_rounded_previous = map(lambda x: round(x, 2), frameInfo_previous[:-1])
+            
             # -- Update Q-Table
             q = update_q_table(tuple(frameInfo_rounded_previous), action, reward, tuple(frameInfo_rounded_current), alpha, gamma)
             
@@ -122,8 +130,9 @@ while episode_counter < MAX_EPISODES:
                 total_reward_vel += vel_reward
                 total_reward_perc += perc_reward
                 total_reward_mt += mt_reward
+                total_reward_cp += cp_reward
                 
-                reward_log.write(f"{total_reward},{total_reward_vel},{total_reward_perc},{total_reward_mt}\n")
+                reward_log.write(f"{total_reward},{total_reward_vel},{total_reward_perc},{total_reward_mt},{total_reward_cp}\n")
                 
                 
             if is_logging:
@@ -137,7 +146,7 @@ while episode_counter < MAX_EPISODES:
                 q = update_q_table(tuple(frameInfo_previous), action, -10, tuple(frameInfo_current), alpha, gamma)
                 # Log episode info
                 print(f"{episode_counter}, {total_reward}, {frame_counter}, {frameInfo_current}, {controller_inputs}\n")
-                log.write(f"{episode_counter}, {total_reward}, {frame_counter}, {vel_reward}, {perc_reward}, {mt_reward}\n") # {q} , {frameInfo_current}\n")
+                log.write(f"{episode_counter}, {total_reward}, {frame_counter}")# {vel_reward}, {perc_reward}, {mt_reward}\n") # {q} , {frameInfo_current}\n")
                 # If its the best we've seen
                 if total_reward > best_reward:
                     # update best reward
