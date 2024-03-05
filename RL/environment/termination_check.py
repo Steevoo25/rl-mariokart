@@ -1,6 +1,6 @@
 # A script that checks if the episode needs to terminate, given the current and previous raceInfo
 # Constants
-MIN_ACCEPTABLE_SPEED = 70
+MIN_ACCEPTABLE_SPEED = 60
 LAP_COMPLETED = 2
 RACE_COMPLETED = 4
 
