@@ -15,11 +15,13 @@ VELOCITY_WEIGHT = 1
 RACE_PERCENT_WEIGHT = 15
 MT_WEIGHT = 20
 
+CP_REWARD = 50
+
 
 def calculate_reward(frameInfo_current, frameInfo_previous):
     
-    curr_vel, curr_racepercent, curr_mt = frameInfo_current
-    prev_vel, prev_racepercent, prev_mt = frameInfo_previous
+    curr_vel, curr_racepercent, curr_mt, curr_cp = frameInfo_current
+    prev_vel, prev_racepercent, prev_mt, prev_cp = frameInfo_previous
     
     #-- Velocity --
     # Need: Current speed, Previous speed, Current Race%
@@ -33,8 +35,10 @@ def calculate_reward(frameInfo_current, frameInfo_previous):
     # Need: Current and Previous MT
     R_mt = calculate_miniturbo_reward(curr_mt, prev_mt) * MT_WEIGHT
     
+    R_cp = calculate_cp_reward(curr_cp, curr_mt)
+    
     #print_rewards(R_vel, R_racepercent, R_mt, frameInfo_current)
-    return round(R_vel + R_racepercent + R_mt, 5), R_vel, R_racepercent, R_mt
+    return round(R_vel + R_racepercent + R_mt + R_cp, 5), R_vel, R_racepercent, R_mt, R_cp
     
 def calculate_velocity_reward(S_current: float, S_prev: float):
 
@@ -77,6 +81,11 @@ def calculate_miniturbo_reward(mt_current: int, mt_previous:int):
     # started miniturbo and released it before fully charging
     if mt_previous < CHARGED_MINITURBO and mt_current < mt_previous:
         return -0.2
+    
+# Gives a static reward for reaching a checkpoint
+def calculate_cp_reward(cp_current: int, cp_previous: int) -> float:
+    if cp_current > cp_previous : return CP_REWARD
+    else: return 0
     
 def print_rewards(R_v, R_racepercent, R_mt, frameInfo):
     print(f'Velocity: {frameInfo[0]}, Reward: {R_v}')
