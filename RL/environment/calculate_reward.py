@@ -16,7 +16,7 @@ RACE_PERCENT_WEIGHT = 15
 MT_WEIGHT = 20
 
 CP_REWARD = 10
-
+LAP_COMPLETE_REWARD = 30
 
 def calculate_reward(frameInfo_current, frameInfo_previous):
     
@@ -63,7 +63,7 @@ def calculate_race_percent_reward(racePercent_current: float, racePercent_previo
     #print(f"Current: {racePercent_current}, Previous: {racePercent_previous}, Difference: {difference}")
     # Lap is complete
     if racePercent_current > LAP_COMPLETE:
-        return 500
+        return LAP_COMPLETE_REWARD
     else:
         return difference * 100
     
