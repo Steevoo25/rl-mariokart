@@ -3,7 +3,7 @@
 from dolphin import event # gives awaitable routine that returns when a frame is drawn
 
 DEFAULT_CONTROLLER = {"A":True,"B":False,"Up":False,"StickX":128}
-START_STATE = (76.332, 0.9, 0)
+START_STATE = (76.332, 0.9, 0, 0)
 PROJECT_DIR = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\'
 MAX_EPISODES = 5000
 
@@ -21,7 +21,6 @@ path.append(this_dir)
 # -- OTHER IMPORTS --
 import socket
 import json
-import logging
 from pickle import dump
 from datetime import datetime
 
@@ -30,7 +29,6 @@ from environment.press_button import press_button as set_controller
 from environment.calculate_reward import calculate_reward
 from environment.memory_viewer import getRaceInfo
 from environment.termination_check import check_termination
-from q_learning_agent import update_q_table, epsilon_greedy, get_q_table
 
 def print_state_to_dolphin_log(episode, frame, speed, racePercent, mt, reward):
     print(f'''Episode: {episode} Frame: {frame}, Speed: {speed}, Race%: {racePercent}, Miniturbo: {mt}, Reward: {reward}''')
@@ -58,11 +56,6 @@ episode_counter = 0
 controller_inputs = []
 best_reward = 0
 
-reward_logging = False
-total_reward_vel = 0
-total_reward_perc = 0
-total_reward_mt = 0
-
 ## Q-Learning parameters
 epsilon = 0.7  #Higher = more chance of random action
 gamma = 0.6 # Higher = more focus on future rewards
@@ -80,10 +73,6 @@ log.write("Episode,Total_Reward,Frame_Count,Velocity_Reward,RacePercent_Reward,M
 
 # Controller Inputs 
 best_inputs_file = f"{PROJECT_DIR}Evaluation\\data\\deep-learning\\controller_episodes\\deep-learning{date_and_time}.pkl"
-if reward_logging:
-    reward_log_file = f"{PROJECT_DIR}Evaluation\\data\\deep-learning\\rewards\\deep-learning-{date_and_time}.csv"
-    reward_log = open(reward_log_file, 'w')
-    reward_log.write("total_reward,vel_reward,perc_reward,mt_reward")
 
 ### Main Training Loop ###
 # -------------------------
@@ -91,7 +80,7 @@ if reward_logging:
 while episode_counter < MAX_EPISODES:
     await event.frameadvance()
     frame_counter += 1
-    file_number +=1
+    file_number += 1
     # Get frameInfo
     if frame_counter == 1:
     # If episode has jsut started don't reset
@@ -100,67 +89,58 @@ while episode_counter < MAX_EPISODES:
         total_reward = 0
         reward = 0
     else:
-        #--- Get current frame info
-        frameInfo_current = getRaceInfo()
-        # --- Check termination
-        termination_flag = check_termination(frameInfo_current)
-    
-    # --- Get response from Rainbow based on previous frame
-    response = json.loads(env_socket.recv(131702).decode("utf-8"))
-    
-    
-    action = response[0]
-    print("action ", action)
-    reset_requested = response[1]
-
-    # -- Calculate reward
-    reward, vel_reward, perc_reward, mt_reward = calculate_reward(frameInfo_current, frameInfo_previous)
-    #print(vel_reward, perc_reward, mt_reward)
-    
-    
-    # -- Send data to Rainbow
-    # encode data as json object and send to agent process
-    data_to_send = json.dumps((reward, termination_flag, frame_counter, file_number)).encode("utf-8")
-    env_socket.sendall(data_to_send)
-    
-    # update previous_frame_info 
-    frameInfo_previous = frameInfo_current
-    # update total reward
-    total_reward = total_reward + reward
-
-    if reward_logging:
-        # log individual reward values
-        total_reward_vel += vel_reward
-        total_reward_perc += perc_reward
-        total_reward_mt += mt_reward
+        if frame_counter % 8 == 0 : 
+            #--- Get current frame info
+            frameInfo_current = getRaceInfo()
+            # --- Check termination
+            termination_flag = check_termination(frameInfo_current)
         
-        reward_log.write(f"{total_reward},{total_reward_vel},{total_reward_perc},{total_reward_mt}")
+        # --- Get response from Rainbow based on previous frame
+        response = json.loads(env_socket.recv(131702).decode("utf-8"))
+        
+        action = response[0]
+        #print("action ", action)
+        reset_requested = response[1]
+        print("reset_requested", reset_requested)
+        # -- Calculate reward
+        reward, vel_reward, perc_reward, mt_reward, cp_reward = calculate_reward(frameInfo_current, frameInfo_previous)
+        #print(vel_reward, perc_reward, mt_reward, cp_reward)
         
         
-    if is_logging:
-    # Print state to dolphin log
-        print_state_to_dolphin_log(episode_counter, frame_counter, *frameInfo_current, reward)
-        #print(f"{episode_counter}, {reward}, {frame_counter}, {q}, {action}, {frameInfo_current}\n")
+        # -- Send data to Rainbow
+        # encode data as json object and send to agent process
+        data_to_send = json.dumps((reward, termination_flag, frame_counter, file_number)).encode("utf-8")
+        env_socket.sendall(data_to_send)
         
-
-    if termination_flag:
-    # Reset
-        # Log episode info
-        print(f"{episode_counter}, {total_reward}, {frame_counter},  {frameInfo_current}, {controller_inputs}\n")
-        log.write(f"{episode_counter}, {total_reward}, {frame_counter}, {vel_reward}, {perc_reward}, {mt_reward}\n") # {q} , {frameInfo_current}\n")
-        # If its the best we've seen
-        if total_reward > best_reward:
-            # update best reward
-            best_reward = total_reward
-            # save controller inputs to pkl file
-            dump(controller_inputs, open(f'{best_inputs_file}', "wb"))
+        # update previous_frame_info 
+        frameInfo_previous = frameInfo_current
+        # update total reward
+        total_reward = total_reward + reward
             
-        frame_counter = 0
-        episode_counter += 1
-        controller_inputs = []
-        frameInfo_previous = list(START_STATE)
-        await load_savestate()
-        continue
+        if is_logging:
+        # Print state to dolphin log
+            print_state_to_dolphin_log(episode_counter, frame_counter, *frameInfo_current, reward)
+            #print(f"{episode_counter}, {reward}, {frame_counter}, {q}, {action}, {frameInfo_current}\n")
+            
+
+        if termination_flag or reset_requested:
+        # Reset
+            # Log episode info
+            print(f"{episode_counter}, {total_reward}, {frame_counter},  {frameInfo_current}, {controller_inputs}\n")
+            log.write(f"{episode_counter}, {total_reward}, {frame_counter}, {vel_reward}, {perc_reward}, {mt_reward}\n") # {q} , {frameInfo_current}\n")
+            # If its the best we've seen
+            if total_reward > best_reward:
+                # update best reward
+                best_reward = total_reward
+                # save controller inputs to pkl file
+                dump(controller_inputs, open(f'{best_inputs_file}', "wb"))
+                
+            frame_counter = 0
+            episode_counter += 1
+            controller_inputs = []
+            frameInfo_previous = list(START_STATE)
+            await load_savestate()
+            continue
 
 
     # -- Send inputs to Dolphin
