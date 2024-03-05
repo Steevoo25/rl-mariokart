@@ -5,7 +5,7 @@ LAP_COMPLETED = 2
 RACE_COMPLETED = 4
 
 def check_termination(raceInfo) -> bool:
-    vel, racePercent, mt = raceInfo
+    vel, racePercent, _, _ = raceInfo
     
     # speed is too low
     if vel < MIN_ACCEPTABLE_SPEED:
