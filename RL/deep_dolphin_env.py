@@ -1,7 +1,7 @@
 
 # -- DOLHPIN IMPORTS --
 from dolphin import event # gives awaitable routine that returns when a frame is drawn
-
+DEFAULT_CONTROLLER_LIST = [False, False, 128]
 DEFAULT_CONTROLLER = {"A":True,"B":False,"Up":False,"StickX":128}
 START_STATE = (76.332, 0.9, 0, 0)
 PROJECT_DIR = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\'
@@ -30,8 +30,8 @@ from environment.calculate_reward import calculate_reward
 from environment.memory_viewer import getRaceInfo
 from environment.termination_check import check_termination
 
-def print_state_to_dolphin_log(episode, frame, speed, racePercent, mt, reward):
-    print(f'''Episode: {episode} Frame: {frame}, Speed: {speed}, Race%: {racePercent}, Miniturbo: {mt}, Reward: {reward}''')
+def print_state_to_dolphin_log(episode, frame, frameInfo reward):
+    print(f'''Episode: {episode} Frame: {frame}, FrameInfo: {frameInfo}, Reward: {reward}''')
 
 ## Socket Initialisation
 # This script will be running within Dolphin's embedded python, meaning it has a lot of limitations
@@ -55,7 +55,7 @@ reset_requested = False
 episode_counter = 0
 controller_inputs = []
 best_reward = 0
-
+action = DEFAULT_CONTROLLER
 ## Q-Learning parameters
 epsilon = 0.7  #Higher = more chance of random action
 gamma = 0.6 # Higher = more focus on future rewards
@@ -76,7 +76,7 @@ best_inputs_file = f"{PROJECT_DIR}Evaluation\\data\\deep-learning\\controller_ep
 
 ### Main Training Loop ###
 # -------------------------
-
+await load_savestate()
 while episode_counter < MAX_EPISODES:
     await event.frameadvance()
     frame_counter += 1
@@ -119,7 +119,7 @@ while episode_counter < MAX_EPISODES:
             
         if is_logging:
         # Print state to dolphin log
-            print_state_to_dolphin_log(episode_counter, frame_counter, *frameInfo_current, reward)
+            print_state_to_dolphin_log(episode_counter, frame_counter, frameInfo_current, reward)
             #print(f"{episode_counter}, {reward}, {frame_counter}, {q}, {action}, {frameInfo_current}\n")
             
 
@@ -141,7 +141,6 @@ while episode_counter < MAX_EPISODES:
             frameInfo_previous = list(START_STATE)
             await load_savestate()
             continue
-
 
     # -- Send inputs to Dolphin
     controller_inputs.append(action)
