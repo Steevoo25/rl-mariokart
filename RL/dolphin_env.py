@@ -2,6 +2,7 @@
 from dolphin import event # gives awaitable routine that returns when a frame is drawn
 
 DEFAULT_CONTROLLER = {"A":True,"B":False,"Up":False,"StickX":128}
+DEFAULT_CONTROLLER_LIST = [False, False, 128]
 START_STATE = (76.332, 0.98, 0)
 PROJECT_DIR = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\'
 MAX_EPISODES = 5000
@@ -48,7 +49,7 @@ reset_requested = False
 episode_counter = 0
 controller_inputs = []
 best_reward = 0
-
+action = DEFAULT_CONTROLLER_LIST
 reward_logging = False
 
 ## Q-Learning parameters
@@ -101,6 +102,7 @@ while episode_counter < MAX_EPISODES:
            
             # -- Get action by epsilon-greedy policy
             action, action_choice = epsilon_greedy(tuple(frameInfo_current), epsilon)
+            controller_inputs.append(action)
             # -- Calculate reward
             reward, vel_reward, perc_reward, mt_reward = calculate_reward(frameInfo_current, frameInfo_previous)
             #print(vel_reward, perc_reward, mt_reward)
@@ -152,6 +154,9 @@ while episode_counter < MAX_EPISODES:
                 continue
 
             # -- Send inputs to Dolphin
+        try:
             action = convert_actions_to_dict(action)
-            controller_inputs.append(action)
+        except KeyError:
+            action = DEFAULT_CONTROLLER
+        finally:
             set_controller(action)
