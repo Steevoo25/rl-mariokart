@@ -2,7 +2,7 @@
 from dolphin import event # gives awaitable routine that returns when a frame is drawn
 
 DEFAULT_CONTROLLER = {"A":True,"B":False,"Up":False,"StickX":128}
-START_STATE = (76.332, 0.9, 0)
+START_STATE = (76.332, 0.98, 0)
 PROJECT_DIR = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\'
 MAX_EPISODES = 5000
 
@@ -76,7 +76,7 @@ if reward_logging:
     
     reward_log_file = f"{PROJECT_DIR}Evaluation\\data\\q-learning\\rewards\\q-learning-{date_and_time}.csv"
     reward_log = open(reward_log_file, 'w')
-    reward_log.write("total_reward,vel_reward,perc_reward,mt_reward")
+    reward_log.write("total_reward,vel_reward,perc_reward,mt_reward\n")
 
 ### Main Training Loop ###
 # -------------------------
@@ -119,7 +119,7 @@ while episode_counter < MAX_EPISODES:
         total_reward_perc += perc_reward
         total_reward_mt += mt_reward
         
-        reward_log.write(f"{total_reward},{total_reward_vel},{total_reward_perc},{total_reward_mt}")
+        reward_log.write(f"{total_reward},{total_reward_vel},{total_reward_perc},{total_reward_mt}\n")
         
         
     if is_logging:
