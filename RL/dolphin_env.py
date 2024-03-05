@@ -83,76 +83,75 @@ if reward_logging:
 
 while episode_counter < MAX_EPISODES:
     await event.frameadvance()
-    if frame_counter % 8 == 0 :
-        frame_counter += 1
-        # Get frameInfo
-        if frame_counter == 1:
-        # If episode has jsut started don't reset
-            frameInfo_current = list(START_STATE)
-            termination_flag = False
-            total_reward = 0
-            reward = 0
-        else:
+    
+    frame_counter += 1
+    # Get frameInfo
+    if frame_counter == 1:
+    # If episode has jsut started don't reset
+        frameInfo_current = list(START_STATE)
+        termination_flag = False
+        total_reward = 0
+        reward = 0
+    else:
+        if frame_counter % 8 == 0 : 
             #--- Get current frame info
             frameInfo_current = getRaceInfo()
             # --- Check termination
-            termination_flag = check_termination(frameInfo_current)
+            termination_flag = check_termination(frameInfo_current)    
+           
+            # -- Get action by epsilon-greedy policy
+            action, action_choice = epsilon_greedy(tuple(frameInfo_current), epsilon)
+            # -- Calculate reward
+            reward, vel_reward, perc_reward, mt_reward = calculate_reward(frameInfo_current, frameInfo_previous)
+            #print(vel_reward, perc_reward, mt_reward)
+            # round statespace values
+            frameInfo_rounded_current = map(lambda x: round(x, 2), frameInfo_current)
+            frameInfo_rounded_previous = map(lambda x: round(x, 2), frameInfo_previous)
+            # -- Update Q-Table
+            q = update_q_table(tuple(frameInfo_rounded_previous), action, reward, tuple(frameInfo_rounded_current), alpha, gamma)
             
-        # -- Get action by epsilon-greedy policy
-        action, action_choice = epsilon_greedy(tuple(frameInfo_current), epsilon)
-        # -- Calculate reward
-        reward, vel_reward, perc_reward, mt_reward = calculate_reward(frameInfo_current, frameInfo_previous)
-        #print(vel_reward, perc_reward, mt_reward)
-        # round statespace values
-        frameInfo_rounded_current = map(lambda x: round(x, 2), frameInfo_current)
-        frameInfo_rounded_previous = map(lambda x: round(x, 2), frameInfo_previous)
-        # -- Update Q-Table
-        q = update_q_table(tuple(frameInfo_rounded_previous), action, reward, tuple(frameInfo_rounded_current), alpha, gamma)
-        
-        # update previous_frame_info 
-        frameInfo_previous = frameInfo_current
-        # update total reward
-        total_reward = total_reward + reward
+            # update previous_frame_info 
+            frameInfo_previous = frameInfo_current
+            # update total reward
+            total_reward = total_reward + reward
 
-        if reward_logging:
-            # log individual reward values
-            total_reward_vel += vel_reward
-            total_reward_perc += perc_reward
-            total_reward_mt += mt_reward
-            
-            reward_log.write(f"{total_reward},{total_reward_vel},{total_reward_perc},{total_reward_mt}\n")
-            
-            
-        if is_logging:
-        # Print state to dolphin log
-            print_state_to_dolphin_log(episode_counter, frame_counter, *frameInfo_current, reward, q, action_choice)
-            #print(f"{episode_counter}, {reward}, {frame_counter}, {q}, {action}, {frameInfo_current}\n")
-            
-
-        if termination_flag:
-        # Reset
-            q = update_q_table(tuple(frameInfo_previous), action, -10, tuple(frameInfo_current), alpha, gamma)
-            # Log episode info
-            print(f"{episode_counter}, {total_reward}, {frame_counter}, {q},  {frameInfo_current}, {controller_inputs}\n")
-            log.write(f"{episode_counter}, {total_reward}, {frame_counter}, {vel_reward}, {perc_reward}, {mt_reward}\n") # {q} , {frameInfo_current}\n")
-            # If its the best we've seen
-            if total_reward > best_reward:
-                # update best reward
-                best_reward = total_reward
-                # save controller inputs to pkl file
-                dump(controller_inputs, open(f'{best_inputs_file}', "wb"))
+            if reward_logging:
+                # log individual reward values
+                total_reward_vel += vel_reward
+                total_reward_perc += perc_reward
+                total_reward_mt += mt_reward
                 
-            frame_counter = 0
-            episode_counter += 1
-            controller_inputs = []
-            frameInfo_previous = list(START_STATE)
-            await load_savestate()
-            continue
+                reward_log.write(f"{total_reward},{total_reward_vel},{total_reward_perc},{total_reward_mt}\n")
+                
+                
+            if is_logging:
+            # Print state to dolphin log
+                print_state_to_dolphin_log(episode_counter, frame_counter, *frameInfo_current, reward, q, action_choice)
+                #print(f"{episode_counter}, {reward}, {frame_counter}, {q}, {action}, {frameInfo_current}\n")
+                
 
-        # -- Send inputs to Dolphin
-        action = convert_actions_to_dict(action)
-        controller_inputs.append(action)
-        set_controller(action)
+            if termination_flag:
+            # Reset
+                q = update_q_table(tuple(frameInfo_previous), action, -10, tuple(frameInfo_current), alpha, gamma)
+                # Log episode info
+                print(f"{episode_counter}, {total_reward}, {frame_counter}, {frameInfo_current}, {controller_inputs}\n")
+                log.write(f"{episode_counter}, {total_reward}, {frame_counter}, {vel_reward}, {perc_reward}, {mt_reward}\n") # {q} , {frameInfo_current}\n")
+                # If its the best we've seen
+                if total_reward > best_reward:
+                    # update best reward
+                    best_reward = total_reward
+                    # save controller inputs to pkl file
+                    dump(controller_inputs, open(f'{best_inputs_file}', "wb"))
+                    
+                frame_counter = 0
+                episode_counter += 1
+                controller_inputs = []
+                frameInfo_previous = list(START_STATE)
+                termination_flag = False
+                await load_savestate()
+                continue
 
-print(f"Q-Table size: {len(get_q_table())}")
-print(f"Time of completion{datetime.now().strftime("%d_%m_%Y--%H-%M")}")
+            # -- Send inputs to Dolphin
+            action = convert_actions_to_dict(action)
+            controller_inputs.append(action)
+            set_controller(action)
