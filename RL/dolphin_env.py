@@ -103,7 +103,6 @@ while True:
     
     #--- Get current frame info
     frameInfo_current = getRaceInfo()
-    #print(frame_counter, frameInfo_current)
 
     # --- Check termination
     termination_flag = check_termination(frameInfo_current)
@@ -113,17 +112,13 @@ while True:
     step_reward += frame_reward
 
     if (frame_counter-1) % TIME_STEP == 0 : 
-           
-       
+             
         # -- Get action by epsilon-greedy policy
         action, action_choice = epsilon_greedy(tuple(frameInfo_current), epsilon)
-        #print(action, frameInfo_current)
         controller_inputs.append(action)
         # -- Update Q-Table
-        q = update_q_table(tuple(frameInfo_previous), action, step_reward, tuple(frameInfo_current), alpha, gamma)
+        q = update_q_table(tuple(frameInfo_previous[:-1]), action, step_reward, tuple(frameInfo_current[:-1]), alpha, gamma)
         
-        # update previous_frame_info 
-        frameInfo_previous = frameInfo_current
         # update total reward
         total_reward = total_reward + step_reward
 
@@ -139,9 +134,11 @@ while True:
         #print("Reward for step :", step_reward)
         step_reward = 0
 
+    frameInfo_previous = frameInfo_current
+
     if termination_flag:
     # Reset
-        update_q_table(tuple(frameInfo_previous), action, -10, tuple(frameInfo_current), alpha, gamma)
+        update_q_table(tuple(frameInfo_previous[:-1]), action, -10, tuple(frameInfo_current[:-1]), alpha, gamma)
         # Log episode info
         if is_logging:
             print(f"{episode_counter}, {total_reward}, {frame_counter}, {frameInfo_current}, {controller_inputs}\n")
