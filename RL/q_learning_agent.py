@@ -42,15 +42,18 @@ def handle_unassigned_q_action(next_state, action):
 def epsilon_greedy(state, eps):
     # If all actions have been explored, always move to it
     # count all occurences of state in q
+    print("")
     count = sum(1 for key in q.keys() if key[0] == state)
     if count == ACTION_COUNT: 
+        print(q.keys())
         eps = -1 # always return best
-        print("Fully explored:", state)
+        print("Fully explored:", state, " count " , count)
     # Pick random action with probability epsilon
     if random.uniform(0,1) < eps:
         return action_tuples[random.randint(0, ACTION_COUNT)], 'Exploring'
     # Choose best action in current state with probability epsilon
     else:
+        print("Taking best action")
         return action_tuples[max(range(ACTION_COUNT), key= lambda x : handle_unassigned_q_index(state, x))], 'Exploiting'
         # Explanation of this line:
         # max() function gives index of best action, based on its q-value
@@ -59,6 +62,7 @@ def epsilon_greedy(state, eps):
 # --- Update Rule
 # Returns Q-value of action-state pair
 def update_q_table(prev_state, action, reward, next_state, alpha, gamma) -> float:
+
     # find a that maximises value of Q in next_state
     max_future_q = max([handle_unassigned_q_action(next_state, action) for action in action_tuples])
     
