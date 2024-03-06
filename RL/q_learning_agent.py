@@ -40,6 +40,10 @@ def handle_unassigned_q_action(next_state, action):
 
 # --- Epsilon-Greedy Policy
 def epsilon_greedy(state, eps):
+    # If all actions have been explored, always move to it
+    if len(q(state)) == ACTION_COUNT:
+        print("All actions explored in state", state)
+        return action_tuples[max(range(ACTION_COUNT), key= lambda x : handle_unassigned_q_index(state, x))], 'Exploiting'
     # Pick random action with probability epsilon
     if random.uniform(0,1) < eps:
         return action_tuples[random.randint(0, ACTION_COUNT)], 'Exploring'
