@@ -38,7 +38,7 @@ def calculate_reward(frameInfo_current, frameInfo_previous):
     R_cp = calculate_cp_reward(curr_cp, prev_cp)
     
     #print_rewards(R_vel, R_racepercent, R_mt, frameInfo_current)
-    return round(R_vel + R_racepercent + R_mt + R_cp, 5), R_vel, R_racepercent, R_mt, R_cp
+    return round(R_vel + R_racepercent + R_mt + R_cp), R_vel, R_racepercent, R_mt, R_cp
     
 def calculate_velocity_reward(S_current: float, S_prev: float):
 
