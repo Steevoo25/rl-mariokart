@@ -100,72 +100,69 @@ while True:
         # total_reward_cp = 0
         step_reward = 0
         reward = 0
-    else:
-        #--- Get current frame info
-        frameInfo_current = getRaceInfo()
-        #print(frame_counter, frameInfo_current)
+    
+    #--- Get current frame info
+    frameInfo_current = getRaceInfo()
+    #print(frame_counter, frameInfo_current)
 
-        # --- Check termination
-        termination_flag = check_termination(frameInfo_current)
+    # --- Check termination
+    termination_flag = check_termination(frameInfo_current)
+    # -- Calculate reward
+    frame_reward, vel_reward, perc_reward, mt_reward, cp_reward = calculate_reward(frameInfo_current, frameInfo_previous)
+    #print("Frame reward", frame_counter, frame_reward)
+    step_reward += frame_reward
 
-        # -- Calculate reward
-        frame_reward, vel_reward, perc_reward, mt_reward, cp_reward = calculate_reward(frameInfo_current, frameInfo_previous)
-        print("Frame reward", frame_counter, frame_reward)
-        step_reward += frame_reward
-
-        if frame_counter % TIME_STEP == 0 : 
-               
+    if (frame_counter-1) % TIME_STEP == 0 : 
            
-            # -- Get action by epsilon-greedy policy
-            action, action_choice = epsilon_greedy(tuple(frameInfo_current), epsilon)
-            print(action, frameInfo_current)
-            controller_inputs.append(action)
+       
+        # -- Get action by epsilon-greedy policy
+        action, action_choice = epsilon_greedy(tuple(frameInfo_current), epsilon)
+        #print(action, frameInfo_current)
+        controller_inputs.append(action)
+        # -- Update Q-Table
+        q = update_q_table(tuple(frameInfo_previous), action, step_reward, tuple(frameInfo_current), alpha, gamma)
+        
+        # update previous_frame_info 
+        frameInfo_previous = frameInfo_current
+        # update total reward
+        total_reward = total_reward + step_reward
 
-            # -- Update Q-Table
-            q = update_q_table(tuple(frameInfo_previous), action, step_reward, tuple(frameInfo_current), alpha, gamma)
+        if reward_logging:
+            # log individual reward values
+            total_reward_vel += vel_reward
+            total_reward_perc += perc_reward
+            total_reward_mt += mt_reward
+            total_reward_cp += cp_reward
             
-            # update previous_frame_info 
-            frameInfo_previous = frameInfo_current
-            # update total reward
-            total_reward = total_reward + step_reward
+            reward_log.write(f"{total_reward},{total_reward_vel},{total_reward_perc},{total_reward_mt},{total_reward_cp}\n")
+            
+        #print("Reward for step :", step_reward)
+        step_reward = 0
 
-            if reward_logging:
-                # log individual reward values
-                total_reward_vel += vel_reward
-                total_reward_perc += perc_reward
-                total_reward_mt += mt_reward
-                total_reward_cp += cp_reward
-                
-                reward_log.write(f"{total_reward},{total_reward_vel},{total_reward_perc},{total_reward_mt},{total_reward_cp}\n")
-                
-            print("Reward for step :", step_reward)
-            step_reward = 0
-
-        if termination_flag:
-        # Reset
-            update_q_table(tuple(frameInfo_previous), action, -10, tuple(frameInfo_current), alpha, gamma)
-            # Log episode info
-            if is_logging:
-                print(f"{episode_counter}, {total_reward}, {frame_counter}, {frameInfo_current}, {controller_inputs}\n")
-                log.write(f"{episode_counter}, {total_reward}, {frame_counter}")# {vel_reward}, {perc_reward}, {mt_reward}\n") # {q} , {frameInfo_current}\n")
-            # If its the best we've seen
-            if total_reward > best_reward:
-                # update best reward
-                best_reward = total_reward
-                # save controller inputs to pkl file
-                dump(controller_inputs, open(f'{best_inputs_file}', "wb"))
-                
-            frame_counter = 0
-            episode_counter += 1
-            controller_inputs = []
-            frameInfo_previous = list(START_STATE)
-            termination_flag = False
-            await load_savestate()
-            continue
-            # Step has passed, reset rewards
+    if termination_flag:
+    # Reset
+        update_q_table(tuple(frameInfo_previous), action, -10, tuple(frameInfo_current), alpha, gamma)
+        # Log episode info
+        if is_logging:
+            print(f"{episode_counter}, {total_reward}, {frame_counter}, {frameInfo_current}, {controller_inputs}\n")
+            log.write(f"{episode_counter}, {total_reward}, {frame_counter}")# {vel_reward}, {perc_reward}, {mt_reward}\n") # {q} , {frameInfo_current}\n")
+        # If its the best we've seen
+        if total_reward > best_reward:
+            # update best reward
+            best_reward = total_reward
+            # save controller inputs to pkl file
+            dump(controller_inputs, open(f'{best_inputs_file}', "wb"))
+            
+        frame_counter = 0
+        episode_counter += 1
+        controller_inputs = []
+        frameInfo_previous = list(START_STATE)
+        termination_flag = False
+        await load_savestate()
+        continue
 
            
 
             # -- Send inputs to Dolphin
-        sent_action = convert_actions_to_dict(action)
-        set_controller(sent_action)
+    sent_action = convert_actions_to_dict(action)
+    set_controller(sent_action)
