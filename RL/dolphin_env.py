@@ -155,6 +155,7 @@ while True:
         controller_inputs = []
         frameInfo_previous = list(START_STATE)
         termination_flag = False
+        action = DEFAULT_CONTROLLR_TUPLE
         await load_savestate()
         continue
 
