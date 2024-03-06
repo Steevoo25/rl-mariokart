@@ -114,7 +114,7 @@ while True:
     if (frame_counter-1) % TIME_STEP == 0 : 
              
         # -- Get action by epsilon-greedy policy
-        action, action_choice = epsilon_greedy(tuple(frameInfo_current[:-1]), epsilon)
+        action, action_choice = epsilon_greedy(tuple(frameInfo_previous[:-1]), epsilon)
         controller_inputs.append(action)
         # -- Update Q-Table
         q = update_q_table(tuple(frameInfo_previous[:-1]), action, step_reward, tuple(frameInfo_current[:-1]), alpha, gamma)
