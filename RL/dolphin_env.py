@@ -1,11 +1,12 @@
 # -- DOLHPIN IMPORTS --
 from dolphin import event # gives awaitable routine that returns when a frame is drawn
 
-DEFAULT_CONTROLLER = {"A":True,"B":False,"Up":False,"StickX":128}
+#DEFAULT_CONTROLLER = {"A":True,"B":False,"Up":False,"StickX":128}
 DEFAULT_CONTROLLER_LIST = [False, False, 128]
 START_STATE = (76.332, 0.98, 0, 0)
 PROJECT_DIR = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\'
 MAX_EPISODES = 5000
+TIME_STEP = 30 #Frames between each step
 
 # As the script is run within the dolphin executable, 
 # Append the true path of scripts to import
@@ -82,7 +83,7 @@ if reward_logging:
 ### Main Training Loop ###
 # -------------------------
 
-while episode_counter < MAX_EPISODES:
+while True:
     await event.frameadvance()
     
     frame_counter += 1
@@ -98,7 +99,7 @@ while episode_counter < MAX_EPISODES:
         total_reward_cp = 0
         reward = 0
     else:
-        if frame_counter % 8 == 0 : 
+        if frame_counter % TIME_STEP == 0 : 
             #--- Get current frame info
             frameInfo_current = getRaceInfo()
             # --- Check termination
@@ -106,6 +107,7 @@ while episode_counter < MAX_EPISODES:
            
             # -- Get action by epsilon-greedy policy
             action, action_choice = epsilon_greedy(tuple(frameInfo_current), epsilon)
+            
             controller_inputs.append(action)
             # -- Calculate reward
             # TODO: Implement Checkpoint rewards
@@ -157,9 +159,5 @@ while episode_counter < MAX_EPISODES:
                 continue
 
             # -- Send inputs to Dolphin
-        try:
-            action = convert_actions_to_dict(action)
-        except KeyError:
-            action = DEFAULT_CONTROLLER
-        finally:
-            set_controller(action)
+        sent_action = convert_actions_to_dict(action)
+        set_controller(sent_action)
