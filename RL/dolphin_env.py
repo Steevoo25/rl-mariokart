@@ -3,7 +3,7 @@ from dolphin import event # gives awaitable routine that returns when a frame is
 
 #DEFAULT_CONTROLLER = {"A":True,"B":False,"Up":False,"StickX":128}
 DEFAULT_CONTROLLR_TUPLE = (False, False, 128)
-START_STATE = (76.332, 0.98, 0, 0)
+START_STATE = (76, 0.98, 0, 0)
 PROJECT_DIR = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\'
 MAX_EPISODES = 5000
 TIME_STEP = 20 #Frames between each step
@@ -101,10 +101,7 @@ while True:
     else:
         #--- Get current frame info
         frameInfo_current = getRaceInfo()
-
-        frameInfo_rounded_current = map(lambda x: round(x, 2), frameInfo_current[:-1])
-        frameInfo_rounded_previous = map(lambda x: round(x, 2), frameInfo_previous[:-1])
-            
+        print(frame_counter, frameInfo_current)
         # --- Check termination
         termination_flag = check_termination(frameInfo_current)
 
@@ -124,7 +121,7 @@ while True:
             # round float statespace values and remove cp
             
             # -- Update Q-Table
-            q = update_q_table(tuple(frameInfo_rounded_previous), action, reward, tuple(frameInfo_rounded_current), alpha, gamma)
+            q = update_q_table(tuple(frameInfo_previous), action, reward, tuple(frameInfo_current), alpha, gamma)
             
             # update previous_frame_info 
             frameInfo_previous = frameInfo_current
@@ -143,7 +140,7 @@ while True:
 
         if termination_flag:
         # Reset
-            update_q_table(tuple(frameInfo_rounded_previous), action, -10, tuple(frameInfo_rounded_current), alpha, gamma)
+            update_q_table(tuple(frameInfo_previous), action, -10, tuple(frameInfo_current), alpha, gamma)
             # Log episode info
             if is_logging:
                 print(f"{episode_counter}, {total_reward}, {frame_counter}, {frameInfo_current}, {controller_inputs}\n")
