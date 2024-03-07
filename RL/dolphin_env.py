@@ -2,7 +2,7 @@
 from dolphin import event # gives awaitable routine that returns when a frame is drawn
 
 #DEFAULT_CONTROLLER = {"A":True,"B":False,"Up":False,"StickX":128}
-DEFAULT_CONTROLLR_TUPLE = (False, False, 128)
+DEFAULT_CONTROLLR_TUPLE = (False, True, 128)
 START_STATE = (76, 0.98, 0, 0)
 PROJECT_DIR = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\'
 MAX_EPISODES = 5000
@@ -55,7 +55,7 @@ reward_logging = False
 
 ## Q-Learning parameters
 epsilon = 0.9  #Higher = more chance of random action
-gamma = 0.8 # Higher = more focus on future rewards
+gamma = 0.9 # Higher = more focus on future rewards
 alpha = 1 # Higher = newer Q-Values will have more impact
 
 ## Logging
@@ -111,13 +111,20 @@ while True:
     #print("Frame reward", frame_counter, frame_reward)
     step_reward += frame_reward
 
-    if (frame_counter-1) % TIME_STEP == 0 : 
-             
-        # -- Get action by epsilon-greedy policy
-        action, action_choice = epsilon_greedy(tuple(frameInfo_previous[:-1]), epsilon)
+    if (frame_counter-1) % TIME_STEP == 0 :  
+        # If its the first frame, dont check the action
+        if frame_counter == 1:
+            action = DEFAULT_CONTROLLR_TUPLE
+        else:
+            # -- Get action by epsilon-greedy policy
+            action, action_choice = epsilon_greedy(tuple(frameInfo_previous[:-1]), epsilon)
+            # -- Update Q-Table
+            q = update_q_table(tuple(frameInfo_previous[:-1]), action, step_reward, tuple(frameInfo_current[:-1]), alpha, gamma)
+        
+        
+        
         controller_inputs.append(action)
-        # -- Update Q-Table
-        q = update_q_table(tuple(frameInfo_previous[:-1]), action, step_reward, tuple(frameInfo_current[:-1]), alpha, gamma)
+        
         
         # update total reward
         total_reward = total_reward + step_reward
@@ -138,7 +145,7 @@ while True:
 
     if termination_flag:
     # Reset
-        update_q_table(tuple(frameInfo_previous[:-1]), action, -(step_reward * 0.7), tuple(frameInfo_current[:-1]), alpha, gamma)
+        #update_q_table(tuple(frameInfo_previous[:-1]), action, -(step_reward * 0.7), tuple(frameInfo_current[:-1]), alpha, gamma)
         # Log episode info
         if is_logging:
             print(f"{episode_counter}, {total_reward}, {frame_counter}, {frameInfo_current}, {controller_inputs}\n")
