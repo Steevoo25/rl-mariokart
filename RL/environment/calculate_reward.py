@@ -76,8 +76,8 @@ def calculate_miniturbo_reward(mt_current: int, mt_previous:int):
     if mt_previous == CHARGED_MINITURBO:
         return 0.1
     # miniturbo is charging
-    #if mt_current > 0:
-    #    return 0.05
+    if mt_current > 0:
+        return 0#0.05
     # no miniturbo being performed
     if mt_current == NOT_CHARGING:
         return 0
