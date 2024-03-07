@@ -1,6 +1,6 @@
 import pandas as pd
 from matplotlib import pyplot as plt
-filename = 'q-learning-02_03_2024--00-30'
+filename = 'q-learning-07_03_2024--18-25'
 path = f'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\Evaluation\\data\\q-learning\\episodes\\{filename}.csv'
 # Read into dataframe
 df = pd.read_csv(path, )
@@ -19,7 +19,7 @@ plt.plot(df['Episode'], smoothed_reward, label='Return', linewidth=1)
 #plt.plot(df['Episode'], df['Frame_Count'], label='Survival Time')
 
 # Set x axis scale
-plt.ylim(0, 500)
+plt.ylim(200, 1000)
 
 # Lables
 plt.xlabel('Episode number')
@@ -32,6 +32,6 @@ plt.legend()
 path = path.replace("csv", "png")
 path = path.replace("data", "plots")
 
-plt.savefig(path)
+#plt.savefig(path)
 
 plt.show()
