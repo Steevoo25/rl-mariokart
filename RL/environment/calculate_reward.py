@@ -15,7 +15,7 @@ VELOCITY_WEIGHT = 1
 RACE_PERCENT_WEIGHT = 25
 MT_WEIGHT = 15
 
-CP_REWARD = 10
+CP_REWARD = 20
 LAP_COMPLETE_REWARD = 30
 
 def calculate_reward(frameInfo_current, frameInfo_previous):
@@ -38,7 +38,7 @@ def calculate_reward(frameInfo_current, frameInfo_previous):
     R_cp = calculate_cp_reward(curr_cp, prev_cp)
     
     #print_rewards(R_vel, R_racepercent, R_mt, frameInfo_current)
-    return round(R_vel + R_racepercent + R_mt + R_cp), R_vel, R_racepercent, R_mt, R_cp
+    return round(R_vel + R_racepercent + R_mt + R_cp, 1), R_vel, R_racepercent, R_mt, R_cp
     
 def calculate_velocity_reward(S_current: float, S_prev: float):
 
