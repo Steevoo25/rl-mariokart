@@ -121,11 +121,7 @@ while True:
             # -- Update Q-Table
             q = update_q_table(tuple(frameInfo_previous[:-1]), action, step_reward, tuple(frameInfo_current[:-1]), alpha, gamma)
         
-        
-        
         controller_inputs.append(action)
-        
-        
         # update total reward
         total_reward = total_reward + step_reward
 
@@ -149,7 +145,7 @@ while True:
         # Log episode info
         if is_logging:
             print(f"{episode_counter}, {total_reward}, {frame_counter}, {frameInfo_current}, {controller_inputs}\n")
-            log.write(f"{episode_counter}, {total_reward}, {frame_counter}")# {vel_reward}, {perc_reward}, {mt_reward}\n") # {q} , {frameInfo_current}\n")
+            log.write(f"{episode_counter}, {total_reward}, {frame_counter}\n")# {vel_reward}, {perc_reward}, {mt_reward}\n") # {q} , {frameInfo_current}\n")
         # If its the best we've seen
         if total_reward > best_reward:
             # update best reward
