@@ -46,7 +46,7 @@ def epsilon_greedy(state, eps):
     #print(count, state)
     if count == ACTION_COUNT: 
         #print(q.keys())
-        eps = -1 # always return best
+        eps = 0.2 # high chance of choosing best
         print("Fully explored:", state, " count " , count)
         filtered = {key: value for key, value in q.items() if key[0] == state}
         print("q of current state: ", filtered)
