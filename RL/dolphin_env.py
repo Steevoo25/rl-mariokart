@@ -54,8 +54,8 @@ action = DEFAULT_CONTROLLR_TUPLE
 reward_logging = False
 
 ## Q-Learning parameters
-epsilon = 0.7  #Higher = more chance of random action
-gamma = 0.6 # Higher = more focus on future rewards
+epsilon = 0.9  #Higher = more chance of random action
+gamma = 0.8 # Higher = more focus on future rewards
 alpha = 1 # Higher = newer Q-Values will have more impact
 
 ## Logging
@@ -138,7 +138,7 @@ while True:
 
     if termination_flag:
     # Reset
-        update_q_table(tuple(frameInfo_previous[:-1]), action, -10, tuple(frameInfo_current[:-1]), alpha, gamma)
+        update_q_table(tuple(frameInfo_previous[:-1]), action, -(step_reward * 0.7), tuple(frameInfo_current[:-1]), alpha, gamma)
         # Log episode info
         if is_logging:
             print(f"{episode_counter}, {total_reward}, {frame_counter}, {frameInfo_current}, {controller_inputs}\n")
