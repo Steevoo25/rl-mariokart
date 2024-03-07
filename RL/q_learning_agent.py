@@ -43,7 +43,7 @@ def epsilon_greedy(state, eps):
     # If all actions have been explored, always move to it
     # count all occurences of state in q
     count = sum(1 for key in q.keys() if key[0] == state)
-    print(count, state)
+    #print(count, state)
     if count == ACTION_COUNT: 
         #print(q.keys())
         eps = -1 # always return best
@@ -54,7 +54,9 @@ def epsilon_greedy(state, eps):
         #print list of fully explored state
     # Pick random action with probability epsilon
     if random.uniform(0,1) < eps:
-        return action_tuples[random.randint(0, ACTION_COUNT)], 'Exploring'
+        random_action = action_tuples[random.randint(0, ACTION_COUNT)]
+        print("Taking random action:", random_action, " in state :", state)
+        return random_action, 'Exploring'
     # Choose best action in current state with probability epsilon
     else:
         
