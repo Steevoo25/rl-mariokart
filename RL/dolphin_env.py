@@ -54,7 +54,7 @@ action = DEFAULT_CONTROLLR_TUPLE
 reward_logging = False
 
 ## Q-Learning parameters
-epsilon = 0.9  #Higher = more chance of random action
+epsilon = 0.6  #Higher = more chance of random action
 gamma = 0.9 # Higher = more focus on future rewards
 alpha = 1 # Higher = newer Q-Values will have more impact
 
@@ -140,6 +140,10 @@ while True:
     frameInfo_previous = frameInfo_current
 
     if termination_flag:
+        # 
+        if frameInfo_current[2] > 0 :
+            update_q_table(tuple(frameInfo_previous[:-1]), action, -(step_reward * 0.7), tuple(frameInfo_current[:-1]), alpha, gamma)
+        
     # Reset
         #update_q_table(tuple(frameInfo_previous[:-1]), action, -(step_reward * 0.7), tuple(frameInfo_current[:-1]), alpha, gamma)
         # Log episode info
