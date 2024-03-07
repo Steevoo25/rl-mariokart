@@ -14,7 +14,7 @@ def getCurrentSpeed() -> float:
 
 # Returns the value of the players current race completion (Race%)
 def getCurrentRaceCompletion() -> float:
-    return round(memory.read_f32(RACE_COMPLETION_LOCATION),2)
+    return round(memory.read_f32(RACE_COMPLETION_LOCATION), 3)
 
 # Returns the value of the player's current miniturbo charge (MT)
 def getCurrentMT() -> int:
