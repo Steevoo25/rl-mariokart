@@ -48,8 +48,10 @@ def calculate_velocity_reward(S_current: float, S_prev: float):
     # if a boost has been performed
     if S_current > NORMAL_MAX_SPEED:
         return S_scaled * 1.6
-    else:
+    elif S_current > MIN_ACCEPTABLE_SPEED:
         return S_scaled
+    else :
+        return -S_scaled
 
 # Options
 # 1. return fixed amount if race% has increased
