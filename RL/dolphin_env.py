@@ -54,7 +54,7 @@ action = DEFAULT_CONTROLLR_TUPLE
 reward_logging = False
 
 ## Q-Learning parameters
-epsilon = 0.6  #Higher = more chance of random action
+epsilon = 0.3  #Higher = more chance of random action
 gamma = 0.9 # Higher = more focus on future rewards
 alpha = 1 # Higher = newer Q-Values will have more impact
 
