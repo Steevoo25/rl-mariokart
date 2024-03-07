@@ -43,17 +43,24 @@ def epsilon_greedy(state, eps):
     # If all actions have been explored, always move to it
     # count all occurences of state in q
     count = sum(1 for key in q.keys() if key[0] == state)
+    print(count, state)
     if count == ACTION_COUNT: 
-        print(q.keys())
+        #print(q.keys())
         eps = -1 # always return best
         print("Fully explored:", state, " count " , count)
+        filtered = {key: value for key, value in q.items() if key[0] == state}
+        print("q of current state: ", filtered)
+        
+        #print list of fully explored state
     # Pick random action with probability epsilon
     if random.uniform(0,1) < eps:
         return action_tuples[random.randint(0, ACTION_COUNT)], 'Exploring'
     # Choose best action in current state with probability epsilon
     else:
-        #print("Taking best action")
-        return action_tuples[max(range(ACTION_COUNT), key= lambda x : handle_unassigned_q_index(state, x))], 'Exploiting'
+        
+        best_action =  action_tuples[max(range(ACTION_COUNT), key= lambda x : handle_unassigned_q_index(state, x))], 'Exploiting' 
+        print("Taking best action:", best_action, " in state :", state)
+        return best_action
         # Explanation of this line:
         # max() function gives index of best action, based on its q-value
         # action_tuples[] returns the action from its index
