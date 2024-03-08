@@ -44,9 +44,9 @@ def epsilon_greedy(state, eps):
     # count all occurences of state in q
     explored_actions = sum(1 for key in q.keys() if key[0] == state)
     
-    if explored_actions == ACTION_COUNT: 
+    if explored_actions >= ACTION_COUNT +1: 
         eps = 0.15 # high chance of choosing best
-        print("Fully explored:", state, " count " , explored_actions)
+        #print("Fully explored:", state, " count " , explored_actions)
         #filtered = {key: value for key, value in q.items() if key[0] == state}
         #print("q of current state: ", filtered)
         
@@ -71,12 +71,15 @@ def epsilon_greedy(state, eps):
 def update_q_table(prev_state, action, reward, next_state, alpha, gamma) -> float:
 
     # find a that maximises value of Q in next_state
-    max_future_q = max([handle_unassigned_q_action(next_state, action) for action in action_tuples])
-    
+    future_q = [(action, handle_unassigned_q_action(next_state, action)) for action in action_tuples]
+    print("future", future_q)
+    max_future_q = max(future_q, key=lambda x: x[1])
+    print("max", max_future_q[1])
+
     try:
-        q[prev_state, action] += alpha * (reward + (gamma * max_future_q) - q[prev_state, action])
+        q[prev_state, action] += alpha * (reward + (gamma * max_future_q[1]) - q[prev_state, action])
     except KeyError:
-        q[prev_state, action] = alpha * (reward + (gamma * max_future_q))
+        q[prev_state, action] = alpha * (reward + (gamma * max_future_q[1]))
     finally:
         return q[prev_state, action]
 
