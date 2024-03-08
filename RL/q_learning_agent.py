@@ -43,13 +43,12 @@ def epsilon_greedy(state, eps):
     # If all actions have been explored, always move to it
     # count all occurences of state in q
     explored_actions = sum(1 for key in q.keys() if key[0] == state)
-    #print(count, state)
+    
     if explored_actions == ACTION_COUNT: 
-        #print(q.keys())
         eps = 0.15 # high chance of choosing best
         print("Fully explored:", state, " count " , explored_actions)
-        filtered = {key: value for key, value in q.items() if key[0] == state}
-        print("q of current state: ", filtered)
+        #filtered = {key: value for key, value in q.items() if key[0] == state}
+        #print("q of current state: ", filtered)
         
         #print list of fully explored state
     # Pick random action with probability epsilon
