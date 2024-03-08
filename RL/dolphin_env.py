@@ -141,8 +141,8 @@ while True:
 
     if termination_flag:
         # 
-        if frameInfo_current[2] > 0 :
-            update_q_table(tuple(frameInfo_previous[:-1]), action, -(step_reward * 0.7), tuple(frameInfo_current[:-1]), alpha, gamma)
+        #if frameInfo_current[2] > 0 :
+         #   update_q_table(tuple(frameInfo_previous[:-1]), action, -(step_reward * 0.7), tuple(frameInfo_current[:-1]), alpha, gamma)
         
     # Reset
         #update_q_table(tuple(frameInfo_previous[:-1]), action, -(step_reward * 0.7), tuple(frameInfo_current[:-1]), alpha, gamma)
