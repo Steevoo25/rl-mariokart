@@ -1,6 +1,6 @@
 import pandas as pd
 from matplotlib import pyplot as plt
-filename = 'q-learning-07_03_2024--19-20'
+filename = input("filename:")
 path = f'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\Evaluation\\data\\q-learning\\episodes\\{filename}.csv'
 # Read into dataframe
 df = pd.read_csv(path, )
