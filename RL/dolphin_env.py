@@ -22,6 +22,7 @@ path.append(this_dir)
 # -- OTHER IMPORTS --
 import json
 import logging
+import math
 from pickle import dump
 from datetime import datetime
 
@@ -56,7 +57,7 @@ reward_logging = False
 ## Q-Learning parameters
 epsilon = 0.5  #Higher = more chance of random action
 gamma = 0.7 # Higher = more focus on future rewards
-alpha = 1 # Higher = newer Q-Values will have more impact
+alpha = 0.4 # Higher = newer Q-Values will have more impact
 
 ## Logging
 ## ---
@@ -112,7 +113,7 @@ while True:
     step_reward += frame_reward
 
     if (frame_counter-1) % TIME_STEP == 0 :
-        round(step_reward, 1)
+        step_reward = math.floor(step_reward)
         # If its the first frame, dont check the action
         if frame_counter == 1:
             action = DEFAULT_CONTROLLR_TUPLE
@@ -135,7 +136,7 @@ while True:
             
             reward_log.write(f"{total_reward},{total_reward_vel},{total_reward_perc},{total_reward_mt},{total_reward_cp}\n")
             
-        print("Reward gained:", step_reward)
+        #print("Reward gained:", step_reward)
         step_reward = 0
 
     frameInfo_previous = frameInfo_current
@@ -168,7 +169,6 @@ while True:
         continue
 
            
-
             # -- Send inputs to Dolphin
     sent_action = convert_actions_to_dict(action)
     set_controller(sent_action)
