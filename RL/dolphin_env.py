@@ -54,8 +54,8 @@ action = DEFAULT_CONTROLLR_TUPLE
 reward_logging = False
 
 ## Q-Learning parameters
-epsilon = 0.3  #Higher = more chance of random action
-gamma = 0.9 # Higher = more focus on future rewards
+epsilon = 0.5  #Higher = more chance of random action
+gamma = 0.7 # Higher = more focus on future rewards
 alpha = 1 # Higher = newer Q-Values will have more impact
 
 ## Logging
@@ -111,7 +111,8 @@ while True:
     #print("Frame reward", frame_counter, frame_reward)
     step_reward += frame_reward
 
-    if (frame_counter-1) % TIME_STEP == 0 :  
+    if (frame_counter-1) % TIME_STEP == 0 :
+        round(step_reward, 1)
         # If its the first frame, dont check the action
         if frame_counter == 1:
             action = DEFAULT_CONTROLLR_TUPLE
@@ -134,7 +135,7 @@ while True:
             
             reward_log.write(f"{total_reward},{total_reward_vel},{total_reward_perc},{total_reward_mt},{total_reward_cp}\n")
             
-        #print("Reward for step :", step_reward)
+        print("Reward gained:", step_reward)
         step_reward = 0
 
     frameInfo_previous = frameInfo_current
