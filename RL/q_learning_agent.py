@@ -75,13 +75,14 @@ def update_q_table(prev_state, action, reward, next_state, alpha, gamma) -> floa
     print("future", future_q)
     max_future_q = max(future_q, key=lambda x: x[1])
     print("max", max_future_q[1])
-
+    # Checks if current state exists, initialises if not
     try:
-        q[prev_state, action] += alpha * (reward + (gamma * max_future_q[1]) - q[prev_state, action])
+        _ = q[prev_state, action]
     except KeyError:
-        q[prev_state, action] = alpha * (reward + (gamma * max_future_q[1]))
-    finally:
-        return q[prev_state, action]
+        q[prev_state, action] = 0
+
+    q[prev_state, action] += alpha * (reward + (gamma * max_future_q[1]) - q[prev_state, action])
+    return q[prev_state, action]
 
 def get_q_table():
     return q
