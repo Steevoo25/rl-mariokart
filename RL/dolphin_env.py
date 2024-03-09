@@ -120,9 +120,12 @@ while True:
     frame_reward, vel_reward, perc_reward, mt_reward, cp_reward = calculate_reward(frameInfo_current, frameInfo_previous)
     #print("Frame reward", frame_counter, frame_reward)
     step_reward += frame_reward
-    # Edit frameInfo to represent left/right drift
+    
 
     if (frame_counter-1) % TIME_STEP == 0 :
+        # Edit frameInfo to represent left/right drift
+        frameInfo_current[2] = specify_mt_direction(action)
+        
         step_reward = math.floor(step_reward)
         # If its the first frame, dont check the action
         if frame_counter == 1:
