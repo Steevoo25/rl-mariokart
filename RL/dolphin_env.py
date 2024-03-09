@@ -132,7 +132,7 @@ while True:
     if frameInfo_current[2] > 0:
         frameInfo_current[2] = drift_direction
 
-    print("Curr", frameInfo_current, "Prev", frameInfo_previous)
+    #print("Curr", frameInfo_current, "Prev", frameInfo_previous)
     if (frame_counter-1) % TIME_STEP == 0 :
 
         # Edit frameInfo to represent left/right drift
@@ -149,7 +149,7 @@ while True:
 
         if frameInfo_previous[2] == 0 or frameInfo_current[2] == 0:
             drift_direction = specify_mt_direction(action)
-            print("drift_direction", drift_direction)
+            #print("drift_direction", drift_direction)
         controller_inputs.append(action)
         # update total reward
         total_reward = total_reward + step_reward
