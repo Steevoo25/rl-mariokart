@@ -116,7 +116,7 @@ while True:
     frameInfo_current = list(getRaceInfo())
 
     # --- Check termination
-    termination_flag = check_termination(frameInfo_current)
+    termination_flag = check_termination(frameInfo_current[:2])
     # -- Calculate reward
     frame_reward, vel_reward, perc_reward, mt_reward, cp_reward = calculate_reward(frameInfo_current, frameInfo_previous)
     #print("Frame reward", frame_counter, frame_reward)
@@ -124,6 +124,8 @@ while True:
     # if a drift has been started, check its direction
     if frameInfo_current[2] > 0 and frameInfo_previous[2] == 0:
         drift_direction = specify_mt_direction(action)
+    else:
+        drift_direction = 0
     frameInfo_current[2] = drift_direction
     
     if (frame_counter-1) % TIME_STEP == 0 :
