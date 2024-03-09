@@ -8,7 +8,7 @@ Source: https://docs.google.com/spreadsheets/d/1gA5WmnEbPAeA1Lq4XUJg9qDwawky9hpN
 
 ##Found using DME - https://github.com/aldelaro5/Dolphin-memory-engine
 
-###Race% 
+### Race% 
 Location = 0x80E43708
 Type = float (f32)
 
@@ -19,3 +19,11 @@ Type = 2 bytes integer (halfword)
 ### Speed
 Location = 0x80E4C678
 Type = float f32
+
+### Wheelie
+Location = 0x90284F04
+Type = 2 bytes (halfword)
+
+### CP
+Location = 0x80E43746
+Type = 2 bytes (integer)
