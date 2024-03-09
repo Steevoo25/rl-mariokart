@@ -3,7 +3,14 @@ from dolphin import event # gives awaitable routine that returns when a frame is
 
 #DEFAULT_CONTROLLER = {"A":True,"B":False,"Up":False,"StickX":128}
 DEFAULT_CONTROLLR_TUPLE = (False, True, 128)
-START_STATE = (76, 0.98, 0, 0)
+
+START_STATE = (76, 0.98, 0, False, 0)
+# [0] = XZ Velocity
+# [1] = Race%
+# [2] = MT
+# [3] = Wheelie
+# [4] = CP
+
 PROJECT_DIR = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\'
 MAX_EPISODES = 5000
 TIME_STEP = 20 #Frames between each step
@@ -128,6 +135,8 @@ while True:
         drift_direction = 0
     frameInfo_current[2] = drift_direction
     
+    print("Curr", frameInfo_current)
+    print("Prev", frameInfo_previous)
     if (frame_counter-1) % TIME_STEP == 0 :
 
         # Edit frameInfo to represent left/right drift
