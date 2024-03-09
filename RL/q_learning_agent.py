@@ -48,19 +48,21 @@ def handle_unassigned_q_action(next_state, action):
 
 # --- Epsilon-Greedy Policy
 def epsilon_greedy(state, eps):
+
+    state = convert_mt_to_bool(state)
     # If all actions have been explored, always move to it
     # count all occurences of state in q
-    explored_actions = sum(1 for key in q.keys() if key[0] == state)
+    #explored_actions = sum(1 for key in q.keys() if key[0] == state)
     
-    if explored_actions >= ACTION_COUNT +1: 
-        eps = 0.15 # high chance of choosing best
+    #if explored_actions >= ACTION_COUNT +1: 
+        #eps = 0.15 # high chance of choosing best
         #print("Fully explored:", state, " count " , explored_actions)
         #filtered = {key: value for key, value in q.items() if key[0] == state}
         #print("q of current state: ", filtered)
         
         #print list of fully explored state
     # Pick random action with probability epsilon
-    if random.uniform(0,1) < eps or explored_actions == 0:
+    if random.uniform(0,1) < eps:# or explored_actions == 0:
         random_action = action_tuples[random.randint(0, ACTION_COUNT)]
         print("Taking random action:", random_action, " in state :", state)
         return random_action, 'Exploring'
@@ -80,7 +82,8 @@ def update_q_table(prev_state, action, reward, next_state, alpha, gamma) -> floa
     # Change mt to bool - drifting or not.
     prev_state = convert_mt_to_bool(prev_state)
     next_state = convert_mt_to_bool(next_state)
-    
+
+    print("Updating:", prev_state)
     # find a that maximises value of Q in next_state
     future_q = [(action, handle_unassigned_q_action(next_state, action)) for action in action_tuples]
     print("future", future_q)
