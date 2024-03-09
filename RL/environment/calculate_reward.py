@@ -1,6 +1,8 @@
 # [0] = XZ Velocity
 # [1] = Race%
 # [2] = MT
+# [3] = Wheelie
+# [4] = CP
 
 # --- Constants --- 
 NORMAL_MAX_SPEED = 84
@@ -22,8 +24,8 @@ MT_FAILED = -30
 
 def calculate_reward(frameInfo_current, frameInfo_previous):
     
-    curr_vel, curr_racepercent, curr_mt, curr_cp = frameInfo_current
-    prev_vel, prev_racepercent, prev_mt, prev_cp = frameInfo_previous
+    curr_vel, curr_racepercent, curr_mt, _, curr_cp = frameInfo_current
+    prev_vel, prev_racepercent, prev_mt, _, prev_cp = frameInfo_previous
     
     #-- Velocity --
     # Need: Current speed, Previous speed, Current Race%
