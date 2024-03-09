@@ -40,6 +40,15 @@ def print_state_to_dolphin_log(episode, frame, speed, racePercent, mt, reward, q
 def convert_actions_to_dict(action: tuple):
     return {"A": True, "B": action[0],"Up": action[1],"StickX": action[2]}
 
+def specify_mt_direction(action):
+    if action[0] == True: #if B is being pressed
+        # Check direction of drift
+        if action[2] < 128: # 1 is left
+            return 1
+        if action[2] > 128:
+            return 2
+    return 0
+
 ## Initialisations
 frame_reward = 0
 step_reward = 0
@@ -57,7 +66,7 @@ reward_logging = False
 ## Q-Learning parameters
 epsilon = 0.5  #Higher = more chance of random action
 gamma = 0.7 # Higher = more focus on future rewards
-alpha = 0.4 # Higher = newer Q-Values will have more impact
+alpha = 0.2 # Higher = newer Q-Values will have more impact
 
 ## Logging
 ## ---
@@ -111,6 +120,7 @@ while True:
     frame_reward, vel_reward, perc_reward, mt_reward, cp_reward = calculate_reward(frameInfo_current, frameInfo_previous)
     #print("Frame reward", frame_counter, frame_reward)
     step_reward += frame_reward
+    # Edit frameInfo to represent left/right drift
 
     if (frame_counter-1) % TIME_STEP == 0 :
         step_reward = math.floor(step_reward)
