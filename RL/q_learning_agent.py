@@ -17,6 +17,14 @@ for dicts in action_space:
     # q[(s,a)] = q[((float, float, int), (Bool, Bool, Bool, int))]
     # q-value of unvisited state-action pairs is undefined, meaning i need the helper functions
 q = {}
+
+def convert_mt_to_bool(raceInfo):
+    raceInfo = list(raceInfo)
+    if raceInfo[2] > 0 : 
+        raceInfo[2] = True 
+    else: 
+        raceInfo[2] = False
+    return tuple(raceInfo)
 # Helper function to choose the best action in a given state 
 # As my q-Table would be massive if I fully initialised it, I will check if a value exists in the try clause
 # If it does exist, use that Q-Value
@@ -69,15 +77,19 @@ def epsilon_greedy(state, eps):
 # --- Update Rule
 # Returns Q-value of action-state pair
 def update_q_table(prev_state, action, reward, next_state, alpha, gamma) -> float:
-
+    # Change mt to bool - drifting or not.
+    prev_state = convert_mt_to_bool(prev_state)
+    next_state = convert_mt_to_bool(next_state)
+    
     # find a that maximises value of Q in next_state
     future_q = [(action, handle_unassigned_q_action(next_state, action)) for action in action_tuples]
     print("future", future_q)
     max_future_q = max(future_q, key=lambda x: x[1])
     print("max", max_future_q[1])
+
     # Checks if current state exists, initialises if not
     try:
-        _ = q[prev_state, action]
+        a = q[prev_state, action]
     except KeyError:
         q[prev_state, action] = 0
 
