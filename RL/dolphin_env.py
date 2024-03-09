@@ -128,15 +128,11 @@ while True:
     frame_reward, vel_reward, perc_reward, mt_reward, cp_reward = calculate_reward(frameInfo_current, frameInfo_previous)
     #print("Frame reward", frame_counter, frame_reward)
     step_reward += frame_reward
-    # if a drift has been started, check its direction
-    if frameInfo_current[2] > 0 and frameInfo_previous[2] == 0:
-        drift_direction = specify_mt_direction(action)
-    else:
-        drift_direction = 0
-    frameInfo_current[2] = drift_direction
     
-    print("Curr", frameInfo_current)
-    print("Prev", frameInfo_previous)
+    if frameInfo_current[2] > 0:
+        frameInfo_current[2] = drift_direction
+
+    print("Curr", frameInfo_current, "Prev", frameInfo_previous)
     if (frame_counter-1) % TIME_STEP == 0 :
 
         # Edit frameInfo to represent left/right drift
@@ -150,7 +146,10 @@ while True:
             action, action_choice = epsilon_greedy(tuple(frameInfo_previous[:-1]), epsilon)
             # -- Update Q-Table
             q = update_q_table(tuple(frameInfo_previous[:-1]), action, step_reward, tuple(frameInfo_current[:-1]), alpha, gamma)
-        
+
+        if frameInfo_previous[2] == 0 or frameInfo_current[2] == 0:
+            drift_direction = specify_mt_direction(action)
+            print("drift_direction", drift_direction)
         controller_inputs.append(action)
         # update total reward
         total_reward = total_reward + step_reward
