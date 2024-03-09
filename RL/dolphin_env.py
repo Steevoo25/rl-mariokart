@@ -56,12 +56,13 @@ total_reward = 0
 frame_counter = 0
 termination_flag = False
 frameInfo_previous = list(START_STATE)
-is_logging = True
+is_logging = False
 episode_counter = 0
 controller_inputs = []
 best_reward = 0
 action = DEFAULT_CONTROLLR_TUPLE
 reward_logging = False
+drift_direction = 0 # 0= not drifting, 1 = left, 2 = right
 
 ## Q-Learning parameters
 epsilon = 0.5  #Higher = more chance of random action
@@ -112,7 +113,7 @@ while True:
         reward = 0
     
     #--- Get current frame info
-    frameInfo_current = getRaceInfo()
+    frameInfo_current = list(getRaceInfo())
 
     # --- Check termination
     termination_flag = check_termination(frameInfo_current)
@@ -120,12 +121,15 @@ while True:
     frame_reward, vel_reward, perc_reward, mt_reward, cp_reward = calculate_reward(frameInfo_current, frameInfo_previous)
     #print("Frame reward", frame_counter, frame_reward)
     step_reward += frame_reward
+    # if a drift has been started, check its direction
+    if frameInfo_current[2] > 0 and frameInfo_previous[2] == 0:
+        drift_direction = specify_mt_direction(action)
+    frameInfo_current[2] = drift_direction
     
-
     if (frame_counter-1) % TIME_STEP == 0 :
+
         # Edit frameInfo to represent left/right drift
-        frameInfo_current[2] = specify_mt_direction(action)
-        
+
         step_reward = math.floor(step_reward)
         # If its the first frame, dont check the action
         if frame_counter == 1:
@@ -153,6 +157,7 @@ while True:
         step_reward = 0
 
     frameInfo_previous = frameInfo_current
+    #frameInfo_previous[2] = drift_direction
 
     if termination_flag:
         # 
