@@ -19,4 +19,3 @@ def generate_action_space():
                 permutations.append(permutation_dict)
     return permutations
     
-print(len(generate_action_space()))
