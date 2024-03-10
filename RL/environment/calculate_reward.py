@@ -14,7 +14,7 @@ NOT_CHARGING = 0
 LAP_COMPLETE = 2
 
 VELOCITY_WEIGHT = 10
-RACE_PERCENT_WEIGHT = 25
+RACE_PERCENT_WEIGHT = 15
 MT_WEIGHT = 8
 
 CP_REWARD = 20
@@ -85,7 +85,8 @@ def calculate_miniturbo_reward(mt_current: int, mt_previous:int):
     if mt_current == NOT_CHARGING:
         return 0
     # started miniturbo and released it before fully charging
-    if mt_previous < CHARGED_MINITURBO and mt_current < mt_previous:
+    if mt_previous > 0 and mt_current == 0:
+        print("failed mt")
         return MT_FAILED
     
 # Gives a static reward for reaching a checkpoint
