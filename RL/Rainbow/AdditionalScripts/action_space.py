@@ -8,14 +8,15 @@ def generate_action_space():
     analog_stick_angles = [0, 64, 128, 192, 255]
 
     # Generate all possible permutations using itertools.product
-    button_states = list(product(buttons, repeat=2))  # All possible combinations of 3 buttons
+    button_states = list(product(buttons, repeat=2))  # All possible combinations of 2 buttons
 
     # Generate permutations and store them in a list of dictionaries
     permutations = []
     for button_state in button_states:
         for analog_state in analog_stick_angles:
             permutation_dict = {"B": button_state[0], "Up": button_state[1], "StickX": analog_state}
-            permutations.append(permutation_dict)
+            if not (button_state[0] == True and analog_state == 128):
+                permutations.append(permutation_dict)
     return permutations
     
-
+print(len(generate_action_space()))
