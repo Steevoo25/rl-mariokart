@@ -3,7 +3,6 @@ from dolphin import event # gives awaitable routine that returns when a frame is
 
 #DEFAULT_CONTROLLER = {"A":True,"B":False,"Up":False,"StickX":128}
 DEFAULT_CONTROLLR_TUPLE = (False, True, 128)
-
 START_STATE = (76, 0.98, 0, False, 0)
 # [0] = XZ Velocity
 # [1] = Race%
@@ -72,22 +71,22 @@ reward_logging = False
 drift_direction = 0 # 0= not drifting, 1 = left, 2 = right
 
 ## Q-Learning parameters
-epsilon = 0.5  #Higher = more chance of random action
+epsilon = 0.75  #Higher = more chance of random action
 gamma = 0.7 # Higher = more focus on future rewards
 alpha = 0.2 # Higher = newer Q-Values will have more impact
 
 ## Logging
 ## ---
 date_and_time = datetime.now().strftime("%d_%m_%Y--%H-%M")
+if is_logging:
+    log_file = f"{PROJECT_DIR}Evaluation\\data\\q-learning\\episodes\\q-learning-{date_and_time}.csv"
+    log = open(log_file, 'w')
 
-log_file = f"{PROJECT_DIR}Evaluation\\data\\q-learning\\episodes\\q-learning-{date_and_time}.csv"
-log = open(log_file, 'w')
+    # Column Headers
+    log.write("Episode,Total_Reward,Frame_Count\n")
 
-# Column Headers
-log.write("Episode,Total_Reward,Frame_Count\n")
-
-# Controller Inputs 
-best_inputs_file = f"{PROJECT_DIR}Evaluation\\data\\q-learning\\controller_episodes\\q-learning-{date_and_time}.pkl"
+    # Controller Inputs 
+    best_inputs_file = f"{PROJECT_DIR}Evaluation\\data\\q-learning\\controller_episodes\\q-learning-{date_and_time}.pkl"
 if reward_logging:
 
     total_reward_vel = 0
@@ -135,17 +134,16 @@ while True:
     #print("Curr", frameInfo_current, "Prev", frameInfo_previous)
     if (frame_counter-1) % TIME_STEP == 0 :
 
-        # Edit frameInfo to represent left/right drift
-
-        step_reward = math.floor(step_reward)
         # If its the first frame, dont check the action
         if frame_counter == 1:
             action = DEFAULT_CONTROLLR_TUPLE
         else:
+
             # -- Get action by epsilon-greedy policy
             action, action_choice = epsilon_greedy(tuple(frameInfo_previous[:-1]), epsilon)
             # -- Update Q-Table
             q = update_q_table(tuple(frameInfo_previous[:-1]), action, step_reward, tuple(frameInfo_current[:-1]), alpha, gamma)
+            stepInfo_previous, stepInfo_current = frameInfo_previous, frameInfo_current
 
         if frameInfo_previous[2] == 0 or frameInfo_current[2] == 0:
             drift_direction = specify_mt_direction(action)
@@ -170,22 +168,22 @@ while True:
     #frameInfo_previous[2] = drift_direction
 
     if termination_flag:
-        # 
-        #if frameInfo_current[2] > 0 :
-         #   update_q_table(tuple(frameInfo_previous[:-1]), action, -(step_reward * 0.7), tuple(frameInfo_current[:-1]), alpha, gamma)
         
+        #print("Terminating, updating: ", stepInfo_previous)
+        update_q_table(tuple(stepInfo_previous[:-1]), action, step_reward, tuple(stepInfo_current[:-1]), alpha, gamma)
+        print(f"{episode_counter}, {total_reward}, {frame_counter}, {frameInfo_current}, {controller_inputs}\n")
+            
     # Reset
         #update_q_table(tuple(frameInfo_previous[:-1]), action, -(step_reward * 0.7), tuple(frameInfo_current[:-1]), alpha, gamma)
         # Log episode info
         if is_logging:
-            print(f"{episode_counter}, {total_reward}, {frame_counter}, {frameInfo_current}, {controller_inputs}\n")
             log.write(f"{episode_counter}, {total_reward}, {frame_counter}\n")# {vel_reward}, {perc_reward}, {mt_reward}\n") # {q} , {frameInfo_current}\n")
-        # If its the best we've seen
-        if total_reward > best_reward:
-            # update best reward
-            best_reward = total_reward
-            # save controller inputs to pkl file
-            dump(controller_inputs, open(f'{best_inputs_file}', "wb"))
+            # If its the best we've seen
+            if total_reward > best_reward:
+                # update best reward
+                best_reward = total_reward
+                # save controller inputs to pkl file
+                dump(controller_inputs, open(f'{best_inputs_file}', "wb"))
             
         frame_counter = 0
         episode_counter += 1
