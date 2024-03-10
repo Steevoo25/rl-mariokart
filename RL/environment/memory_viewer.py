@@ -8,6 +8,7 @@ RACE_COMPLETION_LOCATION = 0x80E43748
 MT_LOCATION = 0x80E4C796
 CP_LOCATION = 0x80E43746
 WHEELIE_LOCATION = 0x90284F04
+ROAD_TYPE_LOCATION = 0x80E51CE8
 
 # Returns the current speed of the kart
 def getCurrentSpeed() -> float:
@@ -32,6 +33,9 @@ def getCurrentWheelie() -> bool:
 # Returns a tuple of the Speed, Race% and MT
 def getRaceInfo() -> tuple:
     return getCurrentSpeed(), getCurrentRaceCompletion(), getCurrentMT(),getCurrentWheelie(), getCurrentCP()
+
+def getCurrentRoadType() -> int:
+    return memory.read_u16(ROAD_TYPE_LOCATION)
 
 def printRaceInfo():
     print(f'MT: {getCurrentMT()}')

@@ -27,3 +27,11 @@ Type = 2 bytes (halfword)
 ### CP
 Location = 0x80E43746
 Type = 2 bytes (integer)
+
+### Road Type
+Location = 0x80E51CE8
+Type = 2 Bytes (integer)
+- 0 = Normal road
+- 1 = ?
+- 2 = ?
+- 3 = Offroad
