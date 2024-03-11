@@ -80,10 +80,10 @@ def calculate_miniturbo_reward(mt_current: int, mt_previous:int):
         return MT_SUCCESS
     # miniturbo is charging
     if mt_current > 0:
-        return 0#0.05
+        return 0.5
     # started miniturbo and released it before fully charging
     if mt_previous > 0 and mt_current == 0:
-        print("failed mt")
+        #print("failed mt")
         return MT_FAILED
     # no miniturbo being performed
     if mt_current == NOT_CHARGING:
