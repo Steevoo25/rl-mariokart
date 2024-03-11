@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 filename = input("filename:")
 path = f'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\Evaluation\\data\\q-learning\\episodes\\{filename}.csv'
 # Read into dataframe
-df = pd.read_csv(path, )
+df = pd.read_csv(path)
 # Remove episodes 1 and 3 (idk why -100 reward)
 
 df = df[1:]
@@ -19,7 +19,7 @@ plt.plot(df['Episode'], smoothed_reward, label='Return', linewidth=1)
 #plt.plot(df['Episode'], df['Frame_Count'], label='Survival Time')
 
 # Set x axis scale
-plt.ylim(200, 1000)
+plt.ylim(400, 2000)
 
 # Lables
 plt.xlabel('Episode number')
