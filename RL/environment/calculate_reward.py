@@ -81,13 +81,13 @@ def calculate_miniturbo_reward(mt_current: int, mt_previous:int):
     # miniturbo is charging
     if mt_current > 0:
         return 0#0.05
-    # no miniturbo being performed
-    if mt_current == NOT_CHARGING:
-        return 0
     # started miniturbo and released it before fully charging
     if mt_previous > 0 and mt_current == 0:
         print("failed mt")
         return MT_FAILED
+    # no miniturbo being performed
+    if mt_current == NOT_CHARGING:
+        return 0
     
 # Gives a static reward for reaching a checkpoint
 def calculate_cp_reward(cp_current: int, cp_previous: int) -> int:
