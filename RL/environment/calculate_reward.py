@@ -14,13 +14,13 @@ NOT_CHARGING = 0
 LAP_COMPLETE = 2
 
 VELOCITY_WEIGHT = 10
-RACE_PERCENT_WEIGHT = 15
-MT_WEIGHT = 8
+RACE_PERCENT_WEIGHT = 100
+MT_WEIGHT = 1
 
-CP_REWARD = 20
+CP_REWARD = 9
 LAP_COMPLETE_REWARD = 30
-MT_SUCCESS = 30
-MT_FAILED = -30
+MT_SUCCESS = 30 / MT_WEIGHT
+MT_FAILED = -30 / MT_WEIGHT
 
 def calculate_reward(frameInfo_current, frameInfo_previous):
     
@@ -33,16 +33,16 @@ def calculate_reward(frameInfo_current, frameInfo_previous):
     
     #-- Race % --
     # Need: current and previous Race&
-    R_racepercent = round(calculate_race_percent_reward(curr_racepercent, prev_racepercent) * RACE_PERCENT_WEIGHT, 5)
+    R_racepercent = round(calculate_race_percent_reward(curr_racepercent, prev_racepercent) * RACE_PERCENT_WEIGHT, 8)
     
     #-- Miniturbo --
     # Need: Current and Previous MT
-    R_mt = calculate_miniturbo_reward(curr_mt, prev_mt) * MT_WEIGHT
-    
-    R_cp = calculate_cp_reward(curr_cp, prev_cp)
+    R_mt = 0#calculate_miniturbo_reward(curr_mt, prev_mt) * MT_WEIGHT
+
+    R_cp = 0#calculate_cp_reward(curr_cp, prev_cp)
     
     #print_rewards(R_vel, R_racepercent, R_mt, frameInfo_current)
-    return round(R_vel + R_racepercent + R_mt + R_cp, 1), R_vel, R_racepercent, R_mt, R_cp
+    return round(R_vel + R_racepercent + R_mt + R_cp, 6), R_vel, R_racepercent, R_mt, R_cp
     
 def calculate_velocity_reward(S_current: float, S_prev: float):
 
@@ -83,7 +83,7 @@ def calculate_miniturbo_reward(mt_current: int, mt_previous:int):
         return 0.5
     # started miniturbo and released it before fully charging
     if mt_previous > 0 and mt_current == 0:
-        #print("failed mt")
+        #print("failed mt: penalty: ", MT_WEIGHT * MT_FAILED)
         return MT_FAILED
     # no miniturbo being performed
     if mt_current == NOT_CHARGING:
