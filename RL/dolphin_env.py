@@ -2,7 +2,8 @@
 from dolphin import event # gives awaitable routine that returns when a frame is drawn
 
 #DEFAULT_CONTROLLER = {"A":True,"B":False,"Up":False,"StickX":128}
-DEFAULT_CONTROLLR_TUPLE = (False, True, 128)
+DEFAULT_CONTROLLR_TUPLE = (False, False, 128)
+
 START_STATE = (76, 0.98, 0, False, 0)
 # [0] = XZ Velocity
 # [1] = Race%
@@ -62,7 +63,7 @@ total_reward = 0
 frame_counter = 0
 termination_flag = False
 frameInfo_previous = list(START_STATE)
-is_logging = False
+is_logging = True
 episode_counter = 0
 controller_inputs = []
 best_reward = 0
@@ -70,10 +71,15 @@ action = DEFAULT_CONTROLLR_TUPLE
 reward_logging = False
 drift_direction = 0 # 0= not drifting, 1 = left, 2 = right
 
+step_reward_vel = 0
+step_reward_perc = 0
+step_reward_mt = 0
+step_reward_cp = 0
+
 ## Q-Learning parameters
 epsilon = 0.75  #Higher = more chance of random action
-gamma = 0.7 # Higher = more focus on future rewards
-alpha = 0.2 # Higher = newer Q-Values will have more impact
+gamma = 0.6 # Higher = more focus on future rewards
+alpha = 0.7 # Higher = newer Q-Values will have more impact
 
 ## Logging
 ## ---
@@ -120,29 +126,40 @@ while True:
     
     #--- Get current frame info
     frameInfo_current = list(getRaceInfo())
-
-    # --- Check termination
+    #--- Check termination
     termination_flag = check_termination(frameInfo_current[:2])
     # -- Calculate reward
     frame_reward, vel_reward, perc_reward, mt_reward, cp_reward = calculate_reward(frameInfo_current, frameInfo_previous)
-    #print("Frame reward", frame_counter, frame_reward)
+    #print("Frame reward", frame_counter, frame_reward, vel_reward, perc_reward, mt_reward, cp_reward)
     step_reward += frame_reward
-    
+    step_reward_vel += vel_reward
+    step_reward_perc += perc_reward
+    step_reward_mt += mt_reward
+    step_reward_cp += cp_reward
+
+    # If we are drifting check direction
     if frameInfo_current[2] > 0:
         frameInfo_current[2] = drift_direction
 
     #print("Curr", frameInfo_current, "Prev", frameInfo_previous)
     if (frame_counter-1) % TIME_STEP == 0 :
 
+        print("Reward gained:", step_reward)
+        print("Vel gained:", step_reward_vel)
+        print("raceperc gained:", step_reward_perc)
+        print("mt gained:", step_reward_mt)
+        print("cp gained:", step_reward_cp)
         # If its the first frame, dont check the action
         if frame_counter == 1:
             action = DEFAULT_CONTROLLR_TUPLE
         else:
 
             # -- Get action by epsilon-greedy policy
+
             action, action_choice = epsilon_greedy(tuple(frameInfo_previous[:-1]), epsilon)
+
             # -- Update Q-Table
-            q = update_q_table(tuple(frameInfo_previous[:-1]), action, step_reward, tuple(frameInfo_current[:-1]), alpha, gamma)
+            q = update_q_table(tuple(frameInfo_previous[:-1]), action, step_reward, tuple(frameInfo_current[:-1]), alpha, gamma, epsilon)
             stepInfo_previous, stepInfo_current = frameInfo_previous, frameInfo_current
 
         if frameInfo_previous[2] == 0 or frameInfo_current[2] == 0:
@@ -161,20 +178,21 @@ while True:
             
             reward_log.write(f"{total_reward},{total_reward_vel},{total_reward_perc},{total_reward_mt},{total_reward_cp}\n")
             
-        #print("Reward gained:", step_reward)
+       
         step_reward = 0
+        step_reward_vel = 0
+        step_reward_perc = 0
+        step_reward_mt = 0
+        step_reward_cp = 0
 
     frameInfo_previous = frameInfo_current
-    #frameInfo_previous[2] = drift_direction
 
     if termination_flag:
-        
-        #print("Terminating, updating: ", stepInfo_previous)
+        print("Reward gained:", step_reward)
+        print("Terminating, updating: ", stepInfo_previous, " with reward ", step_reward)
         update_q_table(tuple(stepInfo_previous[:-1]), action, step_reward, tuple(stepInfo_current[:-1]), alpha, gamma)
         print(f"{episode_counter}, {total_reward}, {frame_counter}, {frameInfo_current}, {controller_inputs}\n")
-            
-    # Reset
-        #update_q_table(tuple(frameInfo_previous[:-1]), action, -(step_reward * 0.7), tuple(frameInfo_current[:-1]), alpha, gamma)
+        
         # Log episode info
         if is_logging:
             log.write(f"{episode_counter}, {total_reward}, {frame_counter}\n")# {vel_reward}, {perc_reward}, {mt_reward}\n") # {q} , {frameInfo_current}\n")
@@ -191,10 +209,9 @@ while True:
         frameInfo_previous = list(START_STATE)
         termination_flag = False
         action = DEFAULT_CONTROLLR_TUPLE
+
         await load_savestate()
         continue
-
-           
-            # -- Send inputs to Dolphin
+    # -- Send inputs to Dolphin
     sent_action = convert_actions_to_dict(action)
     set_controller(sent_action)
