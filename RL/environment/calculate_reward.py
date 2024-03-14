@@ -14,7 +14,7 @@ NOT_CHARGING = 0
 LAP_COMPLETE = 2
 
 VELOCITY_WEIGHT = 10
-RACE_PERCENT_WEIGHT = 120
+RACE_PERCENT_WEIGHT = 10
 MT_WEIGHT = 1
 
 CP_REWARD = 9
@@ -33,8 +33,8 @@ def calculate_reward(frameInfo_current, frameInfo_previous):
     
     #-- Race % --
     # Need: current and previous Race&
-    R_racepercent = round(calculate_race_percent_reward(curr_racepercent, prev_racepercent) * RACE_PERCENT_WEIGHT, 8)
-    
+    R_racepercent = round(calculate_race_percent_reward(curr_racepercent, prev_racepercent) * RACE_PERCENT_WEIGHT)
+    R_racepercent = curr_racepercent * RACE_PERCENT_WEIGHT
     #-- Miniturbo --
     # Need: Current and Previous MT
     R_mt = 0#calculate_miniturbo_reward(curr_mt, prev_mt) * MT_WEIGHT
