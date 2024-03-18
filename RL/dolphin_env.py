@@ -78,8 +78,8 @@ step_reward_cp = 0
 
 ## Q-Learning parameters
 epsilon = 0.75  #Higher = more chance of random action
-gamma = 0.6 # Higher = more focus on future rewards
-alpha = 0.7 # Higher = newer Q-Values will have more impact
+gamma = 0.8 # Higher = more focus on future rewards
+alpha = 0.8 # Higher = newer Q-Values will have more impact
 
 ## Logging
 ## ---
