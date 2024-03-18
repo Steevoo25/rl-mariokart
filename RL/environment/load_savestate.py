@@ -15,9 +15,9 @@ async def load_using_fkey():
         # Using pynput to press hotkey for loading savestate in first slot
         virtual_keyboard = keyboard.Controller()
 
-        virtual_keyboard.press(keyboard.Key.f1)
+        virtual_keyboard.press(keyboard.Key.f8)
         sleep(0.1)
-        virtual_keyboard.release(keyboard.Key.f1)
+        virtual_keyboard.release(keyboard.Key.f8)
         # savestate has been loaded, now next episode can begin
         # Unregister listener
         #event.on_frameadvance(None)
