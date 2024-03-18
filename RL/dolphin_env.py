@@ -190,7 +190,7 @@ while True:
     if termination_flag:
         print("Reward gained:", step_reward)
         print("Terminating, updating: ", stepInfo_previous, " with reward ", step_reward)
-        update_q_table(tuple(stepInfo_previous[:-1]), action, step_reward, tuple(stepInfo_current[:-1]), alpha, gamma)
+        update_q_table(tuple(stepInfo_previous[:-1]), action, step_reward, tuple(stepInfo_current[:-1]), alpha, gamma, epsilon)
         print(f"{episode_counter}, {total_reward}, {frame_counter}, {frameInfo_current}, {controller_inputs}\n")
         
         # Log episode info
