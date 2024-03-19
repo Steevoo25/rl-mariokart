@@ -63,6 +63,7 @@ total_reward = 0
 frame_counter = 0
 termination_flag = False
 frameInfo_previous = list(START_STATE)
+stepInfo_previous = list(START_STATE)
 is_logging = False
 episode_counter = 0
 controller_inputs = []
@@ -114,6 +115,7 @@ while True:
     # Get frameInfo
     if frame_counter == 1:
     # If episode has jsut started don't reset
+        print("-" * 10, "NEW EPISODE: ", episode_counter)
         frameInfo_current = list(START_STATE)
         termination_flag = False
         total_reward = 0
@@ -129,13 +131,13 @@ while True:
     #--- Check termination
     termination_flag = check_termination(frameInfo_current[:2])
     # -- Calculate reward
-    frame_reward, vel_reward, perc_reward, mt_reward, cp_reward = calculate_reward(frameInfo_current, frameInfo_previous)
+    #frame_reward, vel_reward, perc_reward, mt_reward, cp_reward = calculate_reward(frameInfo_current, frameInfo_previous)
     #print("Frame reward", frame_counter, frame_reward, vel_reward, perc_reward, mt_reward, cp_reward)
-    step_reward += frame_reward
-    step_reward_vel += vel_reward
-    step_reward_perc += perc_reward
-    step_reward_mt += mt_reward
-    step_reward_cp += cp_reward
+    # step_reward += frame_reward
+    # step_reward_vel += vel_reward
+    # step_reward_perc += perc_reward
+    # step_reward_mt += mt_reward
+    # step_reward_cp += cp_reward
 
     # If we are drifting check direction
     if frameInfo_current[2] > 0:
@@ -143,12 +145,13 @@ while True:
 
     #print("Curr", frameInfo_current, "Prev", frameInfo_previous)
     if (frame_counter-1) % TIME_STEP == 0 :
-
-        print("Reward gained:", step_reward)
-        print("Vel gained:", step_reward_vel)
-        print("raceperc gained:", step_reward_perc)
-        print("mt gained:", step_reward_mt)
-        print("cp gained:", step_reward_cp)
+        stepInfo_current = frameInfo_current
+        step_reward, step_reward_vel, step_reward_perc, step_reward_mt, step_reward_cp = calculate_reward(stepInfo_current, stepInfo_previous)
+        # print("Reward gained:", step_reward)
+        # print("Vel gained:", step_reward_vel)
+        # print("raceperc gained:", step_reward_perc)
+        # print("mt gained:", step_reward_mt)
+        # print("cp gained:", step_reward_cp)
         # If its the first frame, dont check the action
         if frame_counter == 1:
             action = DEFAULT_CONTROLLR_TUPLE
@@ -156,12 +159,12 @@ while True:
 
             # -- Get action by epsilon-greedy policy
 
-            action, action_choice = epsilon_greedy(tuple(frameInfo_previous[:-1]), epsilon)
-            print(action_choice , "in state", frameInfo_previous[:-1], "with action", action)
+            action, action_choice = epsilon_greedy(tuple(stepInfo_previous[:-1]), epsilon)
+            print(action_choice , "in state", stepInfo_previous[:-1], "with action", action)
 
             # -- Update Q-Table
-            q = update_q_table(tuple(frameInfo_previous[:-1]), action, step_reward, tuple(frameInfo_current[:-1]), alpha, gamma, epsilon)
-            stepInfo_previous, stepInfo_current = frameInfo_previous, frameInfo_current
+            q = update_q_table(tuple(stepInfo_previous[:-1]), action, step_reward, tuple(stepInfo_current[:-1]), alpha, gamma, epsilon)
+            #stepInfo_previous, stepInfo_current = frameInfo_previous, frameInfo_current
 
         if frameInfo_previous[2] == 0 or frameInfo_current[2] == 0:
             drift_direction = specify_mt_direction(action)
@@ -170,14 +173,14 @@ while True:
         # update total reward
         total_reward = total_reward + step_reward
 
-        if reward_logging:
-            # log individual reward values
-            total_reward_vel += vel_reward
-            total_reward_perc += perc_reward
-            total_reward_mt += mt_reward
-            total_reward_cp += cp_reward
+        # if reward_logging:
+        #     # # log individual reward values
+        #     # total_reward_vel += vel_reward
+        #     # total_reward_perc += perc_reward
+        #     # total_reward_mt += mt_reward
+        #     # total_reward_cp += cp_reward
             
-            reward_log.write(f"{total_reward},{total_reward_vel},{total_reward_perc},{total_reward_mt},{total_reward_cp}\n")
+        #     reward_log.write(f"{total_reward},{total_reward_vel},{total_reward_perc},{total_reward_mt},{total_reward_cp}\n")
             
        
         step_reward = 0
@@ -185,7 +188,8 @@ while True:
         step_reward_perc = 0
         step_reward_mt = 0
         step_reward_cp = 0
-
+        stepInfo_previous = stepInfo_current
+        
     frameInfo_previous = frameInfo_current
 
     if termination_flag:
