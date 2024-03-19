@@ -51,18 +51,11 @@ def epsilon_greedy(state, eps):
         #print("sorted q of current state: ", sorted_q)
     # # Make proportional to visits to state
     if explored_actions >= ACTION_COUNT +1: 
-         eps = eps ** 2 # high chance of choosing best
-         print("Fully explored:", state, " count " , explored_actions)
-
-    best_q = 0
-    best_action = "None found"
-    for action in action_tuples:
-        value = handle_unassigned_q_action(state, action)
-        print("Checking", action, ", Value:", value )
-        if handle_unassigned_q_action(state, action) > best_q:
-            best_action = action
-            best_q = value
-    print("best action found: ", best_action)
+        eps = eps ** 2 # high chance of choosing best
+        print("Fully explored:", state, " count " , explored_actions)
+        for action in action_tuples:
+          value = handle_unassigned_q_action(state, action)
+          print("Action:", action, ", Value:", value )
 
     best_action =  action_tuples[max(range(ACTION_COUNT + 1), key= lambda x : handle_unassigned_q_index(state, x))]     
         #print list of fully explored state
