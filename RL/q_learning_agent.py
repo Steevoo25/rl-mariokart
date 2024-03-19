@@ -1,6 +1,6 @@
 # An agent that uses Q-Learning
 import random
-
+import pickle as pkl
 # Action Space
     # Action tuples contains a list of all possible inputs as tuples
 from Rainbow.AdditionalScripts.action_space import generate_action_space
@@ -15,6 +15,7 @@ for dicts in action_space:
     # Table of Q values for each state-action pair
     # q[(s,a)] = q[((float, float, int), (Bool, Bool, Bool, int))]
     # q-value of unvisited state-action pairs is undefined, meaning i need the helper functions
+
 q = {}
 
 # Helper function to choose the best action in a given state 
@@ -44,6 +45,7 @@ def epsilon_greedy(state, eps):
     # If all actions have been explored, always move to it]
     # count all occurences of state in q
     explored_actions = sum(1 for key in q.keys() if key[0] == state)
+    print("Explored actions:", explored_actions)
     #filtered = [(key, value) for key, value in q.items() if key[0] == state]
     #if explored_actions >0:
         #print("Filtered", filtered)
@@ -51,7 +53,7 @@ def epsilon_greedy(state, eps):
         #print("sorted q of current state: ", sorted_q)
     # # Make proportional to visits to state
     if explored_actions >= ACTION_COUNT +1: 
-        eps = eps ** 2 # high chance of choosing best
+        #eps = eps ** 2 # high chance of choosing best
         print("Fully explored:", state, " count " , explored_actions)
         for action in action_tuples:
           value = handle_unassigned_q_action(state, action)
@@ -75,14 +77,15 @@ def epsilon_greedy(state, eps):
         
 # --- Update Rule
 # Returns Q-value of action-state pair
-def update_q_table(prev_state, action, reward, next_state, alpha, gamma, eps) -> float:
+def update_q_table(prev_state, action, reward, next_state, alpha, gamma) -> float:
     
     # pick an action via epsilon greedy-policy in next state
-    future_action = epsilon_greedy(next_state, eps)
-    future_q = (action, handle_unassigned_q_action(next_state, future_action))
+    #future_action = epsilon_greedy(next_state, eps)
+    future_q = [(action, handle_unassigned_q_action(next_state, action)) for action in action_tuples]
+    max_future_q = max(future_q, key=lambda x: x[1])
     ##check here
     #print("future", future_q)
-    #print("max", max_future_q[1])
+    print("max", max_future_q[1])
 
     # Checks if current state exists, initialises if not
     try:
@@ -90,7 +93,7 @@ def update_q_table(prev_state, action, reward, next_state, alpha, gamma, eps) ->
     except KeyError:
         q[prev_state, action] = 0
 
-    q[prev_state, action] += (1-alpha) * q[prev_state, action] + alpha * (reward + (gamma * future_q[1]) - q[prev_state, action])
+    q[prev_state, action] += (1-alpha) * q[prev_state, action] + alpha * (reward + (gamma * max_future_q[1]) - q[prev_state, action])
     q[prev_state, action] = round(q[prev_state, action], 4)
     return q[prev_state, action]
 
