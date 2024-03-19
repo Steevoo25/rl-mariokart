@@ -27,10 +27,7 @@ this_dir = f'{PROJECT_DIR}RL'
 path.append(this_dir)
 
 # -- OTHER IMPORTS --
-import json
-import logging
-import math
-from pickle import dump
+from pickle import dump, load
 from datetime import datetime
 
 from environment.load_savestate import load_using_fkey as load_savestate
@@ -38,7 +35,7 @@ from environment.press_button import press_button as set_controller
 from environment.calculate_reward import calculate_reward
 from environment.memory_viewer import getRaceInfo
 from environment.termination_check import check_termination
-from q_learning_agent import update_q_table, epsilon_greedy, get_q_table
+from q_learning_agent import update_q_table, epsilon_greedy, init_q_table, get_q_table
 
 def print_state_to_dolphin_log(episode, frame, speed, racePercent, mt, reward, q, action_choice):
     print(f'''Episode: {episode} Frame: {frame}, Speed: {speed}, Race%: {racePercent}, Miniturbo: {mt}, Reward: {reward}, Q-Value: {q}, Action Choice: {action_choice}''')
@@ -78,6 +75,13 @@ step_reward_perc = 0
 step_reward_mt = 0
 step_reward_cp = 0
 
+q_path = f"{PROJECT_DIR}RL\\q-table.pkl"
+# open pickle file and load into q
+q = load(open(q_path, "r"))
+# give q table to agent script
+init_q_table(q)
+
+
 ## Q-Learning parameters
 epsilon = 0.6  #Higher = more chance of random action
 gamma = 0.5 # Higher = more focus on future rewards
@@ -95,6 +99,7 @@ if is_logging:
 
     # Controller Inputs 
     best_inputs_file = f"{PROJECT_DIR}Evaluation\\data\\q-learning\\controller_episodes\\q-learning-{date_and_time}.pkl"
+    
 if reward_logging:
 
     total_reward_vel = 0
@@ -170,7 +175,8 @@ while True:
                 best_reward = total_reward
                 # save controller inputs to pkl file
                 dump(controller_inputs, open(f'{best_inputs_file}', "wb"))
-            
+        # save q table to pkl file
+        dump(get_q_table(), open(q_path, "wb"))
         frame_counter = 0
         episode_counter += 1
         controller_inputs = []

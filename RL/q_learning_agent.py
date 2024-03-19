@@ -1,6 +1,5 @@
 # An agent that uses Q-Learning
 import random
-import pickle as pkl
 # Action Space
     # Action tuples contains a list of all possible inputs as tuples
 from Rainbow.AdditionalScripts.action_space import generate_action_space
@@ -17,6 +16,10 @@ for dicts in action_space:
     # q-value of unvisited state-action pairs is undefined, meaning i need the helper functions
 
 q = {}
+
+def init_q_table(new_q):
+    q = new_q
+    return new_q
 
 # Helper function to choose the best action in a given state 
 # As my q-Table would be massive if I fully initialised it, I will check if a value exists in the try clause
