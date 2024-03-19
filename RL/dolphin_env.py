@@ -13,7 +13,7 @@ START_STATE = (76, 0.98, 0, False, 0)
 
 PROJECT_DIR = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\'
 MAX_EPISODES = 5000
-TIME_STEP = 20 #Frames between each step
+TIME_STEP = 10 #Frames between each step
 
 # As the script is run within the dolphin executable, 
 # Append the true path of scripts to import
@@ -63,7 +63,7 @@ total_reward = 0
 frame_counter = 0
 termination_flag = False
 frameInfo_previous = list(START_STATE)
-is_logging = True
+is_logging = False
 episode_counter = 0
 controller_inputs = []
 best_reward = 0
@@ -157,6 +157,7 @@ while True:
             # -- Get action by epsilon-greedy policy
 
             action, action_choice = epsilon_greedy(tuple(frameInfo_previous[:-1]), epsilon)
+            print(action_choice , "in state", frameInfo_previous[:-1], "with action", action)
 
             # -- Update Q-Table
             q = update_q_table(tuple(frameInfo_previous[:-1]), action, step_reward, tuple(frameInfo_current[:-1]), alpha, gamma, epsilon)
