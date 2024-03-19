@@ -71,6 +71,7 @@ best_reward = 0
 action = DEFAULT_CONTROLLR_TUPLE
 reward_logging = False
 drift_direction = 0 # 0= not drifting, 1 = left, 2 = right
+just_reset = True
 
 step_reward_vel = 0
 step_reward_perc = 0
@@ -79,8 +80,8 @@ step_reward_cp = 0
 
 ## Q-Learning parameters
 epsilon = 0.6  #Higher = more chance of random action
-gamma = 0.8 # Higher = more focus on future rewards
-alpha = 0.8 # Higher = newer Q-Values will have more impact
+gamma = 0.2 # Higher = more focus on future rewards
+alpha = 0.5 # Higher = newer Q-Values will have more impact
 
 ## Logging
 ## ---
@@ -110,14 +111,13 @@ if reward_logging:
 
 while True:
 
-    if frame_counter == 1:
+    if just_reset:
     # If episode has jsut started don't reset
         print("-" * 10, "NEW EPISODE: ", episode_counter)
-        frameInfo_current = list(START_STATE)
+        stepInfo_previous = list(START_STATE)
         termination_flag = False
         total_reward = 0
         step_reward = 0
-        reward = 0
 
     # -- Get action by epsilon-greedy policy
     action, action_choice = epsilon_greedy(tuple(stepInfo_previous[:-1]), epsilon)
@@ -126,33 +126,31 @@ while True:
 
     # Perform action and move to next state
     for _ in range(TIME_STEP):
-        await event.frameadvance()
         sent_action = convert_actions_to_dict(action)
         set_controller(sent_action)
+        await event.frameadvance()
+        
     # Recieve reward
     stepInfo_current = list(getRaceInfo())
     step_reward, step_reward_vel, step_reward_perc, step_reward_mt, step_reward_cp = calculate_reward(stepInfo_current, stepInfo_previous)
     termination_flag = check_termination(stepInfo_current[:2])
 
     # If we are drifting check direction
+    if stepInfo_previous[2] == 0 or stepInfo_current[2] == 0:
+        drift_direction = specify_mt_direction(action)
+        #print("drift_direction", drift_direction)
+
     if stepInfo_current[2] > 0:
         stepInfo_current[2] = drift_direction
 
-    if stepInfo_previous[2] == 0 or stepInfo_current[2] == 0:
-        drift_direction = specify_mt_direction(action)
-        print("drift_direction", drift_direction)
+
 
     print("Current state", stepInfo_current)        
     print("Reward gained:", step_reward)
-
+    print("vel_reward", step_reward_vel, "perc_reward", step_reward_perc)
 
     # -- Update Q-Table
     q = update_q_table(tuple(stepInfo_previous[:-1]), action, step_reward, tuple(stepInfo_current[:-1]), alpha, gamma, epsilon)
-        
-    # update total reward
-    total_reward = total_reward + step_reward      
-    step_reward = 0
-    stepInfo_previous = stepInfo_current
 
     if termination_flag:
         #print("Reward gained:", step_reward)
@@ -176,6 +174,12 @@ while True:
         frameInfo_previous = list(START_STATE)
         termination_flag = False
         action = DEFAULT_CONTROLLR_TUPLE
+        just_reset = True
 
         await load_savestate()
         continue
+    else:
+        just_reset = False  
+        total_reward = total_reward + step_reward      
+        step_reward = 0
+        stepInfo_previous = stepInfo_current
