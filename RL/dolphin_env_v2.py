@@ -80,8 +80,8 @@ step_reward_cp = 0
 
 ## Q-Learning parameters
 epsilon = 0.6  #Higher = more chance of random action
-gamma = 0.2 # Higher = more focus on future rewards
-alpha = 0.5 # Higher = newer Q-Values will have more impact
+gamma = 0.5 # Higher = more focus on future rewards
+alpha = 0.7 # Higher = newer Q-Values will have more impact
 
 ## Logging
 ## ---
@@ -153,6 +153,9 @@ while True:
     q = update_q_table(tuple(stepInfo_previous[:-1]), action, step_reward, tuple(stepInfo_current[:-1]), alpha, gamma, epsilon)
 
     if termination_flag:
+        # If it terminates while holing mt
+        if stepInfo_current[2] > 0:
+            step_reward = step_reward - 10
         #print("Reward gained:", step_reward)
         print("Terminating, updating: ", stepInfo_previous, " with reward ", step_reward)
         update_q_table(tuple(stepInfo_previous[:-1]), action, step_reward, tuple(stepInfo_current[:-1]), alpha, gamma, epsilon)
