@@ -35,7 +35,7 @@ from environment.press_button import press_button as set_controller
 from environment.calculate_reward import calculate_reward
 from environment.memory_viewer import getRaceInfo
 from environment.termination_check import check_termination
-from q_learning_agent import update_q_table, epsilon_greedy, init_q_table, get_q_table
+from q_learning_agent import update_q_table, epsilon_greedy, save_q
 
 def print_state_to_dolphin_log(episode, frame, speed, racePercent, mt, reward, q, action_choice):
     print(f'''Episode: {episode} Frame: {frame}, Speed: {speed}, Race%: {racePercent}, Miniturbo: {mt}, Reward: {reward}, Q-Value: {q}, Action Choice: {action_choice}''')
@@ -74,12 +74,6 @@ step_reward_vel = 0
 step_reward_perc = 0
 step_reward_mt = 0
 step_reward_cp = 0
-
-q_path = f"{PROJECT_DIR}RL\\q-table.pkl"
-# open pickle file and load into q
-q = load(open(q_path, "r"))
-# give q table to agent script
-init_q_table(q)
 
 
 ## Q-Learning parameters
@@ -155,7 +149,7 @@ while True:
     print("vel_reward", step_reward_vel, "perc_reward", step_reward_perc)
 
     # -- Update Q-Table
-    q = update_q_table(tuple(stepInfo_previous[:-1]), action, step_reward, tuple(stepInfo_current[:-1]), alpha, gamma, epsilon)
+    q = update_q_table(tuple(stepInfo_previous[:-1]), action, step_reward, tuple(stepInfo_current[:-1]), alpha, gamma)
 
     if termination_flag:
         # If it terminates while holing mt
@@ -163,7 +157,7 @@ while True:
             step_reward = step_reward - 10
         #print("Reward gained:", step_reward)
         print("Terminating, updating: ", stepInfo_previous, " with reward ", step_reward)
-        update_q_table(tuple(stepInfo_previous[:-1]), action, step_reward, tuple(stepInfo_current[:-1]), alpha, gamma, epsilon)
+        update_q_table(tuple(stepInfo_previous[:-1]), action, step_reward, tuple(stepInfo_current[:-1]), alpha, gamma)
         #print(f"{episode_counter}, {total_reward}, {frame_counter}, {frameInfo_current}, {controller_inputs}\n")
         
         # Log episode info
@@ -175,8 +169,8 @@ while True:
                 best_reward = total_reward
                 # save controller inputs to pkl file
                 dump(controller_inputs, open(f'{best_inputs_file}', "wb"))
-        # save q table to pkl file
-        dump(get_q_table(), open(q_path, "wb"))
+
+
         frame_counter = 0
         episode_counter += 1
         controller_inputs = []
@@ -184,7 +178,7 @@ while True:
         termination_flag = False
         action = DEFAULT_CONTROLLR_TUPLE
         just_reset = True
-
+        save_q()         # save q table to pkl file
         await load_savestate()
         continue
     else:

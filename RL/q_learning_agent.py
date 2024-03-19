@@ -1,5 +1,8 @@
 # An agent that uses Q-Learning
 import random
+import pickle as pkl
+PROJECT_DIR = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\'
+
 # Action Space
     # Action tuples contains a list of all possible inputs as tuples
 from Rainbow.AdditionalScripts.action_space import generate_action_space
@@ -13,14 +16,15 @@ for dicts in action_space:
 # Q-Table
     # Table of Q values for each state-action pair
     # q[(s,a)] = q[((float, float, int), (Bool, Bool, Bool, int))]
-    # q-value of unvisited state-action pairs is undefined, meaning i need the helper functions
+ # q-value of unvisited state-action pairs is undefined, meaning i need the helper functions
+q_file = f'{PROJECT_DIR}RL\\q_table.pkl'  
 
-q = {}
+def save_q():
+    pkl.dump(q, open(q_file, "wb"))
 
-def init_q_table(new_q):
-    q = new_q
-    return new_q
-
+print("Loading q table")
+q = pkl.load(open(q_file, 'rb'))
+print("table size:", len(q))
 # Helper function to choose the best action in a given state 
 # As my q-Table would be massive if I fully initialised it, I will check if a value exists in the try clause
 # If it does exist, use that Q-Value
@@ -103,6 +107,7 @@ def update_q_table(prev_state, action, reward, next_state, alpha, gamma) -> floa
 # Recursively picks a random action in a given state and returns it
 #def sum_future_rewards(state, gamma, prev_reward, eps) -> float:
     ## useful? think no lol
+
 
 def get_q_table():
     return q
