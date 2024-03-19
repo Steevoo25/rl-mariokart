@@ -13,7 +13,7 @@ START_STATE = (76, 0.98, 0, False, 0)
 
 PROJECT_DIR = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\'
 MAX_EPISODES = 5000
-TIME_STEP = 10 #Frames between each step
+TIME_STEP = 20 #Frames between each step
 
 # As the script is run within the dolphin executable, 
 # Append the true path of scripts to import
@@ -146,8 +146,9 @@ while True:
     #print("Curr", frameInfo_current, "Prev", frameInfo_previous)
     if (frame_counter-1) % TIME_STEP == 0 :
         stepInfo_current = frameInfo_current
+        print("Current state", stepInfo_current)
         step_reward, step_reward_vel, step_reward_perc, step_reward_mt, step_reward_cp = calculate_reward(stepInfo_current, stepInfo_previous)
-        # print("Reward gained:", step_reward)
+        print("Reward gained:", step_reward)
         # print("Vel gained:", step_reward_vel)
         # print("raceperc gained:", step_reward_perc)
         # print("mt gained:", step_reward_mt)
@@ -160,7 +161,7 @@ while True:
             # -- Get action by epsilon-greedy policy
 
             action, action_choice = epsilon_greedy(tuple(stepInfo_previous[:-1]), epsilon)
-            print(action_choice , "in state", stepInfo_previous[:-1], "with action", action)
+            print(action_choice , "in state", stepInfo_current[:-1], "with action", action)
 
             # -- Update Q-Table
             q = update_q_table(tuple(stepInfo_previous[:-1]), action, step_reward, tuple(stepInfo_current[:-1]), alpha, gamma, epsilon)
@@ -168,7 +169,7 @@ while True:
 
         if frameInfo_previous[2] == 0 or frameInfo_current[2] == 0:
             drift_direction = specify_mt_direction(action)
-            #print("drift_direction", drift_direction)
+            print("drift_direction", drift_direction)
         controller_inputs.append(action)
         # update total reward
         total_reward = total_reward + step_reward
