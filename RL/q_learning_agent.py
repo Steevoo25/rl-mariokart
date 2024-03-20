@@ -42,6 +42,14 @@ def handle_unassigned_q_action(next_state, action):
     finally:
         return value
 
+def optimistically_handle_unassigned_q_action(next_state, action):
+    try:
+        value = q[next_state, action]
+    except KeyError:
+        value = 50
+    finally:
+        return value
+
 # --- Epsilon-Greedy Policy
 def epsilon_greedy(state, eps):
 
@@ -54,8 +62,8 @@ def epsilon_greedy(state, eps):
         eps = 0.25 # high chance of choosing best
         print("Fully explored:", state, " count " , explored_actions)
     for action in action_tuples:
-      value = handle_unassigned_q_action(state, action)
-      print("Action:", action, ", Value:", value )
+        value = handle_unassigned_q_action(state, action)
+        print("Action:", action, ", Value:", value )
 
     best_action =  action_tuples[max(range(ACTION_COUNT + 1), key= lambda x : handle_unassigned_q_index(state, x))]     
 
@@ -77,7 +85,7 @@ def update_q_table(prev_state, action, reward, next_state, alpha, gamma) -> floa
     
     # pick an action via epsilon greedy-policy in next state
     #future_action = epsilon_greedy(next_state, eps)
-    future_q = [(action, handle_unassigned_q_action(next_state, action)) for action in action_tuples]
+    future_q = [(action, optimistically_handle_unassigned_q_action(next_state, action)) for action in action_tuples]
     max_future_q = max(future_q, key=lambda x: x[1])
     avg_future_q = sum([q[1] for q in future_q]) / sum(1 for q in future_q if not q == 0)
     ##check here
