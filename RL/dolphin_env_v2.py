@@ -54,12 +54,12 @@ def specify_mt_direction(action):
     return 0
 
 ## Initialisations
-frame_reward = 0
+
 step_reward = 0
 total_reward = 0
-frame_counter = 0
+
 termination_flag = False
-frameInfo_previous = list(START_STATE)
+
 stepInfo_previous = list(START_STATE)
 is_logging = True
 episode_counter = 0
@@ -70,16 +70,11 @@ reward_logging = False
 drift_direction = 0 # 0= not drifting, 1 = left, 2 = right
 just_reset = True
 
-step_reward_vel = 0
-step_reward_perc = 0
-step_reward_mt = 0
-step_reward_cp = 0
-
-EPS = 0.6
+step_reward_vel, step_reward_perc, step_reward_mt = 0,0,0
 
 ## Q-Learning parameters
 epsilon = 0.6  #Higher = more chance of random action
-gamma = 0.6 # Higher = more focus on future rewards
+gamma = 0.8 # Higher = more focus on future rewards
 alpha = 0.6 # Higher = newer Q-Values will have more impact
 
 ## Logging
@@ -137,7 +132,6 @@ while True:
     # If we are drifting check direction
     if stepInfo_previous[2][1] == 0 or stepInfo_current[2] == 0:
         drift_direction = specify_mt_direction(action)
-        print("drift_direction", drift_direction)
 
     #if stepInfo_current[2] > 0:
     stepInfo_current[2] = drift_direction, stepInfo_current[2]
@@ -147,24 +141,21 @@ while True:
 
     print("Current state", stepInfo_current)        
     print("Reward gained:", step_reward)
-    print("vel_reward", step_reward_vel, "perc_reward", step_reward_perc)
+    print("vel_reward", step_reward_vel, "perc_reward", step_reward_perc, "mt reward", step_reward_mt)
 
     # -- Update Q-Table
     q = update_q_table(tuple(stepInfo_previous[:-1]), action, step_reward, tuple(stepInfo_current[:-1]), alpha, gamma)
 
     if termination_flag:
-        # If it terminates while holing mt
-        # if stepInfo_current[2] > 0:
-        #     step_reward = step_reward - 30
-        step_reward = -10
+        # terminating gives -ve reward
+        step_reward = -100
         #print("Reward gained:", step_reward)
         print("Terminating, updating: ", stepInfo_previous, " with reward ", step_reward)
         update_q_table(tuple(stepInfo_previous[:-1]), action, step_reward, tuple(stepInfo_current[:-1]), alpha, gamma)
-        #print(f"{episode_counter}, {total_reward}, {frame_counter}, {frameInfo_current}, {controller_inputs}\n")
         
         # Log episode info
         if is_logging:
-            log.write(f"{episode_counter}, {total_reward}, {frame_counter}\n")# {vel_reward}, {perc_reward}, {mt_reward}\n") # {q} , {frameInfo_current}\n")
+            log.write(f"{episode_counter}, {total_reward},")#
             # If its the best we've seen
             if total_reward > best_reward:
                 # update best reward
@@ -172,14 +163,12 @@ while True:
                 # save controller inputs to pkl file
                 dump(controller_inputs, open(f'{best_inputs_file}', "wb"))
 
-
-        frame_counter = 0
         episode_counter += 1
         controller_inputs = []
-        frameInfo_previous = list(START_STATE)
         termination_flag = False
         action = DEFAULT_CONTROLLR_TUPLE
         just_reset = True
+        
         if episode_counter % 10 == 0:
             save_q()         # save q table to pkl file every 100 episodes
         await load_savestate()
