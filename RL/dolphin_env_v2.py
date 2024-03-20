@@ -1,19 +1,6 @@
 # -- DOLHPIN IMPORTS --
 from dolphin import event # gives awaitable routine that returns when a frame is drawn
-
-#DEFAULT_CONTROLLER = {"A":True,"B":False,"Up":False,"StickX":128}
-DEFAULT_CONTROLLR_TUPLE = (False, False, 128)
-
-START_STATE = (76, 0.98, (0, 0), False, 0)
-# [0] = XZ Velocity
-# [1] = Race%
-# [2] = MTdirection, charge
-# [3] = Wheelie
-# [4] = CP
-
 PROJECT_DIR = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\'
-MAX_EPISODES = 5000
-TIME_STEP = 20 #Frames between each step
 
 # As the script is run within the dolphin executable, 
 # Append the true path of scripts to import
@@ -27,7 +14,7 @@ this_dir = f'{PROJECT_DIR}RL'
 path.append(this_dir)
 
 # -- OTHER IMPORTS --
-from pickle import dump, load
+from pickle import dump
 from datetime import datetime
 
 from environment.load_savestate import load_using_fkey as load_savestate
@@ -37,13 +24,22 @@ from environment.memory_viewer import getRaceInfo
 from environment.termination_check import check_termination
 from q_learning_agent import update_q_table, epsilon_greedy, save_q
 
-def print_state_to_dolphin_log(episode, frame, speed, racePercent, mt, reward, q, action_choice):
-    print(f'''Episode: {episode} Frame: {frame}, Speed: {speed}, Race%: {racePercent}, Miniturbo: {mt}, Reward: {reward}, Q-Value: {q}, Action Choice: {action_choice}''')
+DEFAULT_CONTROLLR_TUPLE = (False, False, 128)
+START_STATE = (76, 0.98, (0, 0), False, 0)
+# [0] = XZ Velocity
+# [1] = Race%
+# [2] = (MTdirection, charge)
+# [3] = Wheelie
+# [4] = CP
+MAX_EPISODES = 5000
+TIME_STEP = 20 #Frames between each step
 
-# A helper function to convert a tuple of actions (used in the q-learning process) to a dictionary (to send to emulator)
+# A function to convert a tuple of actions (used in q-table as key) to a dict (to send to emulator)
 def convert_actions_to_dict(action: tuple):
     return {"A": True, "B": action[0],"Up": action[1],"StickX": action[2]}
 
+# A function to get the direction of a drift
+# Returns 0 = not drifting, 1 = drifting left, 2 = drifting right
 def specify_mt_direction(action):
     if action[0] == True: #if B is being pressed
         # Check direction of drift
@@ -53,24 +49,21 @@ def specify_mt_direction(action):
             return 2
     return 0
 
-## Initialisations
+#--- Initialisations
 
-step_reward = 0
-total_reward = 0
-
-termination_flag = False
-
-stepInfo_previous = list(START_STATE)
-is_logging = True
 episode_counter = 0
-controller_inputs = []
-best_reward = 0
-action = DEFAULT_CONTROLLR_TUPLE
-reward_logging = False
-drift_direction = 0 # 0= not drifting, 1 = left, 2 = right
+
+# Termination checking
+termination_flag = False
 just_reset = True
 
-step_reward_vel, step_reward_perc, step_reward_mt = 0,0,0
+# State
+stepInfo_previous = list(START_STATE)
+action = DEFAULT_CONTROLLR_TUPLE
+drift_direction = 0 # 0= not drifting, 1 = left, 2 = right
+
+# Rewards
+step_reward, total_reward, step_reward_vel, step_reward_perc, step_reward_mt, best_reward = 0,0,0,0,0,0
 
 ## Q-Learning parameters
 epsilon = 0.6  #Higher = more chance of random action
@@ -78,7 +71,8 @@ gamma = 0.8 # Higher = more focus on future rewards
 alpha = 0.6 # Higher = newer Q-Values will have more impact
 
 ## Logging
-## ---
+is_logging = True
+controller_inputs = []
 date_and_time = datetime.now().strftime("%d_%m_%Y--%H-%M")
 if is_logging:
     log_file = f"{PROJECT_DIR}Evaluation\\data\\q-learning\\episodes\\q-learning-{date_and_time}.csv"
@@ -89,17 +83,6 @@ if is_logging:
 
     # Controller Inputs 
     best_inputs_file = f"{PROJECT_DIR}Evaluation\\data\\q-learning\\controller_episodes\\q-learning-{date_and_time}.pkl"
-    
-if reward_logging:
-
-    total_reward_vel = 0
-    total_reward_perc = 0
-    total_reward_mt = 0    
-    total_reward_cp = 0
-    
-    reward_log_file = f"{PROJECT_DIR}Evaluation\\data\\q-learning\\rewards\\q-learning-{date_and_time}.csv"
-    reward_log = open(reward_log_file, 'w')
-    reward_log.write("total_reward,vel_reward,perc_reward,mt_reward,cp_reward\n")
 
 ### Main Training Loop ###
 # -------------------------
@@ -126,16 +109,16 @@ while True:
         await event.frameadvance()
         
     # Recieve reward
-    stepInfo_current = list(getRaceInfo())
+    stepInfo_current = list(getRaceInfo()) # cast as list as we are going to edit it
     
-
     # If we are drifting check direction
     if stepInfo_previous[2][1] == 0 or stepInfo_current[2] == 0:
         drift_direction = specify_mt_direction(action)
-
-    #if stepInfo_current[2] > 0:
+    
+    # Update mt info
     stepInfo_current[2] = drift_direction, stepInfo_current[2]
     
+    # Calculate Reward
     step_reward, step_reward_vel, step_reward_perc, step_reward_mt, step_reward_cp = calculate_reward(stepInfo_current, stepInfo_previous)
     termination_flag = check_termination(stepInfo_current[:2])
 
@@ -162,19 +145,21 @@ while True:
                 best_reward = total_reward
                 # save controller inputs to pkl file
                 dump(controller_inputs, open(f'{best_inputs_file}', "wb"))
+            controller_inputs = []
 
+        # Reset for next episode
         episode_counter += 1
-        controller_inputs = []
         termination_flag = False
         action = DEFAULT_CONTROLLR_TUPLE
         just_reset = True
         
-        if episode_counter % 10 == 0:
-            save_q()         # save q table to pkl file every 100 episodes
+        if episode_counter % TIME_STEP == 0: # save q table every 20 episodes
+            save_q()         
         await load_savestate()
         continue
     else:
-        just_reset = False  
-        total_reward = total_reward + step_reward      
+        # Next Step
+        just_reset = False
+        total_reward = total_reward + step_reward
         step_reward = 0
         stepInfo_previous = stepInfo_current
