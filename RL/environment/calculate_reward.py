@@ -14,13 +14,13 @@ NOT_CHARGING = 0
 LAP_COMPLETE = 2
 
 VELOCITY_WEIGHT = 18
-RACE_PERCENT_WEIGHT = 15
+RACE_PERCENT_WEIGHT = 18
 MT_WEIGHT = 1
 
 CP_REWARD = 9
 LAP_COMPLETE_REWARD = 30
 MT_SUCCESS = 0#10 / MT_WEIGHT bonus comes from speed
-MT_FAILED = -15 / MT_WEIGHT
+MT_FAILED = -25 / MT_WEIGHT
 
 def calculate_reward(frameInfo_current, frameInfo_previous):
     
@@ -51,7 +51,7 @@ def calculate_velocity_reward(S_current: float, S_prev: float):
     
     # if a boost has been performed
     if S_current > NORMAL_MAX_SPEED:
-        return S_scaled * 2.5
+        return S_scaled * 2
     elif S_current > MIN_ACCEPTABLE_SPEED:
         return S_scaled
     else :
