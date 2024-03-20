@@ -13,9 +13,10 @@
 *.avi
 *.log
 *.csv
-*.pkl
 # venv
 venv/
+Evaluation/data/
+Evaluation/plots/
 Information Base/
 RL/Rainbow/rainbow_venv/
 RL/Rainbow/__pycache__/
