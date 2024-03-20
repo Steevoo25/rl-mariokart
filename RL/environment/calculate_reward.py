@@ -37,7 +37,7 @@ def calculate_reward(frameInfo_current, frameInfo_previous):
     R_racepercent = curr_racepercent * RACE_PERCENT_WEIGHT
     #-- Miniturbo --
     # Need: Current and Previous MT
-    R_mt = calculate_miniturbo_reward(curr_mt, prev_mt) * MT_WEIGHT
+    R_mt = calculate_miniturbo_reward(curr_mt[1], prev_mt[1]) * MT_WEIGHT
 
     R_cp = 0#calculate_cp_reward(curr_cp, prev_cp)
     
