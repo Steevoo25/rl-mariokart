@@ -19,7 +19,7 @@ plt.plot(df['Episode'], smoothed_reward, label='Return', linewidth=1)
 #plt.plot(df['Episode'], df['Frame_Count'], label='Survival Time')
 
 # Set x axis scale
-plt.ylim(400, 2000)
+plt.ylim(0, 400)
 
 # Lables
 plt.xlabel('Episode number')
