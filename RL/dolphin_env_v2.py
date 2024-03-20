@@ -4,10 +4,10 @@ from dolphin import event # gives awaitable routine that returns when a frame is
 #DEFAULT_CONTROLLER = {"A":True,"B":False,"Up":False,"StickX":128}
 DEFAULT_CONTROLLR_TUPLE = (False, False, 128)
 
-START_STATE = (76, 0.98, 0, False, 0)
+START_STATE = (76, 0.98, (0, 0), False, 0)
 # [0] = XZ Velocity
 # [1] = Race%
-# [2] = MT
+# [2] = MTdirection, charge
 # [3] = Wheelie
 # [4] = CP
 
@@ -61,7 +61,7 @@ frame_counter = 0
 termination_flag = False
 frameInfo_previous = list(START_STATE)
 stepInfo_previous = list(START_STATE)
-is_logging = False
+is_logging = True
 episode_counter = 0
 controller_inputs = []
 best_reward = 0
@@ -75,11 +75,12 @@ step_reward_perc = 0
 step_reward_mt = 0
 step_reward_cp = 0
 
+EPS = 0.6
 
 ## Q-Learning parameters
 epsilon = 0.6  #Higher = more chance of random action
-gamma = 0.5 # Higher = more focus on future rewards
-alpha = 0.7 # Higher = newer Q-Values will have more impact
+gamma = 0.6 # Higher = more focus on future rewards
+alpha = 0.6 # Higher = newer Q-Values will have more impact
 
 ## Logging
 ## ---
@@ -131,18 +132,18 @@ while True:
         
     # Recieve reward
     stepInfo_current = list(getRaceInfo())
-    step_reward, step_reward_vel, step_reward_perc, step_reward_mt, step_reward_cp = calculate_reward(stepInfo_current, stepInfo_previous)
-    termination_flag = check_termination(stepInfo_current[:2])
+    
 
     # If we are drifting check direction
-    if stepInfo_previous[2] == 0 or stepInfo_current[2] == 0:
+    if stepInfo_previous[2][1] == 0 or stepInfo_current[2] == 0:
         drift_direction = specify_mt_direction(action)
-        #print("drift_direction", drift_direction)
+        print("drift_direction", drift_direction)
 
-    if stepInfo_current[2] > 0:
-        stepInfo_current[2] = drift_direction
-
-
+    #if stepInfo_current[2] > 0:
+    stepInfo_current[2] = drift_direction, stepInfo_current[2]
+    
+    step_reward, step_reward_vel, step_reward_perc, step_reward_mt, step_reward_cp = calculate_reward(stepInfo_current, stepInfo_previous)
+    termination_flag = check_termination(stepInfo_current[:2])
 
     print("Current state", stepInfo_current)        
     print("Reward gained:", step_reward)
@@ -153,8 +154,9 @@ while True:
 
     if termination_flag:
         # If it terminates while holing mt
-        if stepInfo_current[2] > 0:
-            step_reward = step_reward - 10
+        # if stepInfo_current[2] > 0:
+        #     step_reward = step_reward - 30
+        step_reward = -10
         #print("Reward gained:", step_reward)
         print("Terminating, updating: ", stepInfo_previous, " with reward ", step_reward)
         update_q_table(tuple(stepInfo_previous[:-1]), action, step_reward, tuple(stepInfo_current[:-1]), alpha, gamma)
@@ -178,7 +180,8 @@ while True:
         termination_flag = False
         action = DEFAULT_CONTROLLR_TUPLE
         just_reset = True
-        save_q()         # save q table to pkl file
+        if episode_counter % 10 == 0:
+            save_q()         # save q table to pkl file every 100 episodes
         await load_savestate()
         continue
     else:
