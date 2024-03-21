@@ -4,11 +4,12 @@ from memory_viewer import getCurrentRoadType
 MIN_ACCEPTABLE_SPEED = 60
 LAP_COMPLETED = 2
 RACE_COMPLETED = 4
+OFFROAD = 3
 
 def check_termination(raceInfo) -> bool:
     vel, racePercent = raceInfo
     
-    if getCurrentRoadType() == 3:
+    if getCurrentRoadType() == OFFROAD:
         return True
     # speed is too low
     if vel < MIN_ACCEPTABLE_SPEED:
