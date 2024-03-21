@@ -1,0 +1,30 @@
+% !TEX root =  ../Dissertation.tex
+
+\chapter{Background}
+\section{Markov Decision Process}
+mdp is a structure used to model mathematical sequential decision making problems\\
+Gives an environment for RL\\
+key elements of mdp\\
+\[ < S, a, T, R> mdp formalisation\]
+States - markov property\\
+\[markov property\]\\
+Actions\\
+actions available in each state
+Rewards\\
+reward - expected reward taking action a in state S
+
+\section{Q-Learning}
+\cite{watkins1992q} Q-learning \\
+model-free\\
+q-value assosciated with actions in states\\
+update rule
+\[Update rule\]
+parameters eps, alpha, gamma\\
+rewards fed back through
+\section{Deep Learning}
+Motivations for deep learning - large state space\\
+learns from raw pixels rather than specified state - less design\\
+deep nn for q-approximation\\
+replay buffer\\
+transitions stored and model trained\\
+recently many extensions \cite{hessel2018rainbow}

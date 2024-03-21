@@ -1,0 +1,88 @@
+% !TEX root =  ../Dissertation.tex
+\chapter{Design}
+
+\section{Q-Learning Implementation}
+\section{Modelling as MDP}
+Q-learning does not require transition probability as it is model-free approach - learns through interaction. Great for my case as emulator allows for complete interaction with environment.
+\\Episodic task - reset from savestate
+\cite{watkins1992q}
+explanation of architecture - python script in embedded interpreter, sends inputs through controller api, recieves state info from memory api, controlls execution with event api
+\begin{figure}[h]
+    \centering
+    \includegraphics{Preamble/BirmCrest.png}
+    \caption{System Architecture}
+    \label{fig:q-learning-arch}
+\end{figure}
+\subsection{Environment}
+\begin{figure}
+    \centering
+    \includegraphics{Preamble/BirmCrest.png}
+    \caption{Track Layout}
+    \label{fig:track-layout}
+\end{figure}
+\begin{itemize}
+    \item track - flat, various sharpness of corners, few on track obstacles, offroad borders all road
+    \item kart/character combo - most widely used - allows for most comparison
+    \item only agent on track - mention in future additions
+    \item no item usage - mention in future additions
+\end{itemize}
+
+\subsection{Reward Function}
+design process - reward function evaluation process
+aims - equally reward progress and speed
+encourage progress - speed, race\%
+\\give bonus for completing specific actions - mt (must be fully charged before release)
+\\ + Why each was chosen
+\[
+Reward Function
+R(state) = 1
+\]
+\begin{figure}[ht]
+    \centering
+    \subfloat[Reward function values for a 'well driven' lap]{\includegraphics[width=0.3\textwidth]{Preamble/BirmCrest.png}\label{fig:reward-well-driven}}
+    \hfill
+    \subfloat[Reward function penalty component]{\includegraphics[width=0.3\textwidth]{Preamble/BirmCrest.png}\label{fig:reward-penalty}}
+    \caption{Reward Function graphs}
+\end{figure}
+\subsection{State Space}
+objectives - balance of accuracy and simplicity - large state space can lead to intractable 
+\\ training time and performance
+\\drift and wheelie affects steering
+\\want to maintain MDP Property - all information needed to make decision 
+\\ why I rounded to given value - run experiment for 3 ~1000 episodes
+\begin{itemize}
+    \item Speed - Speed
+    \item Position - race\%
+    \item drift - 0 = not, 1 = left, 2 = right - how direction and charge is tracked
+    \item wheelie - true, false - affects steering
+    \item road Type - check on track or not
+\end{itemize}
+
+\subsubsection{Terminal States}
+Checks speed, ground type and race\%\\
+ground type: Originally set only lower speed threshold, but this was often met when going round a corner, but decreasing would lead to a lot of time spent in offroad and slow lap time, therefore changed to road type\\ also speed decays over time when in offroad was leading to spending a time step in offroad when should have terminate\\
+\\speed: motivation - obstacles on track
+\\lap completed (race\% > 2) - reset as track is same every lap, meaning for 3 lap time 
+\[ Formalisation of terminal states\]
+\\ it is for this reason that road type not used in q-table as any state with road type !=0 is terminal, therefore it would never be updated
+
+\subsection{Action Space}
+again, balance of precise inputs and limiting q-table size
+\\limited set of controller inputs: A is always held (accelerate), B can only be pressed with a direction (drift), Up can only be pressed with no direction (Wheelie), 7 steering angles, sometimes cancelling a drift with small steering adjustment is useful - (steer shallow left, steer shallow right)
+\\ to maintain as small q as possible. predefined 'good' inputs. Steering is mostly done with drift only small adjustments not in drift - higher speed than turning and tighter circle - small info about inside drift
+\\ no turning during wheelie - greatly decreases speed 
+\\ going straight - wheelie is always faster
+\\ weighted actions - more likely not to turn only way of cancelling current drift
+
+\section{Adjustments to Q-Learning}
+motivations: q learning very slow - monitoring training showed that it get stuck in local optima. Investigations showed: reward being exploited, 
+\subsection{Q-Table Update Rule}
+Maximisation step in update rule calculates states to be better than they are (state where every action except for one will have high value but best action not guaranteed to be taken) - take average -> allows more accurate q-value as next action is not known
+\\ optimistic - unexplored actions have standard reward of 30 to not punish states where only explored actions lead to termination (30 chosen as observed average reward for a step)
+
+\subsection{Epsilon-Greedy Policy}
+Treats all stages of training the same, its expected that after some time early states will be fully explored and optimised as they are visited the most often. Once a state is fully explored, half epsilon value to encourage exploitation
+
+\section{Data Collection}
+During reward tuning reward of each component tracked at each time step
+\\ during training only total reward and best epsiode's controller inputs

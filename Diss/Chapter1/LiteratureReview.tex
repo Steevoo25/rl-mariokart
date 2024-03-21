@@ -1,0 +1,23 @@
+% !TEX root =  ../Dissertation.tex
+% how to cite github projects?
+
+\chapter{Literature Review}
+\section{Similar Projects}
+Write about similar projects:
+\\ \cite{BenJMiddleton}
+\\ \href{https://github.com/JackWBoynton/mariokart-rl}{Jack Boynton's Presentation}
+\\ Differences - uses geometric data such as cross track error, x,y pos and angle between track and current heading, state contains pixel data and ram data\\
+\href{https://github.com/benjaminjmiddleton/mkw_ai_env/blob/main/README.md}{rainbow agent}
+\\ Largely similar but implements deep-rl, state contains pixel and ram data
+\\ My contributions - allows replay of episodes, and therefore playing against a trained agent, 
+Suitable for people without access to lots of computational resources, used as educational material to show concepts in a common environment
+
+\section{RL in Games}
+
+\cite{mnih2013playing}Playing atari with rl - used as benchmark for deep-rl, over X references, compares deep and traditional in 2-d games (DQN, sarsa)\\
+FPS games with deep-rl - compares a trained agent with human players in deathmatch scenario - implements visual data alongside q-learning objective\cite{lample2017playing}
+\\End-To-End race driving - deep-rl in realistic racing game\cite{8460934} -
+\section{Real-World Applications}
+many papers published for autonomous driving (more than 1,000,000) 
+\\Hierarchical rl - suggests manouvre selection policy and motion control - allowing for tuning of same manouevre for slightly different situations\cite{duan2020hierarchical}
+\\Deep rl for autonomous driving \cite{kiran2021deep} lots of appliations for rl within autonomous driving - control, recognition, Planning, Behaviour prediction (other drivers)

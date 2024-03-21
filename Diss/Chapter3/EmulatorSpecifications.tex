@@ -1,0 +1,39 @@
+% !TEX root =  ../Dissertation.tex
+
+\chapter{Emulator Specification}
+\section{motivations}
+previous experience\\ 
+most widely used\\
+api access\\
+savestates for resetting\\
+dumping pixel data\\
+allows multiple concurrent controllers - possible to play against agent\\
+
+\section{Memory access}
+\subsection{Process}
+iterative search process using Dolphin Memory Engine + Cheat code to find required memory addresses
+\\cheat code gave value to search for
+\\ iteratively search through memory until address was found 
+\\ use api to read addresses during execution
+\section{Descriptions}
+\begin{itemize}
+    \item Speed - current speed of vehicle
+    \item Race Completion \% - current completion of entire race 1-2 = lap 1, 2-3 = lap 2, 3-4 = lap 3, 4 = finished
+    \item Miniturbo charge - 0-270
+    \item Wheelie = 0,1
+    \item Road Type = Normal road = 0, Offroad = 3
+\end{itemize}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{l|l|c}
+    \textbf{Name}  & \textbf{Location}\\
+    \hline
+     XZ Speed  &    0x0\\
+     Race\%  &   0x0\\
+     Miniturbo Charge &  0x0 \\
+     Wheelie State &  0x0 \\
+     Road Type &  0x0 \\
+    \end{tabular}
+    \caption{Memory Addresses in Mario Kart Wii's memory}
+    \label{tab:memory-addresses}
+\end{table}

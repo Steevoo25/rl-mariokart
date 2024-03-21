@@ -1,0 +1,79 @@
+% !TEX root =  ../Dissertation.tex
+
+\chapter{Evaluation}
+
+\section{Dolphin}
+3rd party software - many issues undocumented, requires specific configurations/workarounds
+\\ savestate issue
+\\importing python packages - not all supported
+\\overrall best option
+
+\section{Q-Learning Results}
+training time \\
+\begin{figure}
+    \centering
+    \includegraphics{Preamble/BirmCrest.png}
+    \caption{Graph of reward function during training of Q-Learning agent}
+    \label{fig:training-reward-q}
+\end{figure}
+\\Simplification of action space - potentially removed best actions in very specific states
+\\Path of agent after 1000, 5000, etc. episodes
+\\ \textbf{On Unsuccessful training} - reasons: \\track too complex (lots of sequential turns -> use simpler track - evidence), \\state space (Race\% not great representation of position across track -> use xz pos evidence - screenshots of same race\% in different locations), \\reward function (design too specific {cite book} ~"encourage what you want it to complete not how to complete it" - I encountered exploitation of reward function (best action charging mt into wall) - rises problem of lots of steps before reward \cite{mnih2013playing})
+
+\section{Deep Learning Results}
+training time \\ resource usage
+
+\begin{figure}
+    \centering
+    \includegraphics{Preamble/BirmCrest.png}
+    \caption{Graph of reward function during training of Rainbow Agent}
+    \label{fig:trainig-reward-deep}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics{Preamble/BirmCrest.png}
+    \caption{Figure of Agent's path at 3 stages of learning}
+    \label{fig:agent-path-q}
+\end{figure}
+
+\section{Comparison to Human Players}
+\subsection{Data Collection}
+humans had 3 attempts at timed race (3 laps), best attempt was taken\\ timed 3 laps, best and average lap
+\\ mix of abilities - new, moderate, experienced
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{l|l}
+    \textbf{Player} & \textbf{Average Lap Time}\\
+    \hline
+    Q-Learning    &  \\
+    Rainbow & \\
+    Human - Experienced & \\
+    Human - Intermediate & \\
+    Human - Beginner &  
+    \end{tabular}
+    \caption{Table Comparing human and RL Performance}
+    \label{tab:lap-times}
+\end{table}
+\section{Comparison between Approaches}
+training time, data required, computational resources
+\begin{table}[h]
+    \centering
+    \begin{tabular}{c|l}
+    \textbf{Q-Learning} & \textbf{Rainbow}\\
+    \hline
+    \textbf{Training Time (Episodes)}     &  \\
+    \textbf{Training Time (Hours)}     &  \\
+    \textbf{Storage space (q-table/nn+replaybuff respectively)}     &  \\
+    \textbf{First lap completion(Episodes)}     &  \\
+    \end{tabular}
+    \caption{Table Comparing results between Deep Learning and Q-Learning}
+    \label{tab:rl-comparison}
+\end{table}
+
+\section{Experiment: Performance on unseen track}
+Best and average lap time/completion
+Simple track (LC), complicated track (daisy circ)
+\section{Experiment: Performance in real race}
+Best and average race position - after 1 lap
