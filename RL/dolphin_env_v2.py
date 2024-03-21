@@ -138,7 +138,7 @@ while True:
         
         # Log episode info
         if is_logging:
-            log.write(f"{episode_counter}, {total_reward},")#
+            log.write(f"{episode_counter}, {total_reward},\n")#
             # If its the best we've seen
             if total_reward > best_reward:
                 # update best reward
