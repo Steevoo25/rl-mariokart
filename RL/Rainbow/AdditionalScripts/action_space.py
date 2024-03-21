@@ -19,6 +19,6 @@ def generate_action_space():
     #         turn_in_wheelie = (button_state[1] == True and not analog_state == 128)
     #         if not (jump_in_place or turn_in_wheelie):
     #             permutations.append(permutation_dict)
-    permutations = [{"B": True, "Up": False, "StickX": 0},{"B": True, "Up": False, "StickX": 64},{"B": True, "Up": False, "StickX": 192},{"B": True, "Up": False, "StickX": 255},{"B": False, "Up": True, "StickX": 128},]
+    permutations = [{"B": True, "Up": False, "StickX": 0},{"B": True, "Up": False, "StickX": 64},{"B": True, "Up": False, "StickX": 192},{"B": True, "Up": False, "StickX": 255},{"B": False, "Up": True, "StickX": 128},{"B": False, "Up": False, "StickX": 64},{"B": False, "Up": False, "StickX": 192}]
     return permutations
     
