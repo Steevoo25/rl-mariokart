@@ -5,14 +5,19 @@
 # [4] = CP
 
 # --- Constants --- 
+# Vel
 NORMAL_MAX_SPEED = 84
 ABSOLUTE_MAX_VELOCITY = 120
 MIN_ACCEPTABLE_SPEED = 65
 
+# MT
 CHARGED_MINITURBO = 270
 NOT_CHARGING = 0
+
+# Race%
 LAP_COMPLETE = 2
 
+# Weights
 VELOCITY_WEIGHT = 18
 RACE_PERCENT_WEIGHT = 18
 MT_WEIGHT = 1
@@ -24,8 +29,8 @@ MT_FAILED = -25 / MT_WEIGHT
 
 def calculate_reward(frameInfo_current, frameInfo_previous):
     
-    curr_vel, curr_racepercent, curr_mt, _, curr_cp = frameInfo_current
-    prev_vel, prev_racepercent, prev_mt, _, prev_cp = frameInfo_previous
+    curr_vel, curr_racepercent, curr_mt, _, _ = frameInfo_current
+    prev_vel, prev_racepercent, prev_mt, _, _ = frameInfo_previous
     
     #-- Velocity --
     # Need: Current speed, Previous speed, Current Race%
@@ -33,16 +38,15 @@ def calculate_reward(frameInfo_current, frameInfo_previous):
     
     #-- Race % --
     # Need: current and previous Race&
-    R_racepercent = round(calculate_race_percent_reward(curr_racepercent, prev_racepercent) * RACE_PERCENT_WEIGHT)
+    #R_racepercent = round(calculate_race_percent_reward(curr_racepercent, prev_racepercent) * RACE_PERCENT_WEIGHT)
     R_racepercent = curr_racepercent * RACE_PERCENT_WEIGHT
     #-- Miniturbo --
     # Need: Current and Previous MT
     R_mt = calculate_miniturbo_reward(curr_mt[1], prev_mt[1]) * MT_WEIGHT
 
-    R_cp = 0#calculate_cp_reward(curr_cp, prev_cp)
     
     #print_rewards(R_vel, R_racepercent, R_mt, frameInfo_current)
-    return round(R_vel + R_racepercent + R_mt + R_cp, 6), R_vel, R_racepercent, R_mt, R_cp
+    return round(R_vel + R_racepercent + R_mt, 6), R_vel, R_racepercent, R_mt
     
 def calculate_velocity_reward(S_current: float, S_prev: float):
 
@@ -51,10 +55,10 @@ def calculate_velocity_reward(S_current: float, S_prev: float):
     
     # if a boost has been performed
     if S_current > NORMAL_MAX_SPEED:
-        return S_scaled * 2
+        return S_scaled * 1.8
     elif S_current > MIN_ACCEPTABLE_SPEED:
         return S_scaled
-    else :
+    else:
         return -S_scaled
 
 # Options
