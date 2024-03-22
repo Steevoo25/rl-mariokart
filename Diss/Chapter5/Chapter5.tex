@@ -1,20 +1,33 @@
 % !TEX root =  ../Dissertation.tex
 
 \chapter{Deep-RL Implementation}
-implementation adapted from benJMiddleton
-\cite{BenJMiddleton}
-\subsection{Rainbow Specifications}
-introduction on what rainbow is: combination of many improvements to DQN 
-\cite{hessel2018rainbow}
-\begin{figure}[h]
+\section{Rainbow Agent}
+implementation adapted from benJMiddleton\cite{BenJMiddleton}
+introduction on what rainbow is: combination of many extensions to DQN - Include brief explanations\cite{hessel2018rainbow}
+
+\begin{itemize}
+    \item Double Q-learning \cite{van2016doubleq}
+    \item Prioritized Replay \cite{schaul2015prioritized}
+    \item Duelling Networks \cite{wang2016dueling}
+    \item multi-step learning \cite{sutton2018reinforcement}
+    \item Distributional RL\cite{bellemare2017distributional}
+    \item Noisy Nets\cite{DBLP:journals/corr/FortunatoAPMOGM17}
+\end{itemize}
+
+\section{System Architecture}
+How deep-rl interacts with dolphin. python libraries (pytorch etc. not supported by embedded python in dolphin) -> use ports to send json objects to and from dolphin process to rainbow process
+\\ what rainbow does at each time step
+
+\begin{figure}[ht]
     \centering
     \includegraphics{Preamble/BirmCrest.png}
     \caption{Diagram of D-RL Framework}
     \label{fig:rainbow-arch}
-\end{figure}[h]
-\subsection{Input Processing}
+\end{figure}
+
+\section{Input Processing}
 how frame data is processed before going to rainbow
-\begin{figure}
+\begin{figure}[ht]
     \centering
     \includegraphics{Preamble/BirmCrest.png}
     \caption{Screenshot of game before and after processing}
@@ -22,7 +35,4 @@ how frame data is processed before going to rainbow
 \end{figure}
 \\pixel data along with same info as q-learning
 \\how does removing frameInfo data affect deep-learning performance - pixel vs frameInfo
-\\how its processed within rainbow - cnn?
-\subsection{Limitations}
-lots of processing required - laptop can run traditional at 60fps, but deep at less than 1fps
-\\ some python libraries not supported by Dolphin's embedded python
+\\how its processed within rainbow - cnn

@@ -6,16 +6,19 @@ Different vehicle combos? - quicker learning in easier vehicle? - does one outpe
 \\ allow items - access memory location for item - lots of learning possibilities as items have different uses
 \\Different tracks - other similar simple tracks - complex tracks -- xyz speed
 \\ use minimap - direction and locations
+
 \section{Q-Learning}
 Accuracy of state space for q-learning - include additional information\\
-speed replaced with frame step? - kart rotation? xyz pos?
+kart rotation, xz pos?
 \\ Epsilon-greedy policy - consider how many visits there are to a given state and increase chance of taking best accordingly - fewer visits -> more likely to explore, more visits -> more likely to exploit
 \\ Evaluation of maximisation step vs average step
-\\ Compare with sarsa
+\\ Compare with SARSA
+\\ weighted actions - track specific? fewer turns = better to go straight most of the time so pick more when random
+\\ improve training time - multithreaded - dolphin can run without rendering, many instances at once updating central q table, take advantage of lower processing requirements
 
 \section{Deep-Q}
 how much pixel data is needed - decrease processing requirements while maintaining performance
 \\ change textures to flat colours - clearly show track boundaries
 \\ compare with other DQN improvements
 \\ conduct same study as Rainbow \cite{hessel2018rainbow} investigate which extensions to DQN had the most effect
-\\ tesseract OCR - using pixel data already, may as well
+\\ tesseract OCR - using pixel data already, may as well extract state info from it

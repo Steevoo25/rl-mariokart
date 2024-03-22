@@ -1,13 +1,21 @@
 % !TEX root =  ../Dissertation.tex
 
 \chapter{Background}
+\section{Mario Kart Wii}
+popular racing game released by Nintendo in year \\ large speedrunning/tas (explanation of TAS) community (number of discord members) \\ lots of exploits discovered\\
+
 \section{Markov Decision Process}
 mdp is a structure used to model mathematical sequential decision making problems\\
 Gives an environment for RL\\
-key elements of mdp\\
-\[ < S, a, T, R> mdp formalisation\]
+elements of mdp\\ tuple of
+\[ <S, A, P, R, \gamma>\]
+explain each element\\ s=states, a=actoins,p=transition probability function, r=reward, $\gamma$=discounts
+
 States - markov property\\
-\[markov property\]\\
+The Markov property states that the future state depends only on the current state and not on the sequence of events that preceded it. Mathematically, it can be represented as:
+\[
+P(S_{t+1} | S_t) = P(S_{t+1} | S_t, S_{t-1}, \ldots, S_0)
+\]
 Actions\\
 actions available in each state
 Rewards\\
@@ -17,10 +25,27 @@ reward - expected reward taking action a in state S
 \cite{watkins1992q} Q-learning \\
 model-free\\
 q-value assosciated with actions in states\\
-update rule
-\[Update rule\]
+update rule and 
+\[
+Q(s, a) \leftarrow (1 - \alpha) \cdot Q(s, a) + \alpha \cdot \left( r + \gamma \cdot \max_{a'} Q(s', a') \right)
+\]
+where:
+\begin{itemize}
+    \item $Q(s, a)$ is the Q-value of state-action pair $(s, a)$,
+    \item $\alpha$ is the learning rate,
+    \item $r$ is the immediate reward,
+    \item $\gamma$ is the discount factor,
+    \item $s'$ is the next state, and
+    \item $\max_{a'} Q(s', a')$ represents the maximum Q-value for the next state.
+\end{itemize}
 parameters eps, alpha, gamma\\
-rewards fed back through
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\textwidth]{Figures/generic-rl.png}
+    \caption{Generic Q-learning architecture\cite{sutton2018reinforcement}} %Cite RL - an introduction
+    \label{fig:q-learning-generic}
+\end{figure}
 \section{Deep Learning}
 Motivations for deep learning - large state space\\
 learns from raw pixels rather than specified state - less design\\

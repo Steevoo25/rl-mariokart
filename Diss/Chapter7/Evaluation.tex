@@ -9,6 +9,7 @@
 \\overrall best option
 
 \section{Q-Learning Results}
+link to yt video of trained agent at different stages\\
 training time \\
 \begin{figure}
     \centering
@@ -16,13 +17,20 @@ training time \\
     \caption{Graph of reward function during training of Q-Learning agent}
     \label{fig:training-reward-q}
 \end{figure}
-\\Simplification of action space - potentially removed best actions in very specific states
+\\Simplification of action space - potentially removed best actions in some circumstances
 \\Path of agent after 1000, 5000, etc. episodes
-\\ \textbf{On Unsuccessful training} - reasons: \\track too complex (lots of sequential turns -> use simpler track - evidence), \\state space (Race\% not great representation of position across track -> use xz pos evidence - screenshots of same race\% in different locations), \\reward function (design too specific {cite book} ~"encourage what you want it to complete not how to complete it" - I encountered exploitation of reward function (best action charging mt into wall) - rises problem of lots of steps before reward \cite{mnih2013playing})
+\\ \textbf{On Unsuccessful training} - reasons: \\track too complex (lots of sequential turns -> use simpler track - evidence), \\state space (Race\% not great representation of position across track -> use xz position evidence - screenshots of same race\% in different locations), \\reward function (design too specific \cite{sutton2018reinforcement} ~"encourage what you want it to complete not how to complete it" - I encountered exploitation of reward function (best action charging mt into wall) - rises problem of lots of steps before reward \cite{mnih2013playing}): multi-step rewards addresses this use checkpoint instead of race\%? also long term benefits/drawbacks - starting to drift left when right turn is next.
+\\potential alternative reward function design
+
+\subsection{Evaluation of Modifications to q-learning}
+\subsubsection{Update Rule}
+states with good values in all actions performed better than true maximum i.e. staying nearer middle of track
+\subsubsection{Epsilon}
+progress through the track was quicker, but current Best state would be visited a lot more than all others, giving higher q value than deserved
 
 \section{Deep Learning Results}
-training time \\ resource usage
-
+lots of processing required - laptop can run traditional at 60fps, but deep at less than 1fps\\
+link to yt video of trained agent at different stages
 \begin{figure}
     \centering
     \includegraphics{Preamble/BirmCrest.png}
@@ -60,20 +68,25 @@ humans had 3 attempts at timed race (3 laps), best attempt was taken\\ timed 3 l
 training time, data required, computational resources
 \begin{table}[h]
     \centering
-    \begin{tabular}{c|l}
-    \textbf{Q-Learning} & \textbf{Rainbow}\\
+    \begin{tabular}{l|c|l}
+    & \textbf{Q-Learning} & \textbf{Rainbow}\\
     \hline
-    \textbf{Training Time (Episodes)}     &  \\
-    \textbf{Training Time (Hours)}     &  \\
-    \textbf{Storage space (q-table/nn+replaybuff respectively)}     &  \\
-    \textbf{First lap completion(Episodes)}     &  \\
+    \textbf{Training Time (Episodes)}  &   &  \\
+    \textbf{Training Time (Hours)}   &  &  \\
+    \textbf{First lap completion(Episodes)}   &  &  \\
+    \textbf{Best lap time after X Episodes}   &  &  \\
     \end{tabular}
     \caption{Table Comparing results between Deep Learning and Q-Learning}
     \label{tab:rl-comparison}
 \end{table}
+\begin{figure}
+    \centering
+    \includegraphics{Preamble/BirmCrest.png}
+    \caption{Graph comparing rewards during training}
+    \label{fig:q-vs-deep-rewards}
+\end{figure}
 
+hardware consideration - devices without gpu suffer a lot of slowdown from increased graphical processing - 60fps in traditional vs 0.5fps in deep
 \section{Experiment: Performance on unseen track}
 Best and average lap time/completion
-Simple track (LC), complicated track (daisy circ)
-\section{Experiment: Performance in real race}
-Best and average race position - after 1 lap
+Simple track (Luigi Circuit), complicated track (daisy circuit), perhaps custom track engineered to fool dqn - track and offroad same colour
