@@ -9,6 +9,7 @@
 *.pdf
 *.pptx
 # dumps from dolphin
+*.jpg
 *.png
 *.avi
 *.log
@@ -20,3 +21,4 @@ Evaluation/plots/
 Information Base/
 RL/Rainbow/rainbow_venv/
 RL/Rainbow/__pycache__/
+Diss/Figures/
