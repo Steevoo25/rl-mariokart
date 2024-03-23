@@ -32,7 +32,7 @@ def calculate_reward(frameInfo_current, frameInfo_previous):
     curr_vel, curr_racepercent, curr_mt, _, _ = frameInfo_current
     prev_vel, prev_racepercent, prev_mt, _, _ = frameInfo_previous
     
-    print("IN Reward \n", frameInfo_current, "\n", frameInfo_previous)
+    #print("IN Reward \n", frameInfo_current, "\n", frameInfo_previous)
     
     #-- Velocity --
     # Need: Current speed, Previous speed, Current Race%
@@ -83,14 +83,14 @@ def calculate_miniturbo_reward(mt_current: int, mt_previous:int):
 
     # miniturbo has been fully charged and released
     if mt_previous == CHARGED_MINITURBO and mt_current == 0:
-        return MT_SUCCESS
+        return MT_SUCCESS #(0)
     # started miniturbo and released it before fully charging
     if mt_previous > 0 and mt_current == 0:
         print("failed mt: penalty: ", MT_WEIGHT * MT_FAILED)
         return MT_FAILED
     # miniturbo is charging
     if mt_current > 0:
-        return 0.5
+        return 3
     # no miniturbo being performed
     if mt_current == NOT_CHARGING:
         return 0
