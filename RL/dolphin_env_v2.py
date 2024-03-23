@@ -1,6 +1,7 @@
 # -- DOLHPIN IMPORTS --
 from dolphin import event # gives awaitable routine that returns when a frame is drawn
 PROJECT_DIR = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\'
+PROJECT_DIR = 'Z:\\project\\hjs115\\'
 
 # As the script is run within the dolphin executable, 
 # Append the true path of scripts to import
