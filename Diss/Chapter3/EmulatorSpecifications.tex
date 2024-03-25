@@ -9,12 +9,13 @@ api access\cite{DolphinWithScriptingSupport}\\
 savestates for resetting\\
 dumping pixel data - mp4, configure to frame by frame. configurabel jpg level, dumps current frame\\
 allows multiple concurrent controllers - possible to play against agent\\
-playing the game - iso file from genuine wii and disc
+playing the game - iso file from genuine wii and disc\\
+cheat codes readily available - displays relevant information
 
 \section{Memory access}
 \subsection{Process}
-iterative search process using Dolphin Memory Engine + Cheat code to find required memory addresses \cite{DolhpinMemoryEngine}
-\\cheat code gave value to search for
+iterative search process using Dolphin Memory Engine + Cheat code to find required memory addresses \cite{DolphinMemoryEngine}
+\\Gecko code showed value to search for
 \\ iteratively search through memory until address was found 
 \\ use api to read addresses during execution
 \begin{figure}
@@ -62,3 +63,8 @@ Inputs available
     \caption{Diagram of GameCube controller with available inputs labelled}
     \label{fig:laballed-gc-diagram}
 \end{figure}
+\section{Drawbacks}
+3rd party software - many issues undocumented, requires specific configurations/workarounds
+\\ savestate issue
+\\importing python packages - not all supported
+\\overrall best option
