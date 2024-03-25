@@ -51,7 +51,11 @@ def calculate_reward(frameInfo_current, frameInfo_previous):
     return round(R_vel + R_racepercent + R_mt, 6), R_vel, R_racepercent, R_mt
     
 def calculate_velocity_reward(S_current: float, S_prev: float):
-
+    
+    if S_current > MIN_ACCEPTABLE_SPEED:
+        return 1
+    else:
+        return 0
     # Scale velocity to value between 0 and 1
     S_scaled = S_current / ABSOLUTE_MAX_VELOCITY
     
@@ -70,7 +74,12 @@ def calculate_velocity_reward(S_current: float, S_prev: float):
 # 3. return a scaled flat difference
 #       -- This will be most effective
 def calculate_race_percent_reward(racePercent_current: float, racePercent_previous: float):
-    
+    if racePercent_current > racePercent_previous:
+        return 1
+    elif racePercent_current > LAP_COMPLETE:
+        return 100
+    else:
+        return 0
     difference = racePercent_current - racePercent_previous
     #print(f"Current: {racePercent_current}, Previous: {racePercent_previous}, Difference: {difference}")
     # Lap is complete
@@ -83,16 +92,12 @@ def calculate_miniturbo_reward(mt_current: int, mt_previous:int):
 
     # miniturbo has been fully charged and released
     if mt_previous == CHARGED_MINITURBO and mt_current == 0:
-        return MT_SUCCESS #(0)
+        return 1 #(0)
     # started miniturbo and released it before fully charging
-    if mt_previous > 0 and mt_current == 0:
+    elif mt_previous > 0 and mt_current == 0:
         print("failed mt: penalty: ", MT_WEIGHT * MT_FAILED)
-        return MT_FAILED
-    # miniturbo is charging
-    if mt_current > 0:
-        return 3
-    # no miniturbo being performed
-    if mt_current == NOT_CHARGING:
+        return -1
+    else:
         return 0
     
 # Gives a static reward for reaching a checkpoint
