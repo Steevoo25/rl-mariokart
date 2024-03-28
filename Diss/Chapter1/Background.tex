@@ -1,0 +1,50 @@
+% !TEX root =  ../Dissertation.tex
+
+\chapter{Background}
+\section{Mario Kart Wii}
+Mariokart Wii was and still is a popular local and online multiplayer racing game for the Nintendo Wii, where players select from a wide range of characters and vehicles to compete in a variety of game modes; including 3 lap races, time trials, and battle modes. Despite official online servers shutting down in 2014, third-party, community-run servers continue to support a dedicated fanbase. Many of these fans create Tool-Assisted Speedruns (TASs) for a track, where creators step through a race frame by frame and manually set the inputs for each, which is then replayed by a computer player at full speed. While this has proved very effective in producing extremely quick lap times, (sometimes even exploiting quirks in the physics engine), it is a long and complicated process, requiring many hours to make even a mediocre TAS. Reinforcement Learning, along with other AI approaches, could be useful to this community in discovering new strategies, or exploring existing strategies with large state spaces.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.4\textwidth]{Figures/mkwii-sample.jpg}
+    \caption{Screenshot from Mariokart Wii}
+    \label{fig:mariokart-standard}
+\end{figure}
+\section{Reinforcement Learning}
+Reinforcement Learning describes an interaction between an agent and an environment, in which an agent takes an action in the environment, placing it in a certain state, associated with a reward. In contrast to traditional AI approaches, where a learner is 'taught' which actions to take, RL 'learns' by itself, from its own actions.
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=0.6\textwidth]{Figures/generic-rl.png}
+    \caption{Generic reinforcement learning architecture\cite{sutton2018reinforcement}} %Cite RL - an introduction
+    \label{fig:q-learning-generic}
+\end{figure}
+\subsection{Markov Decision Process}
+Many problems in RL can be modelled by a 'Markov Decision Process' \cite{bellman1957markovian}, a structure which models sequential decision making problems. This is well-suited to RL, due to the repeated decisions the agent takes.\\ A standard MDP for optimisation is a tuple of
+\[ <S, A, P, R, \gamma>\]
+where
+\begin{itemize}
+    \item $S$ is the set of states the agent can be in (the \textit{state space}),
+    \item $A$ is the set of actions available to the agent (the \textit{action space}),
+    \item $P$ is the transition probability of moving from one given state to another, taking a given action,
+    \item $R$ is the reward assosciated with moving from one given state to another, taking a given action,
+    \item $\gamma$ is the discount factor, which balances short and long-term rewards (
+\end{itemize}
+\subsubsection{States and The Markov Property}
+For an MDP to be valid, it must satisfy the Markov Property, which states that the next state depends solely on the current state, and not on any states that preceded it. Formally, at each time-step $t$ , $$P(S_{t+1} | S_t) = P(S_{t+1} | S_t, S_{t-1}, \ldots, S_0)$$ Essentially, this means that all necessary information about the state must be included at all times.
+\subsection{Q-Learning}
+Q-Learning \cite{watkins1992q} is a model-free RL algorithm, which maintains and updates a Q-table, containing values of taking given actions in given states. As an agent transitions from one state to the next, the table is updated according to the following update rule
+\[
+Q(s, a) \leftarrow (1 - \alpha) \cdot Q(s, a) + \alpha \cdot \left( r + \gamma \cdot \max_{a'} Q(s', a') \right)
+\]
+where:
+\begin{itemize}
+    \item $s$ is the previous state
+    \item $a$ is the previous action
+    \item $Q(s, a)$ is the Q-value of state-action pair $(s, a)$\footnote{A Q-table is usually initialised to 0, assuming no knowledge about the environment, however initialising randomly can help the agent to explore the search space.},
+    \item $\alpha$ is the learning rate, affecting how much new updates affect the stored value,
+    \item $r$ is the reward earned by taking action $a$ in $s$, moving to $s'$,
+    \item $\gamma$ is the discount factor, weighting potential future rewards,
+    \item $s'$ is the current state, and
+    \item $\max_{a'} Q(s', a')$ represents the maximum Q-value for the current state.
+\end{itemize}
+\subsection{Deep Reinforcement Learning}
+Mnih \textit{et al.} (2015) \cite{mnih2015human} was successful in achieving human-level control with a deep Q-network (DQN), a deep neural network that estimates the q-function based on pixel input data. This success spearheaded further research into the area, resulting in further advancements and extensions to DQN. Including, but not limited to: Dueling DQN \cite{wang2016dueling} and Double DQN \cite{van2016doubleq}. This approach is suited to problems with very large state spaces, where a Q-table would become intractably large. Additionally, the high-dimensional input gives this model better generalisation capabilities than Q-learning, where a small change in the state space can greatly decrease the effectiveness of a trained agent.

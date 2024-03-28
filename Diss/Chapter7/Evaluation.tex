@@ -2,12 +2,6 @@
 
 \chapter{Evaluation}
 
-\section{Dolphin}
-3rd party software - many issues undocumented, requires specific configurations/workarounds
-\\ savestate issue
-\\importing python packages - not all supported
-\\overrall best option
-
 \section{Q-Learning Results}
 link to yt video of trained agent at different stages\\
 training time \\
@@ -21,10 +15,14 @@ training time \\
 \\Path of agent after 1000, 5000, etc. episodes
 \\ \textbf{On Unsuccessful training} - reasons: \\track too complex (lots of sequential turns -> use simpler track - evidence), \\state space (Race\% not great representation of position across track -> use xz position evidence - screenshots of same race\% in different locations), \\reward function (design too specific \cite{sutton2018reinforcement} ~"encourage what you want it to complete not how to complete it" - I encountered exploitation of reward function (best action charging mt into wall) - rises problem of lots of steps before reward \cite{mnih2013playing}): multi-step rewards addresses this use checkpoint instead of race\%? also long term benefits/drawbacks - starting to drift left when right turn is next.
 \\potential alternative reward function design
+\\could use set of start states - allows for greater exploration through the track - states at the start line are visited a large number of times. - best action already found but eps-greedy takes random. solution? record how many visits to each state and scale epsilon value accordingly, more visits = more likely to have found best action, therefore exploit more, fewer visits = less likely to have found best action, therefore explore more. Would be problem specific - not effective in problems where say there are '2 paths' one looks bad at first but is the best and the other looks good at first but is bad at the end. \\Could also be designed using some function of episode number and step number - would need parameters to tune but could be effective - store highest step reached, explore with probability (higheststep - current step / highest step)
+
 
 \subsection{Evaluation of Modifications to q-learning}
 \subsubsection{Update Rule}
 states with good values in all actions performed better than true maximum i.e. staying nearer middle of track
+states with only one action that doesnt lead to termnation are seen as bad, but can sometimes be best action - ie taking tight turn: wider would mean slower but tighter leads to termination
+
 \subsubsection{Epsilon}
 progress through the track was quicker, but current Best state would be visited a lot more than all others, giving higher q value than deserved
 
@@ -50,7 +48,7 @@ link to yt video of trained agent at different stages
 humans had 3 attempts at timed race (3 laps), best attempt was taken\\ timed 3 laps, best and average lap
 \\ mix of abilities - new, moderate, experienced
 
-\begin{table}[h]
+\begin{table}[htb]
     \centering
     \begin{tabular}{l|l}
     \textbf{Player} & \textbf{Average Lap Time}\\
@@ -66,6 +64,7 @@ humans had 3 attempts at timed race (3 laps), best attempt was taken\\ timed 3 l
 \end{table}
 \section{Comparison between Approaches}
 training time, data required, computational resources
+generalisation capability - run trained agent on unseen track, \\input robustness - run both agents on 'busy' track, \\Scalability - when does q-table become too large
 \begin{table}[h]
     \centering
     \begin{tabular}{l|c|l}

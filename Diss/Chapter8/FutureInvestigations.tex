@@ -15,7 +15,7 @@ kart rotation, xz pos?
 \\ Compare with SARSA
 \\ weighted actions - track specific? fewer turns = better to go straight most of the time so pick more when random
 \\ improve training time - multithreaded - dolphin can run without rendering, many instances at once updating central q table, take advantage of lower processing requirements
-
+\\application to TAS/speedrunning: For example, a technique known as \textit{superhopping} can be executed by performing a series of drifts sequentially. When starting a drift, the kart 'hops' into the air and rotates slightly, if the drift is cancelled midair and another is started the same frame the kart hits the ground, then the kart maintains its current speed, instead of slowing down. A community member who goes by the alias 'Monster' demonstrated the potential of this, taking a long turn with lots of speed \cite{Superhopping}. Techniques such as these could be formalised and given as actions with parameters of \textit{direction} and \textit{duration}, allowing for exploration of many techniques. PROBLEM - reward defined by completing lap as many techniques require going backwards, stopping etc to set up.
 \section{Deep-Q}
 how much pixel data is needed - decrease processing requirements while maintaining performance
 \\ change textures to flat colours - clearly show track boundaries
