@@ -5,10 +5,13 @@ from dolphin import memory
 
 SPEED_LOCATION = 0x80E4C8B8
 RACE_COMPLETION_LOCATION = 0x80E43748
+X_POS_LOCATION = 0x80E4DAE8
+Z_POS_LOCATION = 0x80E4DAF0
 MT_LOCATION = 0x80E4C796
 CP_LOCATION = 0x80E43746
 WHEELIE_LOCATION = 0x90284F04
 ROAD_TYPE_LOCATION = 0x80E51CE8
+
 
 # Returns the current speed of the kart
 def getCurrentSpeed() -> float:
@@ -17,6 +20,14 @@ def getCurrentSpeed() -> float:
 # Returns the value of the players current race completion (Race%)
 def getCurrentRaceCompletion() -> float:
     return round(memory.read_f32(RACE_COMPLETION_LOCATION), 2)
+
+# Rounds a nunber to the nearest 100
+def factorPositions(position) -> float:
+    return round(position / 100)
+
+# Returnsth current X and Z coordinate
+def getCurrentXZPos() -> tuple:
+    return factorPositions(memory.read_f32(X_POS_LOCATION)), factorPositions(memory.read_f32(Z_POS_LOCATION))
 
 # Returns the value of the player's current miniturbo charge (MT)
 def getCurrentMT() -> int:

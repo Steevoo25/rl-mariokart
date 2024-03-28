@@ -102,6 +102,7 @@ def calculate_miniturbo_reward(mt_current: int, mt_previous:int):
     
 # Gives a static reward for reaching a checkpoint
 def calculate_cp_reward(cp_current: int, cp_previous: int) -> int:
+    return 1
     if cp_current > cp_previous : return CP_REWARD
     else: return 0
     

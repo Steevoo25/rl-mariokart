@@ -20,14 +20,14 @@ from datetime import datetime
 from environment.load_savestate import load_using_fkey as load_savestate
 from environment.press_button import press_button as set_controller
 from environment.calculate_reward import calculate_reward
-from environment.memory_viewer import getRaceInfo
+from environment.memory_viewer import getRaceInfo, getCurrentXZPos
 from environment.termination_check import check_termination
 from q_learning_agent import update_q_table, epsilon_greedy, save_q
 
 DEFAULT_CONTROLLR_TUPLE = (False, False, 128)
-START_STATE = (76, 0.98, (0, 0), False, 0)
+START_STATE = (76, (-149, -54), (0, 0), False, 0)
 # [0] = XZ Velocity
-# [1] = Race%
+# [1] = XZ position
 # [2] = (MTdirection, charge)
 # [3] = Wheelie
 # [4] = CP
@@ -101,7 +101,6 @@ while True:
     action, action_choice = epsilon_greedy(tuple(stepInfo_previous[:-1]), epsilon)
     print(action_choice , "in state", stepInfo_previous[:-1], "with action", action) 
     controller_inputs.append(action)   
-
     # Perform action and move to next state
     for _ in range(TIME_STEP):
         sent_action = convert_actions_to_dict(action)
@@ -114,14 +113,14 @@ while True:
     # If we are drifting check direction
     if stepInfo_previous[2][1] == 0 or stepInfo_current[2] == 0:
         drift_direction = specify_mt_direction(action)
-    
     # Update mt info
     stepInfo_current[2] = drift_direction, stepInfo_current[2]
     
     # Calculate Reward
-    step_reward, step_reward_vel, step_reward_perc, step_reward_mt, step_reward_cp = calculate_reward(stepInfo_current, stepInfo_previous)
+    step_reward, step_reward_vel, step_reward_perc, step_reward_mt = calculate_reward(stepInfo_current, stepInfo_previous)
     termination_flag = check_termination(stepInfo_current[:2])
-
+    # Add xz pos for q table
+    stepInfo_current[1] = getCurrentXZPos()
     print("Current state", stepInfo_current)        
     print("Reward gained:", step_reward)
     print("vel_reward", step_reward_vel, "perc_reward", step_reward_perc, "mt reward", step_reward_mt)
