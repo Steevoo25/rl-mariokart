@@ -3,6 +3,7 @@
 *.pyo
 # temp office files
 *.tmp
+~$*.*
 ~$monstration.docx
 ~$oject Notes.docx
 # literature

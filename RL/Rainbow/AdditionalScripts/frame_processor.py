@@ -5,7 +5,7 @@ import numpy as np
 
 #TODO : Path will be different for different systems, get default path from dolphin
 # For my laptop
-path_to_framedumps = 'C:/Users/steve/OneDrive/Documents/Dolphin Emulator/Dump/Frames/framedump_'
+path_to_framedumps = 'Z:\\project\\dumps\\frames\\framedump_'
 # For my PC
 #path_to_framedumps = 'Z:/Users/Harry Stevenson/Documents/OneDrive - University of Birmingham/Documents/Dolphin Emulator/Dump/Frames/framedump_'
 tesseract_config = '--psm 6 -c tessedit_char_whitelist=0123456789'
@@ -113,14 +113,13 @@ def dump_pixel_data(frame_index: int) :
 
     # greyscale and downsample
     im = frame.convert("L").resize((84, 84))
+    #im.save('./processed_im.png')
     # get raw data
     pixels = list(im.getdata())
     width, height = im.size
     
     # Arrange into rows
     frame_data = [pixels[i * width:(i + 1) * width] for i in range(height)]
-    
     # delete frame image once data extracted
-    
-    
     return frame_data
+#dump_pixel_data(999)
