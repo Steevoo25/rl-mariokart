@@ -7,7 +7,6 @@
 ~$oject Notes.docx
 # literature
 *.pdf
-*.pptx
 # dumps from dolphin
 *.jpg
 *.png
@@ -22,3 +21,4 @@ Information Base/
 RL/Rainbow/rainbow_venv/
 RL/Rainbow/__pycache__/
 Diss/Figures/
+Literature/
