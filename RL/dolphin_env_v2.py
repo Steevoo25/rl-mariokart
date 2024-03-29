@@ -126,9 +126,6 @@ while True:
     print("Reward gained:", step_reward)
     print("vel_reward", step_reward_vel, "perc_reward", step_reward_perc, "mt reward", step_reward_mt)
 
-    # -- Update Q-Table
-    q = update_q_table(tuple(stepInfo_previous[:-1]), action, step_reward, tuple(stepInfo_current[:-1]), alpha, gamma)
-
     if termination_flag:
         # terminating gives -ve reward
         step_reward = -100
@@ -158,6 +155,8 @@ while True:
         await load_savestate()
         continue
     else:
+            # -- Update Q-Table
+        update_q_table(tuple(stepInfo_previous[:-1]), action, step_reward, tuple(stepInfo_current[:-1]), alpha, gamma)
         # Next Step
         just_reset = False
         total_reward = total_reward + step_reward
