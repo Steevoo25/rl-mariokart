@@ -1,7 +1,6 @@
 # -- DOLHPIN IMPORTS --
 from dolphin import event # gives awaitable routine that returns when a frame is drawn
 PROJECT_DIR = 'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\'
-PROJECT_DIR = 'Z:\\project\\hjs115\\'
 
 # As the script is run within the dolphin executable, 
 # Append the true path of scripts to import
@@ -26,7 +25,7 @@ from environment.termination_check import check_termination
 from q_learning_agent import update_q_table, epsilon_greedy, save_q
 
 DEFAULT_CONTROLLR_TUPLE = (False, False, 128)
-START_STATE = (76, (-149, -54), (0, 0), False, 0)
+START_STATE = (76, (-149, -54), (0, False), False, 0)
 # [0] = XZ Velocity
 # [1] = XZ position
 # [2] = (MTdirection, charge)
@@ -50,6 +49,9 @@ def specify_mt_direction(action):
             return 2
     return 0
 
+def check_mt_charge(charge):
+    return charge == 270
+
 #--- Initialisations
 
 episode_counter = 0
@@ -57,7 +59,7 @@ episode_counter = 0
 # Termination checking
 termination_flag = False
 just_reset = True
-
+lap_completed = False
 # State
 stepInfo_previous = list(START_STATE)
 action = DEFAULT_CONTROLLR_TUPLE
@@ -67,7 +69,7 @@ drift_direction = 0 # 0= not drifting, 1 = left, 2 = right
 step_reward, total_reward, step_reward_vel, step_reward_perc, step_reward_mt, best_reward = 0,0,0,0,0,0
 
 ## Q-Learning parameters
-epsilon = 0.6  #Higher = more chance of random action
+epsilon = 0.01  #Higher = more chance of random action
 gamma = 0.8 # Higher = more focus on future rewards
 alpha = 0.6 # Higher = newer Q-Values will have more impact
 
@@ -88,7 +90,7 @@ if is_logging:
 ### Main Training Loop ###
 # -------------------------
 
-while True:
+while not lap_completed:
 
     if just_reset:
     # If episode has jsut started don't reset
@@ -102,37 +104,45 @@ while True:
     action, action_choice = epsilon_greedy(tuple(stepInfo_previous[:-1]), epsilon)
     print(action_choice , "in state", stepInfo_previous[:-1], "with action", action) 
     controller_inputs.append(action)   
-    # Perform action and move to next state
+    
+    # -- Perform action and move to next state
     for _ in range(TIME_STEP):
         sent_action = convert_actions_to_dict(action)
         set_controller(sent_action)
         await event.frameadvance()
         
-    # Recieve reward
+    # -- Recieve state info
     stepInfo_current = list(getRaceInfo()) # cast as list as we are going to edit it
     
     # If we are drifting check direction
     if stepInfo_previous[2][1] == 0 or stepInfo_current[2] == 0:
         drift_direction = specify_mt_direction(action)
-    # Update mt info
-    stepInfo_current[2] = drift_direction, stepInfo_current[2]
     
-    # Calculate Reward
-    step_reward, step_reward_vel, step_reward_perc, step_reward_mt = calculate_reward(stepInfo_current, stepInfo_previous)
+    # Update drift info
+    stepInfo_current[2] = drift_direction, check_mt_charge(stepInfo_current[2])
+    
+    # -- Calculate Reward
+    step_reward, _, _, _ = calculate_reward(stepInfo_current, stepInfo_previous)
+    
+    # -- Check episode termination
     termination_flag = check_termination(stepInfo_current[:2])
-    # Add xz pos for q table
+    
+    # -- Check session termination
+    if stepInfo_current[1] > 2: lap_completed = True
+    
+    # -- Update state info for q-table (calculate_reward expects completion%)
     stepInfo_current[1] = getCurrentXZPos()
-    print("Current state", stepInfo_current)        
-    print("Reward gained:", step_reward)
-    print("vel_reward", step_reward_vel, "perc_reward", step_reward_perc, "mt reward", step_reward_mt)
-
+    
+    # -- Reset and update Q-table with -ve reward
     if termination_flag:
-        # terminating gives -ve reward
-        step_reward = -100
+        # terminating gives -ve reward, unless its because a lap has been completed.
+        if not lap_completed:
+            step_reward = -100
+        else:
+            step_reward = 1000
         #print("Reward gained:", step_reward)
-        print("Terminating, updating: ", stepInfo_previous, " with reward ", step_reward)
         update_q_table(tuple(stepInfo_previous[:-1]), action, step_reward, tuple(stepInfo_current[:-1]), alpha, gamma)
-        
+        print("Terminating, updating: ", stepInfo_previous, " with reward ", step_reward)
         # Log episode info
         if is_logging:
             log.write(f"{episode_counter}, {total_reward},\n")#
@@ -154,8 +164,10 @@ while True:
             save_q()         
         await load_savestate()
         continue
+
+    # -- Continue and update Q-table with earned reward
     else:
-            # -- Update Q-Table
+        # Update Q Table
         update_q_table(tuple(stepInfo_previous[:-1]), action, step_reward, tuple(stepInfo_current[:-1]), alpha, gamma)
         # Next Step
         just_reset = False
