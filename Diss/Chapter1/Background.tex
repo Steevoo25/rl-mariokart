@@ -17,7 +17,9 @@ Reinforcement Learning describes an interaction between an agent and an environm
     \caption{Generic reinforcement learning architecture\cite{sutton2018reinforcement}} %Cite RL - an introduction
     \label{fig:q-learning-generic}
 \end{figure}
+\textbf{episodic rl}
 \subsection{Markov Decision Process}
+\label{sec:mdp}
 Many problems in RL can be modelled by a 'Markov Decision Process' \cite{bellman1957markovian}, a structure which models sequential decision making problems. This is well-suited to RL, due to the repeated decisions the agent takes.\\ A standard MDP for optimisation is a tuple of
 \[ <S, A, P, R, \gamma>\]
 where
@@ -46,5 +48,6 @@ where:
     \item $s'$ is the current state, and
     \item $\max_{a'} Q(s', a')$ represents the maximum Q-value for the current state.
 \end{itemize}
+\textbf{Q learning proof: given infinite time blah blah best policy $\pi*$}
 \subsection{Deep Reinforcement Learning}
 Mnih \textit{et al.} (2015) \cite{mnih2015human} was successful in achieving human-level control with a deep Q-network (DQN), a deep neural network that estimates the q-function based on pixel input data. This success spearheaded further research into the area, resulting in further advancements and extensions to DQN. Including, but not limited to: Dueling DQN \cite{wang2016dueling} and Double DQN \cite{van2016doubleq}. This approach is suited to problems with very large state spaces, where a Q-table would become intractably large. Additionally, the high-dimensional input gives this model better generalisation capabilities than Q-learning, where a small change in the state space can greatly decrease the effectiveness of a trained agent.

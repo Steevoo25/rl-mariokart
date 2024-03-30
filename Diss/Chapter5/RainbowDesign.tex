@@ -1,39 +1,29 @@
 % !TEX root =  ../Dissertation.tex
-
-\chapter{Deep-RL Implementation}
-\section{Rainbow Agent}
-for deep learning Rainbow - framework adapted from Ben Middleton, intro to rainbow rl agent
-benJMiddleton\cite{BenJMiddleton}
-introduction on what rainbow is: combination of many extensions to DQN - Include brief explanations\cite{hessel2018rainbow}
-
-\begin{itemize}
-    \item Double Q-learning \cite{van2016doubleq}
-    \item Prioritized Replay \cite{schaul2015prioritized}
-    \item Duelling Networks \cite{wang2016dueling}
-    \item multi-step learning \cite{sutton2018reinforcement}
-    \item Distributional RL\cite{bellemare2017distributional}
-    \item Noisy Nets\cite{DBLP:journals/corr/FortunatoAPMOGM17}
-\end{itemize}
-
+\chapter{Deep-RL Design}
 \section{System Architecture}
-How deep-rl interacts with dolphin. python libraries (pytorch etc. not supported by embedded python in dolphin) -> use ports to send json objects to and from dolphin process to rainbow process
-\\ what rainbow does at each time step
-
+For the Deep-Learning implementation, I adapted an existing implementation of the Rainbow Agent \cite{hessel2018rainbow}. The existing implementation\cite{BenJMiddleton} uses an older version of Dolphin which gives direct access to the pixel data of each frame. This feature has since been removed due to bugs. To get around this I made use of the framedump functionality built in to Dolphin. This can be configured to save every frame as a png as it is rendered to the screen. This causes Dolphin to slow down greatly, but is the only way I currently have to access the pixel data. In order to get the pixel data from these files, I use a script that takes the time step $t$ and returns the processed pixel data of that step. The pixel data then acts as input to the D-RL algorithm.
 \begin{figure}[ht]
     \centering
-    \includegraphics{Preamble/BirmCrest.png}
+    \includegraphics[width=1\textwidth]{Figures/Deep-RL.png}
     \caption{Diagram of D-RL Framework}
     \label{fig:rainbow-arch}
 \end{figure}
-
+\section{Rainbow Agent}
+The Rainbow Agent implements a combination of improvements to DQN. Many of these are complicated and require lots of background knowledge outside the scope of this paper. Regardless, here is a short summary of each: 
+\begin{enumerate}
+    \item \textbf{Double Q-learning}\cite{van2016doubleq} addresses the overestimation in the maximisation step ($\max_{a'} Q(s', a')$) of the Q-learning update rule, in some stochastic environments. Double Q-learning maintains 2 Q-tables, each taking the maximising value from the other, giving an unbiased estimate of the best value in the next state.
+    \item \textbf{Prioritized Experience Replay}\cite{schaul2015prioritized} is a variation of Experience Replay\cite{lin1992self} which prioritises transitions\footnote{A transition is a record of one interaction in RL, in this case a state $s_{t-1}$, an action $a_{t-1}$, a reward $R_{t}$, and a next state $s_t$} from which an agent can learn more efficiently from. The higher priority a transition has, the higher likelihood it will be replayed, allowing the agent to learn efficiently.
+    \item \textbf{Duelling Networks} \cite{wang2016dueling} is a D-RL architecture which splits a Q network into its separate components, giving a value network, which estimates the value of states, and an advantage network, which estimates the value of actions. These are then combined in an aggregating layer, giving a final value.
+    \item \textbf{Multi-step learning} considers the rewards earned $n$ steps into the future during the maximisation step in Q-learning. Allowing the agent to consider the further future effects of the action. Sutton and Barto (2018) \cite{sutton2018reinforcement} found that a well-tuned $n$ lead to faster training.
+    \item \textbf{Distributional RL} learns to approximate the distribution of returns, rather than the expected return. Bellemere \textit{et al.} (2017)\cite{bellemare2017distributional} found that it surpassed the performance of other approaches at the time, when applied to the ALE.
+    \item \textbf{Noisy Nets} (Fortunato \textit{et al.} (2017))\cite{DBLP:journals/corr/FortunatoAPMOGM17} introduces additional exploration capabilities by including a noisy layer. Over time, the network learns to ignore the noise at different rates through the search space. Allowing for different levels of exploration depending on the current state. 
+\end{enumerate}
 \section{Input Processing}
-how frame data is processed before going to rainbow
+Rainbow takes pixel data as input, which is then fed into a CNN and then the Rainbow DQN. To help with the effectiveness of the CNN this input data is preprocessed through cropping, down-sampling and grey-scaling. 
 \begin{figure}[ht]
     \centering
-    \includegraphics{Preamble/BirmCrest.png}
+    \subfloat[Screenshot of game before preprocessing\\ (1080p, 263kb)]{\includegraphics[width=0.6\textwidth]{Figures/raw-frame.png}\label{fig:preprocess-raw}}
+    \hfill
+    \subfloat[Screenshot of game after preprocessing\\ (84x84, 4kb)]{\includegraphics[width=0.3\textwidth]{Figures/rainbow-input.png}\label{fig:preprocess-final}}
     \caption{Screenshot of game before and after processing}
-    \label{fig:frame-processing}
 \end{figure}
-\\pixel data along with same info as q-learning
-\\how does removing frameInfo data affect deep-learning performance - pixel vs frameInfo
-\\how its processed within rainbow - cnn
