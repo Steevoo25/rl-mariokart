@@ -60,6 +60,7 @@ episode_counter = 0
 termination_flag = False
 just_reset = True
 lap_completed = False
+in_drift = False
 # State
 stepInfo_previous = list(START_STATE)
 action = DEFAULT_CONTROLLR_TUPLE
@@ -69,7 +70,7 @@ drift_direction = 0 # 0= not drifting, 1 = left, 2 = right
 step_reward, total_reward, step_reward_vel, step_reward_perc, step_reward_mt, best_reward = 0,0,0,0,0,0
 
 ## Q-Learning parameters
-epsilon = 0.01  #Higher = more chance of random action
+epsilon = 0.005  #Higher = more chance of random action
 gamma = 0.8 # Higher = more focus on future rewards
 alpha = 0.6 # Higher = newer Q-Values will have more impact
 
@@ -113,13 +114,18 @@ while not lap_completed:
         
     # -- Recieve state info
     stepInfo_current = list(getRaceInfo()) # cast as list as we are going to edit it
-    
-    # If we are drifting check direction
-    if stepInfo_previous[2][1] == 0 or stepInfo_current[2] == 0:
+
+    if not in_drift:
         drift_direction = specify_mt_direction(action)
-    
-    # Update drift info
+
+    if stepInfo_current[2] > 0:
+        in_drift = True
+    else:
+        in_drift = False
+        drift_direction = 0
+
     stepInfo_current[2] = drift_direction, check_mt_charge(stepInfo_current[2])
+    
     
     # -- Calculate Reward
     step_reward, _, _, _ = calculate_reward(stepInfo_current, stepInfo_previous)
