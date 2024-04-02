@@ -71,7 +71,7 @@ step_reward, total_reward, step_reward_vel, step_reward_perc, step_reward_mt, be
 
 ## Q-Learning parameters
 epsilon = 0.005  #Higher = more chance of random action
-gamma = 0.8 # Higher = more focus on future rewards
+gamma = 0.95 # Higher = more focus on future rewards
 alpha = 0.6 # Higher = newer Q-Values will have more impact
 
 ## Logging
@@ -139,7 +139,7 @@ while not lap_completed:
     # -- Update state info for q-table (calculate_reward expects completion%)
     stepInfo_current[1] = getCurrentXZPos()
     
-    # -- Reset episode and update Q-table with -ve reward
+    # -- Reset and update Q-table with -ve reward
     if termination_flag:
         # terminating gives -ve reward, unless its because a lap has been completed.
         if not lap_completed:
@@ -171,7 +171,7 @@ while not lap_completed:
         await load_savestate()
         continue
 
-    # -- Continue episode and update Q-table with earned reward
+    # -- Continue and update Q-table with earned reward
     else:
         # Update Q Table
         update_q_table(tuple(stepInfo_previous[:-1]), action, step_reward, tuple(stepInfo_current[:-1]), alpha, gamma)
