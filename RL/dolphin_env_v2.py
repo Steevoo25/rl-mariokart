@@ -139,7 +139,7 @@ while not lap_completed:
     # -- Update state info for q-table (calculate_reward expects completion%)
     stepInfo_current[1] = getCurrentXZPos()
     
-    # -- Reset and update Q-table with -ve reward
+    # -- Reset episode and update Q-table with -ve reward
     if termination_flag:
         # terminating gives -ve reward, unless its because a lap has been completed.
         if not lap_completed:
@@ -171,7 +171,7 @@ while not lap_completed:
         await load_savestate()
         continue
 
-    # -- Continue and update Q-table with earned reward
+    # -- Continue episode and update Q-table with earned reward
     else:
         # Update Q Table
         update_q_table(tuple(stepInfo_previous[:-1]), action, step_reward, tuple(stepInfo_current[:-1]), alpha, gamma)

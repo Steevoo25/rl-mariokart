@@ -22,12 +22,20 @@ def getCurrentRaceCompletion() -> float:
     return round(memory.read_f32(RACE_COMPLETION_LOCATION), 2)
 
 # Rounds a nunber to the nearest 100
-def factorPositions(position) -> float:
+def factorPositionsB(position) -> float:
     return round(position / 100)
+
+# Rounds a nunber to the nearest 1000
+def factorPositionsA(position) -> float:
+    return round(position / 10)
+
+# Rounds a nunber to the nearest 100
+def factorPositionsC(position) -> float:
+    return round(position // 300)
 
 # Returnsth current X and Z coordinate
 def getCurrentXZPos() -> tuple:
-    return factorPositions(memory.read_f32(X_POS_LOCATION)), factorPositions(memory.read_f32(Z_POS_LOCATION))
+    return factorPositionsB(memory.read_f32(X_POS_LOCATION)), factorPositionsB(memory.read_f32(Z_POS_LOCATION))
 
 # Returns the value of the player's current miniturbo charge (MT)
 def getCurrentMT() -> int:
