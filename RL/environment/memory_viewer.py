@@ -29,9 +29,9 @@ def factorPositionsB(position) -> float:
 def factorPositionsA(position) -> float:
     return round(position / 10)
 
-# Rounds a nunber to the nearest 100
+# Rounds a nunber to the nearest 300
 def factorPositionsC(position) -> float:
-    return round(position // 300)
+    return round(position // 500)
 
 # Returnsth current X and Z coordinate
 def getCurrentXZPos() -> tuple:
