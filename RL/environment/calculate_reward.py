@@ -16,6 +16,7 @@ NOT_CHARGING = 0
 
 # Race%
 LAP_COMPLETE = 2
+RACE_COMPLETE = 4
 
 # Weights
 VELOCITY_WEIGHT = 1
@@ -76,7 +77,7 @@ def calculate_velocity_reward(S_current: float, S_prev: float):
 def calculate_race_percent_reward(racePercent_current: float, racePercent_previous: float):
     if racePercent_current > racePercent_previous:
         return 1
-    elif racePercent_current > LAP_COMPLETE:
+    elif racePercent_current > RACE_COMPLETE:
         return 100
     else:
         return 0
