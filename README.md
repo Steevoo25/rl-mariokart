@@ -13,7 +13,7 @@ This project contains code for training a Q-learning Agent
 3. In `dolphin_env_v2.py` change _venv_dir_ to the path to the venv made in 1.
 4. Copy _PROJECT_DIR_ from `dolphin_env_v2.py` into `q_learning_agent.py`
 ### Dolphin
-[Build dolphin](https://github.com/dolphin-emu/dolphin) according to your system
+Following Dolphin's [Build instructions](https://github.com/dolphin-emu/dolphin) build the TASLabz fork with scripting support
 #### Add Script to Dolphin Scripting Directory
 Open Dolphin and go to __View__ at the top of the screen and make sure Scripting is checked. This will give a panel on the left hand side of the screen. Click the '+' button in that panel and select `dolphin_env_v2.py` in the dialogue. This will add `dolphin_env_v2.py` to the Script directory. Repeat this process for `q_learning_agent.py`
 #### Create Savestate Slot
