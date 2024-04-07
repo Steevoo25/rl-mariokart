@@ -1,23 +1,26 @@
 import pandas as pd
 from matplotlib import pyplot as plt
-filename = input("filename:")
-path = f'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\Evaluation\\data\\q-learning\\episodes\\{filename}.csv'
-# Read into dataframe
-df = pd.read_csv(path)
+#filename = input("filename:")
+#laptop
+#path = f'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\Evaluation\\data\\q-learning\\episodes\\{filename}.csv'
+#pc
+full_session_files = ['Agent_A_5kEps','Agent_B_5kEps','Agent_C_5kEps']
 
 # Smooth the data
-smoothing_window = len(df) // 10
-df.reset_index()
-smoothed_reward = pd.Series(df['Total_Reward']).rolling(window=smoothing_window, min_periods=1, center=True).mean()
-print(df.index)
-# Plotting
-#plt.plot(df['Episode'], df['Total_Reward'], label='Return', linewidth=0.1)
-plt.plot(df.index, smoothed_reward, label='Return', linewidth=1)
-#plt.plot(df['Episode'], df['Frame_Count'], label='Survival Time')
+
+for filename in full_session_files:
+    path = f'C:\\project\\hjs115\Evaluation\\data\\episodes\\{filename}.csv'
+    # Read into dataframe
+    df = pd.read_csv(path)
+    smoothing_window = len(df) // 10
+    smoothed_reward = pd.Series(df['Total_Reward']).rolling(window=smoothing_window, min_periods=5, center=True).mean()
+    # Plotting
+    plt.plot(df['Episode'], smoothed_reward, label=filename[:7], linewidth=1)
 
 # Set x axis scale
-plt.ylim(0, 5000)
-
+plt.ylim(0, 400)
+# Add 1-lap line
+plt.axhline(y=220, color='gray', linestyle='--', label='Lap 1 Complete')
 # Lables
 plt.xlabel('Episode number')
 plt.ylabel('Return')
