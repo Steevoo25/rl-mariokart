@@ -14,9 +14,8 @@ def check_termination(raceInfo) -> bool:
     # speed is too low
     if vel < MIN_ACCEPTABLE_SPEED:
         return True
-    if racePercent > LAP_COMPLETED:
-        return True
-    # --- Uncomment if training for whole race
-    # if racePercent > RACE_COMPLETED:
+    # if racePercent > LAP_COMPLETED:# --- Uncomment if training for lap
     #     return True
+    if racePercent > RACE_COMPLETED:
+        return True
     return False
