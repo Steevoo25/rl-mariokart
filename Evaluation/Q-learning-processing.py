@@ -4,22 +4,19 @@ filename = input("filename:")
 path = f'C:\\Users\\steve\\OneDrive\\Documents\\3rd Year\\Project\\my-project\\Evaluation\\data\\q-learning\\episodes\\{filename}.csv'
 # Read into dataframe
 df = pd.read_csv(path)
-# Remove episodes 1 and 3 (idk why -100 reward)
-
-df = df[1:]
 
 # Smooth the data
 smoothing_window = len(df) // 10
-
+df.reset_index()
 smoothed_reward = pd.Series(df['Total_Reward']).rolling(window=smoothing_window, min_periods=1, center=True).mean()
-
+print(df.index)
 # Plotting
 #plt.plot(df['Episode'], df['Total_Reward'], label='Return', linewidth=0.1)
-plt.plot(df['Episode'], smoothed_reward, label='Return', linewidth=1)
+plt.plot(df.index, smoothed_reward, label='Return', linewidth=1)
 #plt.plot(df['Episode'], df['Frame_Count'], label='Survival Time')
 
 # Set x axis scale
-plt.ylim(0, 400)
+plt.ylim(0, 5000)
 
 # Lables
 plt.xlabel('Episode number')
