@@ -1,25 +1,47 @@
 % !TEX root =  ../Dissertation.tex
-
-\chapter{Future Investigations}
-\section{both}
-Different vehicle combos? - quicker learning in easier vehicle? - does one outperform the other
-\\ allow items - access memory location for item - lots of learning possibilities as items have different uses
-\\Different tracks - other similar simple tracks - complex tracks -- xyz speed
-\\ use minimap - direction and locations
-
-\section{Q-Learning}
-Accuracy of state space for q-learning - include additional information\\
-kart rotation, xz pos?
-\\ Epsilon-greedy policy - consider how many visits there are to a given state and increase chance of taking best accordingly - fewer visits -> more likely to explore, more visits -> more likely to exploit
-\\ Evaluation of maximisation step vs average step
-\\ Compare with SARSA
-\\ weighted actions - track specific? fewer turns = better to go straight most of the time so pick more when random
-\\ improve training time - multithreaded - dolphin can run without rendering, many instances at once updating central q table, take advantage of lower processing requirements
-\\application to TAS/speedrunning: For example, a technique known as \textit{superhopping} can be executed by performing a series of drifts sequentially. When starting a drift, the kart 'hops' into the air and rotates slightly, if the drift is cancelled midair and another is started the same frame the kart hits the ground, then the kart maintains its current speed, instead of slowing down. A community member who goes by the alias 'Monster' demonstrated the potential of this, taking a long turn with lots of speed \cite{Superhopping}. Techniques such as these could be formalised and given as actions with parameters of \textit{direction} and \textit{duration}, allowing for exploration of many techniques. PROBLEM - reward defined by completing lap as many techniques require going backwards, stopping etc to set up.
-\section{Deep-Q}
-how much pixel data is needed - decrease processing requirements while maintaining performance
-\\ change textures to flat colours - clearly show track boundaries
-\\different cropped areas of screen - minimap, kart/track
-\\ compare with other DQN improvements
-\\ conduct same study as Rainbow \cite{hessel2018rainbow} investigate which extensions to DQN had the most effect
-\\ tesseract OCR - using pixel data already, may as well extract state info from it
+\chapter{Discussion and Limitations}
+\section{Environment}
+\subsection{Track}
+The environment that I chose was designed with simplicity and comparison in mind. However, this heavily limited the scope of my project. While this led to an effective agent on one specific track, its performance on other tracks which require vastly different input sequences would be comparable to random action selection. To counteract this, I could include the current track in the state, therefore allowing for training on multiple tracks, however doing so would increase the state space size by a factor of 32, the total number of tracks in the game. 
+\subsection{Character and Vehicle}
+The same can be said for the character and vehicle selection. It would be interesting to see if the agent trains quicker on an easier vehicle, or how two vehicles compare after a specified training time. This adjustment would, however, require the action space to be broadened slightly, as different karts have marginally different turning characteristics. 
+\subsection{Items}
+The use of items in Mariokart Wii can greatly benefit the user, while also having the potential to greatly disadvantage them. I decided to remove the ability to use these, as designing a reward function that encourages correct usage in the correct situations proved to be very complex. The introduction of items into the state space could lead to interesting situations and learning possibilities as the agent adapts its strategy, but also has the possibility of exploiting the reward function, using all items as soon as possible.
+%\section{Time Step}
+\subsection{State Representation}
+% My Q-learning agent took  a large amount of time to train, the main reason for this being the size of the search space. The XZ location component of my state representation is extremely precise, leading to many states with redundant information. This is due to the fact that many neighbouring states would all benefit equally from taking the same action (if a left turn is coming up, then turning left will be the best action regardless of current position). In order to reduce the state space, I could reduce the precision of the xz coordinates, potentially by performing integer division. This would map similar positions the same state, potentially losing some fine detail but greatly decreasing the state space. 
+The game displays a minimap on the right hand side of the screen, which shows the characters position and rotation on the track. Extracting the current rotation of the kart (in a similar way to Jack Boynton (2022)) could help the agent during the training process by providing it more information about the environment. The minimap, however is unfortunately not very precise, and extracting this information directly from the minimap would require additional image processing. Therefore, if I were to include the rotation of the kart in the state space, it would be more computationally efficient to read the value from memory.
+\begin{figure}[htb]
+    \centering
+    \includegraphics{Figures/minimap.png}
+    \caption{On screen minimap}
+    \label{fig:minimap}
+\end{figure}
+\section{Q-Learning Implementation}
+\subsection{Training Approach}
+My Q-Learning implementations took approximately 15 hours to complete 5000 episodes, which can be greatly decreased by making a few changes to the training process. Firstly I ran the training process sequentially, with only one instance of Dolphin running at a time. This could be greatly improved by implementing parallel computation, allowing for multiple agents to run simultaneously. Additionally, Dolphin can be configured to run in 'headless' mode, where the game isn't displayed on the screen, but is still run in the background. This would decrease the computational resources required for each instance, increasing the parallel capacity. 
+\subsection{Initial States}
+During training, the agent visits the states towards the start of the track many more times than those further along, meaning they receive more updates and therefore a better optimal policy function approximation. To counteract this, I could define a set of start states, spread equally across the track that are chosen from uniformly upon termination. This would allow the agent to learn different areas of the track at the same rate.
+\subsection{Action Space}
+In my implementation I reduced the action space greatly, from around 40 total controller permutations down to 8. While this produced good results, the agent used the normal 'turning' inputs a lot more than I expected. Performing these actions reduces the agents speed more than if it used a drift to adjust its direction, suggesting that the agent required inputs that allowed for a small adjustment in direction. In a revised state space, I would remove these turning inputs and instead include more angles of drifting, perhaps 7 or 9 different analog stick angles, allowing the agent to make these slight adjustments. 
+\subsubsection{TAS Inputs}
+Members of the TAS community have discovered many advanced input combinations that exploit the game's physics engine to achieve higher speeds than normally possible. These techniques are not humanly possible, requiring many sequential frame-perfect inputs, but could easily be performed by a script. One example of these techniques, known as \textit{superhopping}, is executed by sequentially performing a series of drifts. When starting a drift, the kart 'hops' into the air and rotates slightly, if the drift is cancelled midair and another is started the same frame the kart hits the ground, then the kart maintains its current speed, instead of slowing down. A community member who goes by the alias 'Monster' demonstrated the potential of this, creating a short TAS which takes a long turn with lots of speed \cite{Superhopping}. To extend and enhance the action space, techniques such as this could be formalised as actions with parameters of \textit{direction} and \textit{duration}, allowing for further exploration of the many existing techniques. One issue with this, however, is that many of these techniques rely on many sub-optimal actions before the technique is executed. This could be tackled by redefining the reward function to give sparse rewards, but this in turn has its own problems. The most likely application for this would be exploration or proof-of-concept, rather than a refined TAS.
+\subsection{Action Selection Policy}
+The $\epsilon$-greedy policy is a state-independent policy, meaning that the current state doesn't affect the action selection. However, more actions are explored in a given state, it becomes increasingly likely that the optimal action has been found. Therefore we should decrease the likelihood of exploration in this state. This is also true for vice versa. Considering this, an alteration to the policy could be made that adjusts the epsilon value based on the proportion of unexplored actions, encouraging exploration when fewer actions are explored and exploitation when more actions are explored. This could lead to a more efficient balance of exploration and exploitation.
+\subsubsection{Random Action Weighting}
+When split into steps of 20 frames, more often than not the best action is the same as or similar to the current action being performed, such as a slight adjustment to the steering during a corner or holding down accelerate through a straight. To encourage these similar actions to be performed more often, I could weight the available actions and define 'neighbour' actions. The 'neighbour' actions would have higher weights, such that when an action is randomly selected they have a higher probability of being chosen. This would decrease the time taken to explore the optimal action in each state.
+\subsection{Reward Function}
+The reward function I designed gave a constant reward for completing a lap. However the objective is to complete the lap in the \textit{quickest time possible}. The current implementation actually rewards slower laps more than quicker laps, as there are more episodes to gain a reward from. To mitigate this effect I can give a reward inversely proportional to the number of time steps at the time of completion, giving a higher reward for lower time steps taken to complete the lap. This would however give the same reward to any laps completed within the same 20 frame window. To accommodate this, I would need to redesign my system to check the completion on every frame.
+\section{Rainbow (DQN) Implementation}
+\subsection{Input Data Size}
+The current implementation of Rainbow uses an 84x84 grey-scale image as input to the neural network, changing the size of this could lead to interesting discoveries. For example the minimum amount of pixel data needed, or which areas of the screen lead to the quickest training. For example, the minimap mentioned earlier \ref{fig:minimap}  could be compared with the main area of the screen containing the track and character. Furthermore, decreasing the amount of pixel data slightly could lead to similar results whilst using less computational resources, but decreasing too much would undoubtedly lead to a loss of detail and therefore required information.
+\subsection{Ablation Comparisons}
+Mnih \textit{et al.} (2018) \cite{hessel2018rainbow} compare the full Rainbow agent with some ablations, removing one extension and performing the same tests. This helps to see the effect of each extension individually. Performing the same study in this application and comparing to the original results could be interesting, as different extensions may have different effects in this scenario, potentially highlighting their specific strengths. 
+\section{Generalisation Capabilities}
+One of the main known advantages of Deep-RL over traditional RL is its ability to generalise. Testing and demonstrating this could be performed very easily in this application by simply changing the track. If I were to carry out this experiment, I would expect DQN to greatly outperform Q-learning at all stages. In addition to this, finding a situation where Q-learning is superior requires very specific circumstances. One example of this would be a track where the road and offroad are the same colour and texture, with no border between the two. This would prove very tricky for DQN as the pixel data for very different situations would be near identical. In contrast, the values in memory used by Q-learning would not have the same problem, potentially leading to better performance.
+% \section{Input Robustness}
+% As mentioned earlier, Mariokart Wii supports many game modes
+% \section{Text Extraction}
+% As mentioned earlier, my initial approach to extracting the required state space information was to use OCR to extract the information from the on-screen cheat code. If I was able to get this functionality working then I could greatly improve the robustness of both approaches. For Q-learning, the memory addresses I access will change for different tracks, 
+% memory locations different for different tracks/gamemodes?
+% tesseract OCR - using pixel data already, may as well extract state info from it

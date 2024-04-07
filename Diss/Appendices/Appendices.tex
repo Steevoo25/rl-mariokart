@@ -1,0 +1,38 @@
+%% RL Publications Graph
+\begin{figure}[hbt]
+    \centering
+    \includegraphics[width=0.7\textwidth]{Figures/google-scholar-graph.png}
+    \caption{Graph of Reinforcement Learning Publications (Google Scholar)}
+    \label{fig:rl-papers-graph}
+\end{figure}
+% Memory Locations Table
+\begin{table}[hbt]
+    \centering
+    \begin{tabular}{l|c|c|c}
+    \textbf{Name}  & \textbf{Location} & \textbf{Type (in Memory)} & \textbf{Range}\\
+    \hline
+     Speed  &        \texttt{0x80E4C678} & 32-bit Float  & $$[0, 113.4]$$\\
+     Completion  &   \texttt{0x80E43708} & 32-bit Float  & $$[0, 4] $$\\
+     X Position  &   \texttt{0x80E4DAE8} & 32-bit Float  & $$[-150,000, 150,000] $$\\
+     Z Position  &   \texttt{0x80E4DAF0} & 32-bit Float  & $$[-150,000, 150,000] $$\\
+     MT Charge &     \texttt{0x80E4C756} & 16-bit Integer& $$\{0,270\}$$\\
+     Wheelie State & \texttt{0x90284F04} & 16-bit Integer& $$\{0,1\}$$\\
+     Road Type &     \texttt{0x80E51CE8} & 16-bit Integer& $$ \{0,7\} $$\\
+    \end{tabular}
+    \caption{Memory Addresses in Mario Kart Wii's emulated memory}
+    \label{tab:memory-addresses}
+\end{table}
+% Funky Flame Runner
+\begin{figure}[hb]
+    \centering
+    \includegraphics[width=0.4\textwidth]{Figures/funky-flame.png}
+    \caption{Screenshot of Funky Kong on the Flame Runner}
+    \label{fig:funky-flame}
+\end{figure}
+% Human lap time data collection
+\begin{table}[hbt]
+    \centering
+    \csvautotabular{Appendices/raw_lap_data.csv}
+    \caption{Lap time data, in seconds, from human participants}
+    \label{tab:csv_table}
+\end{table}

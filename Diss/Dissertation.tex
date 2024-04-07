@@ -4,6 +4,7 @@
 \usepackage{amssymb}
 \usepackage{algorithm}
 \usepackage{algorithmic}
+\usepackage{csvsimple}
 \usepackage{fancyhdr}
 \usepackage{graphicx}
 \usepackage{lipsum}
@@ -21,27 +22,25 @@
 
 % Styles can be Sonny, Lenny, Glenn, Conny, Rejne, Bjarne and Bjornstrup
 \usepackage[Sonny]{fncychap} 
-
 \begin{document}
 
 \include{Preamble/Frontpage}
 \include{Preamble/Abstract}
-\include{Preamble/Introduction}
 \include{Preamble/Acknowledge}
 \include{Preamble/Abbreviations}
 \include{Preamble/Contents}
 \include{Preamble/Lists}
+\include{Preamble/Introduction}
 \include{Preamble/ChapterMods}
 
 \include{Chapter1/Background}
 \include{Chapter2/LiteratureReview}
 \include{Chapter3/EmulatorSpecifications}
-\include{Chapter4/Design}
-\include{Chapter5/RainbowDesign}
-%\include{Chapter6/Process}
-\include{Chapter7/Evaluation}
+\include{Chapter5/Design}
+\include{Chapter6/RainbowDesign}
+\include{Chapter7/Results}
 \include{Chapter8/FutureInvestigations}
-%\include{Chapter9/Conclusion}
+\include{Chapter9/Conclusion}
 %\include{Chapter10/Chapter10}
 
 \bibliographystyle{abbrv}

@@ -2,38 +2,36 @@
 
 \chapter{Background}
 \section{Mario Kart Wii}
-Mariokart Wii was and still is a popular local and online multiplayer racing game for the Nintendo Wii, where players select from a wide range of characters and vehicles to compete in a variety of game modes; including 3 lap races, time trials, and battle modes. Despite official online servers shutting down in 2014, third-party, community-run servers continue to support a dedicated fanbase. Many of these fans create Tool-Assisted Speedruns (TASs) for a track, where creators step through a race frame by frame and manually set the inputs for each, which is then replayed by a computer player at full speed. While this has proved very effective in producing extremely quick lap times, (sometimes even exploiting quirks in the physics engine), it is a long and complicated process, requiring many hours to make even a mediocre TAS. Reinforcement Learning, along with other AI approaches, could be useful to this community in discovering new strategies, or exploring existing strategies with large state spaces.
+Mariokart Wii is a popular local and online multiplayer racing game for the Nintendo Wii, where players select from a wide range of characters and vehicles to compete in a variety of game modes; including 3 lap races, time trials and battle modes. Despite official online servers shutting down in 2014, community-run servers continue to support a dedicated fanbase. Within this fanbase many members spend their time to creating Tool-Assisted Speedruns (TASs), where creators step through a race frame by frame and manually set the controller inputs for each frame. This is then replayed by a computer player at full speed. While this has proved very effective in producing extremely quick lap times, sometimes even exploiting quirks in the physics engine, it is a long and complicated process, requiring many hours to make a TAS. Reinforcement Learning, potentially in combination with other AI approaches, will be be useful to this community in discovering new strategies or exploring existing ones.
 \begin{figure}
-    \centering
-    \includegraphics[width=0.4\textwidth]{Figures/mkwii-sample.jpg}
-    \caption{Screenshot from Mariokart Wii}
+    \centering   \includegraphics[width=0.5\textwidth]{Figures/mkwii-sample.jpg}
+    \caption{Screenshot from Mariokart Wii\cite{mkwii_sample_screenshot}}
     \label{fig:mariokart-standard}
 \end{figure}
 \section{Reinforcement Learning}
-Reinforcement Learning describes an interaction between an agent and an environment, in which an agent takes an action in the environment, placing it in a certain state, associated with a reward. In contrast to traditional AI approaches, where a learner is 'taught' which actions to take, RL 'learns' by itself, from its own actions.
+Reinforcement Learning describes an interaction between an agent and an environment, in which an agent takes actions in the environment, changing its state, associated with a reward\cite{sutton2018reinforcement}. In contrast to traditional AI approaches, where a learner is \textit{taught} which actions to take, RL \textit{learns} by itself from its own actions. One field of RL is episodic RL, in which the training process consists of many discrete episodes, starting from an initial state and ending in a terminal state. 
 \begin{figure}[htb]
     \centering
     \includegraphics[width=0.6\textwidth]{Figures/generic-rl.png}
     \caption{Generic reinforcement learning architecture\cite{sutton2018reinforcement}} %Cite RL - an introduction
     \label{fig:q-learning-generic}
 \end{figure}
-\textbf{episodic rl}
 \subsection{Markov Decision Process}
 \label{sec:mdp}
-Many problems in RL can be modelled by a 'Markov Decision Process' \cite{bellman1957markovian}, a structure which models sequential decision making problems. This is well-suited to RL, due to the repeated decisions the agent takes.\\ A standard MDP for optimisation is a tuple of
+Many problems in RL can be modelled by a 'Markov Decision Process', first introduced by Bellman in 1957 \cite{bellman1957markovian}. This is a structure which models sequential decision making problems. This is well-suited to RL, due to the repeated decisions the agent takes.\\ A standard MDP for optimisation is a tuple of
 \[ <S, A, P, R, \gamma>\]
 where
 \begin{itemize}
     \item $S$ is the set of states the agent can be in (the \textit{state space}),
     \item $A$ is the set of actions available to the agent (the \textit{action space}),
     \item $P$ is the transition probability of moving from one given state to another, taking a given action,
-    \item $R$ is the reward assosciated with moving from one given state to another, taking a given action,
-    \item $\gamma$ is the discount factor, which balances short and long-term rewards (
+    \item $R$ is the reward associated with taking an action in a given state, moving to another state,
+    \item $\gamma$ is the discount factor, which balances short and long-term rewards
 \end{itemize}
 \subsubsection{States and The Markov Property}
-For an MDP to be valid, it must satisfy the Markov Property, which states that the next state depends solely on the current state, and not on any states that preceded it. Formally, at each time-step $t$ , $$P(S_{t+1} | S_t) = P(S_{t+1} | S_t, S_{t-1}, \ldots, S_0)$$ Essentially, this means that all necessary information about the state must be included at all times.
+For an MDP to be effective, it must satisfy the Markov Property \cite{puterman2014markov}. This specifies that the next state depends solely on the current state, and not on any states that preceded it. Formally, at each time-step $t$, $$P(S_{t+1} | S_t) = P(S_{t+1} | S_t, S_{t-1}, \ldots, S_0)$$ Essentially, this means that all necessary information about the state must be included at all times.
 \subsection{Q-Learning}
-Q-Learning \cite{watkins1992q} is a model-free RL algorithm, which maintains and updates a Q-table, containing values of taking given actions in given states. As an agent transitions from one state to the next, the table is updated according to the following update rule
+Q-Learning \cite{watkins1992q} is a model-free RL algorithm, which maintains and updates a Q-table  containing values of taking given actions in given states. This table serves as a direct approximation of the optimal action-value function. As an agent transitions from one state to the next, the table is updated according to the following update rule
 \[
 Q(s, a) \leftarrow (1 - \alpha) \cdot Q(s, a) + \alpha \cdot \left( r + \gamma \cdot \max_{a'} Q(s', a') \right)
 \]
@@ -48,6 +46,18 @@ where:
     \item $s'$ is the current state, and
     \item $\max_{a'} Q(s', a')$ represents the maximum Q-value for the current state.
 \end{itemize}
-\textbf{Q learning proof: given infinite time blah blah best policy $\pi*$}
+It is proven that Q-Learning, with a finite state-action space, will always converge to the optimal action selection policy.
 \subsection{Deep Reinforcement Learning}
-Mnih \textit{et al.} (2015) \cite{mnih2015human} was successful in achieving human-level control with a deep Q-network (DQN), a deep neural network that estimates the q-function based on pixel input data. This success spearheaded further research into the area, resulting in further advancements and extensions to DQN. Including, but not limited to: Dueling DQN \cite{wang2016dueling} and Double DQN \cite{van2016doubleq}. This approach is suited to problems with very large state spaces, where a Q-table would become intractably large. Additionally, the high-dimensional input gives this model better generalisation capabilities than Q-learning, where a small change in the state space can greatly decrease the effectiveness of a trained agent.
+Mnih \textit{et al.} (2015) \cite{mnih2015human} were successful in achieving human-level control with a Deep Q-Network (DQN), a deep neural network that acts as an estimator for the Q-function. RL transitions \footnote{A record of an interaction in RL, containing the current state $s$, the action taken $a$, the reward earned by taking that action $r$ and the next state (result of taking action $a$ in state $s$)} are stored in a replay buffer which is randomly sampled from. These samples are then used to optimise the parameters of the neural network, in this case done by gradient descent on the mean squared error. Additionally, DQN makes use of 2 concurrent neural networks, the \textit{online} network and the \textit{target} network. The \textit{online} network is directly optimised through backpropogation and used for action selection, and the \textit{target} network is a periodic copy of the \textit{online} network. The \textit{target} network is used during the maximisation step of the mean squared error calculation and has the effect of improving the algorithm's stability. The loss function is as follows:
+\[
+(R_{t+1} + \gamma_{t+1} + \max_{a'} q_{\bar{\theta}}(S_{t+1}, a') - q_\theta(S_t,A_t))^2
+\]
+where
+\begin{itemize}
+    \item $t$ is a time step picked randomly from the replay buffer,
+    \item $R_{t+1}$ is the immediate reward of taking action $A_t$ in state $S_t$,
+    \item $\gamma_{t+1}$ is the discount factor at step $t$,
+    \item $\bar{\theta}$ is the parameters of the \textit{target} network,
+    \item $\theta$ is the parameters of the \textit{online} network.
+\end{itemize}
+This success spearheaded further research into the area, resulting in advancements and extensions to DQN. Including, but not limited to: Dueling DQN \cite{wang2016dueling} and Double DQN \cite{van2016doubleq}. These approaches outperformed traditional RL in all tested cases, but are particularly suited to problems with very wide state spaces, where a Q-table would become intractably large. Additionally, the high-dimensional input gives this model better generalisation capabilities than Q-learning, in which a small change in the state space can greatly decrease the performance of a previously effective agent.

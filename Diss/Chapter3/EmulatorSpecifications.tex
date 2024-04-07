@@ -1,37 +1,40 @@
 % !TEX root =  ../Dissertation.tex
 
-\chapter{Emulator Specification}
+\chapter{Emulator}
 \section{Motivations}
-Dolphin Emulator \cite{DolphinEmulator} has many features 'out-of-the-box' that make it suited for my use case. These include, but are not limited to:
+In order to perform RL in my chosen application I required some Emulation software. Dolphin Emulator \cite{DolphinEmulator} is a free, open source Wii and GameCube emulator. My past experience with Dolphin, along with its wide use within the retro gaming community were the initial motivations for choosing Dolphin. However, as I researched deeper into the emulator's capabilities, I found that it has a plethora of useful features, making it an appropriate choice for my project. This section outlines what these features are and why they are useful to me.
 \subsection{Savestates}
-The savestate system allows for saving to and loading from predefined 'slots' and files. This is extremely useful when performing episodic RL as the environment will need to  reset when a terminal state is reached, setting the next state to an initial state $s_0$.
+The savestate system allows for saving to and loading from predefined 'slots' and files. This is extremely useful when performing episodic RL as the environment will need to reset to an initial state $s_0$ when a terminal state is reached. To implement this I can manually move the character to a desired initial state, in my case the start/finish line), and save it to a specific slot. Once it has been saved, I can load that specific state when required. 
 \subsection{Framedumps}
-Framedumping saves the current frame's pixel data as jpeg files as soon as they are rendered. This allows us to access this data without any interaction with Dolphin itself. The pixel data, being the input to the D-RL agent, is extremely important as without it the neural network's input data size would be greatly decreased, leading to a potentially ineffective agent.
+Configuring the emulator to perform Framedumping saves the eacg frame's pixel data to a specified directory as a png file as soon as it is rendered. The file is named sequentially based on the order of rendering, i.e. the first frame of an emulation is \textit{framedump\_0.png}. Thus allowing access to the pixel data without any interaction with Dolphin itself. This data will be required as input to the D-RL agent's neural network.
+\subsection{Emulation Speed}
+Dolphin gives the user the option to set a specific emulation speed. This allows the games to run many times quicker than normal, only limited by the user's hardware. This feature helps in decreasing the total amount of training time.
 \subsection{API Access}
-An unofficial version of Dolphin with intergrated API access has been created by the TAS community. Currently known as \textit{Pycore}\cite{DolphinWithScriptingSupport}, this version provides an API with the emulation, allowing for programmatic access and control of a few core features, including:
+An unofficial version of Dolphin with integrated API access has been created by the TAS community. Currently known as \textit{Pycore}\cite{DolphinWithScriptingSupport}, this version provides an API with Dolphin, allowing for programmatic access and control of a few core features, including:
 \begin{itemize}
     \item Waiting for the next frame to be drawn
-    \item Reading a given location in memory
-    \item Setting the current state of an emulated controller
+    \item Reading a given location in the game's memory
+    \item Controlling an emulated controller
     \item Loading a savestate \footnote{As per\href{https://github.com/TASLabz/dolphin/issues/123}{Issue \#123}, this is currently not working, however a workaround involving pressing a hotkey assigned to loading a savestate slot is effective}
 \end{itemize}
+
 \subsection{Multiple Concurrent Controllers}
-Dolphin also supports local multiplayer, allowing multiple emulated or real controllers connected at one time. This leads to the possibility of playing against a trained agent, possibly comparing different amounts of training time to human performance.
+Dolphin also supports local multiplayer, allowing multiple emulated or real controllers connected at one time, enabling an interactive comparison between different amounts of training time and human performance.
 \subsection{Cheat Codes}
-Due to the age and nature of the game, many cheat codes for Mariokart Wii have been created, known as \textit{Gecko Codes}. Traditionally cheat codes are synonymous with gaining an unfair advantage in online play, however many of these differ from that. The two that I used during this project gave me a fully completed game save (unlocking all characters, vehicles and tracks) and displays many key values from Memory on the screen, known as the \textit{Debug Panel}\cite{GeckoCode}.
+Due to the age and nature of the game, many cheat codes for Mariokart Wii have been created, known as \textit{Gecko Codes}\cite{GeckoCode}. Traditionally cheat codes are synonymous with gaining an unfair advantage in online play, however many of these differ from that. The two that I used during this project gave me a fully completed game save (unlocking all characters, vehicles and tracks) and displays many key values from Memory on the screen, known as the \textit{Debug Panel}.
 \begin{figure}[hbt]
     \centering
-    \includegraphics[width=0.7\textwidth]{Figures/debug-panel.png}
-    \caption{A screenshot of the game with the \textit{Debug Panel} cheat enabled}
+    \includegraphics[width=\textwidth]{Figures/debug-panel.png}
+    \caption{Screenshot of Mariokart Wii with the \textit{Debug Panel} cheat enabled}
     \label{fig:gecko-code}
 \end{figure}
-\section{Controller}
+\section{Emulated Controller Choice}
 Mariokart Wii permits 4  controller types:
 \begin{itemize}
-    \item A standard Wii Remote turned sideways and ususally in a 'Wii Wheel' accessory
+    \item A standard Wii Remote turned sideways and usually in a 'Wii Wheel' accessory
     \item A Wii Remote with the 'nunchuck' extension
     \item A Wii Classic Controller
-    \item A GameCube Controller\footnote{\href{https://www.nintendo.co.uk/Hardware/Nintendo-History/Nintendo-GameCube/Nintendo-GameCube-627129.html}{Nintendo's predecessor} console to the Wii, which the Wii supported}
+    \item A GameCube\footnote{\href{https://www.nintendo.co.uk/Hardware/Nintendo-History/Nintendo-GameCube/Nintendo-GameCube-627129.html}{The Nintendo Wii's predecessor}} Controller
 \end{itemize}
 \begin{figure}[ht]
     \centering
@@ -42,50 +45,44 @@ Mariokart Wii permits 4  controller types:
     \subfloat[A Wii Classic Controller]{\includegraphics[width=0.25\textwidth]{Figures/wii-classic.jpg}\label{fig:wii-classic}}
     \hfill
     \subfloat[A GameCube Controller]{\includegraphics[width=0.17\textwidth]{Figures/gc-controller.jpg}\label{fig:gc-controller}}
-    \caption{Mariokart Wii's permitted controllers}
+    \caption{Mariokart Wii's permitted controllers \cite{gc_image} \cite{wii_controllers}}
 \end{figure}
-Out of those available, I chose to use a GameCube Controller. The main reason for this is the clear distinction between its inputs.In contrast, the Wii Remote uses motion controls for steering and other actions, and as these need to be represented formally, I decided that purely button or stick inputs would be the best way forwards, eliminating any uncertainty in regards to motion actuation zones/speeds. The main actions available to control the kart are:
+Out of these available options, I chose to use an emulated GameCube controller. The main reason for this is the clear distinction of its inputs. In contrast, the Wii remote uses motion controls for steering. To avoid a missed detail in my formalisation, I decided that purely button or stick inputs would be the best way forwards. This choice eliminates any uncertainty in regards to motion control actuation zones/values etc. The main actions available to control the kart are:
 \renewcommand{\labelitemii}{$\rightarrow$}
 \begin{itemize}
     \item 'A' Button = Accelerate
     \item 'B' Button = Performs 2 different actions:\begin{itemize}
         \item Brake (when no direction is held)
-        \item Drift in given direction\footnote{A drift's direction cannot be changed during a drift, but can be adjusted. That is, a drift that is started while holding right will always drift to the right, but keeping 'B' held and steering left will make the turn less sharp.}
+        \item Drift (when a direction is held)\footnote{A drift's direction cannot be changed during a drift, but can be adjusted. That is, a drift that is started while holding right will always drift to the right, but keeping 'B' held and steering left will make the turn less sharp.}
     \end{itemize}
+    \item 'R' Button = Performs the same as the 'B' Button
     \item 'Up' Button = Performs a wheelie, increasing top speed, but heavily decreasing handling\footnote{A wheelie can only be performed on 'bike' vehicles} \footnote{The button does not need to be held to perform the wheelie. Once pressed, the wheelie will continue for a short period, unless it is cancelled by pressing 'B'}
     \item Main Control Stick = Steers the kart/dictates direction of drift
+    \item 'L' Button = Uses an item
 \end{itemize}
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=0.6\textwidth]{Figures/controllerinputs.png}
+    \caption{Diagram of GameCube controller with labelled inputs\cite{gc_diagram}}
+    \label{fig:laballed-gc-diagram}
+\end{figure}
 \section{Memory Access}
-The values shown on-screen in the \textit{Debug Panel} provide a lot of information about the current state of the kart, giving me lots of options to consider. It was clear that I needed a method for finding memory addresses, given its value. A tool for this type of process exists already and is called Dolphin Memory Engine\cite{DolphinMemoryEngine}. This hooks to the running Dolphin process and accesses the emulated memory, providing filtering and searching capabilities
-\subsection{Method}
-The method I used to find memory addresses was an iterative search process. Lets say I am searching for the memory address that contains the current speed of the kart. We know that it will most likely be a float, as speed is real-valued. To get a baseline, I search memory for any float with value 0, 'discarding' all other locations . I then accelerate up to a certain speed and search the remaining memory for that value. A repetition of this 'elimination' style search proved effective in finding the locations of all the values I required, these being:
+The values shown on-screen in the \textit{Debug Panel} provide a lot of information about the current state of the kart, giving me lots of options to consider for my state space. In order to implement the state space, I would need a way of extracting these values from the screen. My initial idea was to use Google's Optical Character Recognition (OCR) software Tesseract \cite{google_tesseract} to read these values from the screen, but due to issues with external packages in Dolphin's embedded Python I had to reconsider this choice. Instead, I chose the read the values directly from memory, meaning I needed a method for finding a memory address, given its current value. For this I used Dolphin Memory Engine \cite{DolphinMemoryEngine}, a tool that allows for filtering and searching through Dolphin's emulated memory, achieved by hooking to the current Dolphin process.
+\subsection{Memory Search Method}
+I used an iterative search process to find the required memory addresses. Just searching one value at one time gives many possible addresses, so I needed to filter out addresses that just matched my required value by chance. Let's say I am searching for the memory address that contains the current speed of the kart. We know that it will most likely be a float, as speed is real-valued. To get a baseline, I search the memory for any float with value 0, discarding all other locations. I can then accelerate up to a certain speed and search the remaining memory for that value, which I know from the on-screen readout. Repeating this elimination style search proved effective in finding the locations of all the values I required, those being:
 \begin{figure}[bt]
     \centering
-    \includegraphics{Preamble/BirmCrest.png}
+    \includegraphics[width=0.7\textwidth]{Figures/dme.png}
     \caption{Screenshot of Dolphin Memory Engine}
     \label{fig:dme}
 \end{figure}
 \begin{itemize}
-    \item Speed = The current speed of the vehicle
-    \item Race Completion \% = A number from 0 to 4 representing the vehicle's progress through the course. Where the whole number portion represents the current lap and the decimal portion represents the progress through that lap.
-    \item Miniturbo (MT) charge = (when drifting) How long a drift has been held for
-    \item Wheelie = Whether the vehicle is currently performing a wheelie
-    \item Road Type = What type of road surface the vehicle is on
+    \item \textbf{Speed} = The current speed of the vehicle
+    \item \textbf{Race Completion \%}  = A number from 0 to 4 representing the vehicle's progress through the course. Where the whole number portion represents the current lap and the decimal portion represents the progress through that lap.
+    \item \textbf{X Position} = The current X co-ordinate of the kart
+    \item \textbf{Z Position} = The current Z co-ordinate of the kart\footnote{Mariokart Wii uses the X-Z plane for horizontal positions}
+    \item \textbf{Miniturbo (MT)} charge = (when drifting) How long a drift has been held for\footnote{In the range of [0,270] with 0 representing no charge and 270 representing fully charged}
+    \item \textbf{Wheelie} = Whether the vehicle is currently performing a wheelie
+    \item \textbf{Road Type} = What type of road surface the vehicle is on
 \end{itemize}
-Once found, I stored the addresses to read during runtime. Utilising the memory module of the API, giving live access to the emulated memory.
-\begin{table}[b]
-    \centering
-    \begin{tabular}{l|c|c|c}
-    \textbf{Name}  & \textbf{Location} & \textbf{Type (in Memory)} & \textbf{Range}\\
-    \hline
-     Speed  &        \texttt{0x80E4C678} & 32-bit Float  & $$[0, 113.4]$$\\
-     Completion  &   \texttt{0x80E43708} & 32-bit Float  & $$[0, 4] $$\\
-     X Position  &   \texttt{0x80E4DAE8} & 32-bit Float  & $$[-150,000, 150,000] $$\\
-     Z Position  &   \texttt{0x80E4DAF0} & 32-bit Float  & $$[-150,000, 150,000] $$\\
-     MT Charge &     \texttt{0x80E4C756} & 16-bit Integer& $$\{0,270\}$$\\
-     Wheelie State & \texttt{0x90284F04} & 16-bit Integer& $$\{0,1\}$$\\
-     Road Type &     \texttt{0x80E51CE8} & 16-bit Integer& $$ \{0,7\} $$\\
-    \end{tabular}
-    \caption{Memory Addresses in Mario Kart Wii's emulated memory}
-    \label{tab:memory-addresses}
-\end{table}
+Once found, I stored the addresses to read during runtime, which would utilise the memory module of the API, giving live access to the emulated memory.

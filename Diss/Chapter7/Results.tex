@@ -1,0 +1,47 @@
+% !TEX root =  ../Dissertation.tex
+\chapter{Results}
+\section{Q-Learning}
+\subsection{Problem Instances}
+In very early iterations, the agent would exploit the MT component of my reward function, leading to the agent getting stuck in a local optima. It did this by drifting to the left, charging a miniturbo and releasing it into the wall, ending the episode. This took advantage of the overly-weighted MT component and my termination conditions, which at the time only considered the agent's speed. This oversight allowed the agent to stay in the offroad area for just long enough to charge the miniturbo, granting it a large reward. To combat this I greatly decreased the weighting of the MT reward component, and introduced the road type check into the termination conditions. These two additions, along with a slight adjustment to $\gamma$ prevented the agent from exploiting this any further.
+\begin{figure}[hbt]
+    \centering
+    \includegraphics[width=0.6\textwidth]{Figures/local-optima.png}\label{fig:local-optima}
+    \hfill
+    \caption{Graph showing agent stuck in local optima}
+\end{figure}
+\subsection{Experimental Runs}
+As mentioned earlier, I conducted a series of experimental runs to find the optimal representation of the karts position in my state space. These runs consisted of adjusting the accuracy of the XZ co-ordinates to three different levels of accuracy. I trained each agent for 5000 episodes, changing only the rounding procedure of the state space. From the three trained agents I found that agent B, which was accurate to nearest Integer, to be the most effective. Analysing the training results, it is interesting to see that agents A and C got stuck in the same local optima, implying similar problems between the two. From monitoring the reward value through a single lap, I found that this occurred at the 'hairpin' turn\footnote{Where the track turns sharply back on itself, almost 180 degrees (\ref{fig:track-layout})}. This local optima makes sense as it is a difficult part of the track, requiring the agent to come into the corner on the right hand side of the track and hold a drift left the entire way through. Another factor that makes this corner more difficult for the agent is the fact that the track widens around this corner. While this is designed to make it easier, it led to many more states being explored, as going straight on (i.e. not taking the corner) took longer to terminate, leading to more time steps spent exploring actions that all eventually lead to terminal states. This was most likely due to the fact that the agent was unable to detect upcoming track borders. Finding a way to do this could greatly help the agent to navigate difficult corners such as these.\\ Agent B completed its first lap after 2491 episodes and only improved its time by .2 seconds after the total 5000 episodes. This is most likely due to the absence of a lap-time focused reward function. With the current implementation, completing a lap is rewarded the same whether it is a quick or slow lap, possibly meaning that a fast lap 1 was missed due to earlier termination in lap 2 than a slower lap 1.
+\\\href{https://youtu.be/CMENnIKdkOg}{Click here to watch agent B drive around the track} (YouTube)\\ \textit{Note: Lap timer starts at 47 seconds}
+\begin{figure}[htb]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Figures/training-reward.png}
+    \caption{Graph of Agents' average reward during training, smoothed using a moving average}
+    \label{fig:training-graph}
+\end{figure}
+\section{Deep Learning}
+Unfortunately, when running the D-RL algorithm, I repeatedly encountered an unknown issue. The emulation and the rainbow agent terminal would freeze for seemingly no reason. I investigated the RAM, CPU and GPU usage during this time but noticed no issues, therefore leading me to believe that there was a deadlock within Dolphin or my implementation of Rainbow. Due to the unknown factor of this issue and time restraints, I had to unfortunately abandon this part of my project. However, to still allow for comparison between the approaches, I used existing results from a trained agent \cite{BenJMiddletonAgent}. This agent is trained on a different track however, so to compare between tracks I used the agent's lap time as a percentage of the current human world record (WR) time on that track\footnote{As of 31st March 2023}. This allows us to see how close the agent was to 'optimal' performance.
+\section{Comparative Analysis}
+\subsection{Human Data Collection}
+In order to compare with human players, I collected race and lap time data from a range of abilities. As the participants were unfamiliar with the controls and the track, I gave each of them 3 attempts at a 3-lap time trial, taking their best result. After separating the results into 3 ability levels (beginner, intermediate and advanced), I took the average lap times and race times to give 3 clear performance bands.
+% Current WR - mc3 = 1:17.84, lc = 1:08.73
+\begin{table}[htb]
+    \centering
+    \begin{tabular}{l|c|c|c}
+    \textbf{Player} & \textbf{Race Time (m:s)} & \textbf{Lap Time (s)}& \textbf{\% of WR}\\
+    \hline
+    Q-Learning (Agent B) & 1:52.5  &37.5 & 145\%\\
+    Rainbow              & 1:33.91 & 31.3  & 136\% \\
+    Human - Advanced     & 1:40.58 & 33.52 & 129\% \\
+    Human - Intermediate & 1:52.57 & 37.52 & 144\% \\
+    Human - Beginner     & 2:02.54 & 40.84 & 157\%
+    \end{tabular}
+    \caption{Human and RL results}
+    \label{tab:lap-times}
+\end{table}
+\section{Analysis}
+\subsection{Comparison between Approaches}
+Both the Q-learning and rainbow agents trained for approximately 12-15 hours and achieved relatively similar lap times\footnote{In comparison to the WR} This suggests that their training speeds for this application are very similar, however that is not completely true. The rainbow agent was able to complete 3 separate laps of the track, however the Q-learning agent was only able to complete 1.5 laps.
+\subsection{Hardware Limitations}
+While Rainbow performed somewhat comparably to Q-learning after a much shorter training time, it is important to keep in mind the computational resources that each takes. My laptop was able to run the Q-learning algorithm alongside Dolphin at 250\% of the normal game speed (approx. 150 fps), allowing for lots of episodes in a short time. When running DQN however, the emulation slowed to around 1.6\% game speed (approx. 1fps). These differences outline the hardware limitations of DQN and how Q-learning is a more accessible globally due to the lower processing requirements. An application of this could take the form of an interactive Q-learning demonstration, used in an educational context as an introduction to RL.
+\subsection{Scalability}
+If I were to increase the scope of this project, to potentially include other tracks, vehicles etc.,  the size of my state space, and therefore Q-table would increase, potentially becoming intractable. In comparison, the Deep-RL approach would not encounter this same issue, as the size of the neural network doesn't change during execution, only the parameters.    

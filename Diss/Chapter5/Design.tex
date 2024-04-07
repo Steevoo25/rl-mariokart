@@ -1,0 +1,206 @@
+% !TEX root =  ../Dissertation.tex
+\chapter{Design - Q-Learning}
+% ------------------------------
+% PROBLEM FORMULATION
+% ------------------------------
+\section{Problem Formulation}
+To perform the Q-learning algorithm, I represent the problem as an MDP(\ref{sec:mdp}). However Q-learning, being a model-free RL algorithm learns purely through interaction with its environment, meaning it does not require the transition probabilities $P$. This gives my formalisation the structure of $$<S, R, A, \gamma>$$
+\subsection{State Space}
+When designing the state space, it was important to balance both accuracy and simplicity. A state must maintain the Markov Property, in that it contains all necessary information, and must not be too detailed, doing so can lead to an extremely large state space, and possibly an intractable problem. To represent the state space, I used the following components:
+\subsubsection{Speed}
+The speed of the vehicle is an important factor to consider when racing. A higher speed means a quicker lap time, which is what we are optimising.
+\subsubsection{Position}
+The position of the vehicle is also integral to the RL process, as moving its position around the track to the finish line is the ultimate goal of the agent. To represent the agent's position I used X and Z components of the bike's co-ordinates.  Choosing a suitable degree of rounding accuracy is an impoertant consideration for my state space representatino. I chose to train 3 agents, each with varying degrees of precision in its position, for 5000 episodes.
+\begin{itemize}
+    \item \textbf{Agent A} = Accurate to 1 d.p.
+    \item \textbf{Agent B} = Accurate to the nearest Integer
+    \item \textbf{Agent C} = Accurate to the nearest 5th Integer\footnote{To achieve this I perform integer division by 5, essentially mapping every 5 coordinates to one in each axis}
+\end{itemize}
+The Y component was not required in my environment, as the track I have chosen is completely flat, however on other tracks this would need to be included to account for places where the track overlaps itself.\\When choosing my representation for the position of the kart I had two options, those being the XZ coordinates and the completion \% .In earlier versions of my representation, I instead used the completion value as it seemed to be a precise representation of the karts position. However after some failed trial runs I investigated this value further, and from these I found that the position of the kart across the track has no effect on the completion \% making it unsuitable for my implementation. This can be seen in the below diagram, the locations of the karts are different but the completion values are the same.
+\begin{figure}[ht]
+    \centering
+    \subfloat[Kart positioned on the start line in the middle of the track]{\includegraphics[width=0.45\textwidth]{Figures/raceperc-1.png}\label{fig:raceperc-middle}}
+    \hfill
+    \subfloat[Kart positined on the start line on the side of the track]{\includegraphics[width=0.45\textwidth]{Figures/raceperc-2.png}\label{fig:raceperc-side}}
+    \caption{Demonstration of the inaccuracy in Race\%}
+\end{figure}
+\subsubsection{Drift}
+To progress around a corner, a kart must either turn or drift in that direction. If the kart is drifting, then its physics change slightly, depending on the direction that the drift was started in. Additionally, after holding a drift for approximately a second a 'miniturbo' (MT) is charged, resulting in a great speed boost when the drift is released. This dynamic gives me 2 elements to track: The start direction of the drift, and how charged the miniturbo is. 
+%From memory I have access to the second component straight away: a value in the range $\{0,270\}$, with 0 being not charged at all and 270 being fully charged. As the speed boost is only granted for a fully charged miniturbo, I can reduce this to a boolean value representing charged or not charged. To check the start direction of a drift, I can keep track of the current state of the controller, and store what direction (left, right, neutral) is being held, then in the case a drift is started (value from memory is greater than 0), its start direction is included in the state.
+\subsubsection{Wheelie}
+When driving in a straight line, performing a wheelie increases the top speed by 12 mph \footnote{From 84mph to 96mph}. This does however greatly decrease the turning capabilities of the bike. Because of this change to the steering, it is important that the bike's wheelie state is included in the state information. Performing a wheelie only requires the button to be pressed once, after which the bike enters a wheelie for approximately 3 seconds, unless interrupted by the player.% This means that whether the vehicle is in a wheelie or not cannot be determined from the controller state. To circumvent this problem I simply read the wheelie state directly from memory and include it in my state representation.\\
+\begin{quote}
+This design gives me a state space in the magnitude of $10^6$.
+\end{quote}
+\subsubsection{Terminal States}
+\label{sec:terminal-states}
+For episodic RL, I need to define a set of terminal states, which indicate that the episode has ended and needs to be reset. I want the episode to terminate if the vehicle's speed is below a certain value, if the vehicle is off the track, or if a lap has been completed.\\In Mariokart Wii there are many different types of track surface, such as normal road, off-road and boost panels. On the track I have selected, an area of off-road surrounds the entire track, allowing me to check the type of surface the vehicle is on to find whether it is off the track.\\I have also set a low speed bound, terminating the episode if the vehicle is below a certain speed. Additionally, hitting the obstacles on track doesn't change the type of road we are on, but will greatly decrease the speed, further justifying this condition.\\Finally, I want to check whether an episode has been successful in completing a lap, given by the completion \% value. If this is $>2$ ,meaning we are currently on lap 2), then a lap has been completed.\footnote{This can be changed to 4 to allow the agent to train to complete an entire 3-lap time trial} \\The set of terminal states can be formalised as the following:
+\[ S_t = \{s \in S | s_{roadType} =  \textit{offroad}\text{ or } s_{speed} < minSpeed \text{ or } s_{completion} >2\}\]
+where
+\begin{itemize}
+    \item $s_{roadType}$ is the type of road in state $s$
+    \item \textit{offroad} is Mariokart Wii's encoding of off-road road type
+    \item $s_{speed}$ is the speed of the vehicle in state $s$
+    \item $minSpeed$ is a constant representing the minimum acceptable speed\footnote{set to 60mph}
+    \item $s_{completion}$ is the completion value in state $s$
+\end{itemize}
+\subsection{Reward Function}
+The reward function is a key element of the learning process, serving as an evaluation of the agent's performance. To design the reward function I investigated the fastest route around the track by looking at the current top speedruns. From these I saw that the fastest lap around the track consisted mostly of drifting, to charge miniturbos around the corners, and performing wheelies on the straights. This behaviour is what I want to encourage through the design of my reward function, as well as making progress through the track.
+\subsubsection{Speed Component}
+To encourage the agent to perform wheelies, I give a small bonus to the reward if the current speed is greater than the normal top speed of the kart. I also reward the agent for staying above the minimum acceptable speed, and no reward for terminating.
+\[
+R_{speed}(s') = 
+\begin{cases}
+ 1.5 & \text{if } s'_{speed} > maxNormalSpeed\\
+ 1 & \text{if } s'_{speed} > minSpeed\\
+ 0 & \text{otherwise}
+\end{cases}
+\]
+where
+\begin{itemize}
+    \item $s'$ is the current state 
+    \item $s'_{speed}$ is the speed in the current state
+    \item $maxNormalSpeed$ is the maximum speed of the vehicle \footnote{While not in a wheelie or speed boost. For the chosen character and bike combo, this is 84mph}
+    \item $minSpeed$ is the minimum acceptable speed of the vehicle, defined in \ref{sec:terminal-states}
+\end{itemize}
+\subsubsection{Completion Component}
+In order for the agent to complete a lap, I want it to progress forwards around the track. To encourage this, I use the completion value of the current state and compare it with the completion value of the previous state. I also provide a large reward for completing a lap.
+\[
+R_{completion}(s, s') =
+\begin{cases}
+ 100 & \text{if } s'_{completion} > 2\\
+ 1 & \text{if } s'_{completion} > s_{completion}\\
+ 0 & \text{otherwise}
+\end{cases}
+\]
+where
+\begin{itemize}
+    \item $s$ is the previous state
+    \item $s'$ is the current state
+    \item $s_{completion}$ is the completion value of the previous state
+    \item $s'_{completion}$ is the completion value of the previous state
+\end{itemize}
+\subsubsection{MT Component}
+To encourage the agent to drift around corners instead of simply turning, I give a large reward for fully charging and releasing a miniturbo, and a penalty for releasing a miniturbo before it has fully charged. This will encourage the agent to fully charge a miniturbo before it is released, ensuring it gets the speed boost, as well as discouraging it from starting to drift on straight parts of the track.
+\[
+R_{mt}(s, s') = 
+\begin{cases}
+     1 &\text{if }s_{mt} = 270\text{ and }s'_{mt} = 0\\
+     -1 &\text{if }s_{mt} < 270\text{ and } s'_{mt} = 0 \\
+     0 & \text{otherwise}
+\end{cases}
+\]
+where
+\begin{itemize}
+    \item $s$ is the previous state
+    \item $s'$ is the current state
+    \item $s_{mt}$ is the MT charge of the previous state
+    \item $s'_{mt}$ is the MT charge of the current state
+    \item 270 is a constant representing a fully charged MT
+    \item 0 is a constant representing no MT being performed
+\end{itemize}
+\subsubsection{Complete Reward Function}
+These components combined and weighted give my complete reward function:
+\[
+R(s,s') = w_1 \cdot R_{speed}(s) + w_2 \cdot R_{completion}(s,s') + w_3 \cdot R_{mt}(s,s')
+\]
+where
+\begin{itemize}
+    \item $w_1$ is the weight associated with the speed component
+    \item $w_2$ is the weight associated with the completion component
+    \item $w_3$ is the weight associated with the MT component
+\end{itemize}
+\subsubsection{Reward Function Evaluation}
+In order to evaluate the effectiveness of my reward function, I designed and conducted and investigation process. This was to drive a fast lap myself, and record and plot the reward function values. From this data I tuned the weights and rewards so the function performs as I intended.
+\begin{figure}[ht]
+    \centering
+    \subfloat[Reward function of a fast lap before\\ tuning weights]{\includegraphics[width=0.5\textwidth]{Figures/Rewards-before.png}\label{fig:reward-well-driven}}
+    \hfill
+    \subfloat[Reward function of a fast lap after\\ tuning weights]{\includegraphics[width=0.5\textwidth]{Figures/Rewards-after.png}\label{fig:reward-penalty}}
+    \caption{Reward Function graphs of a 'well driven' lap}
+\end{figure}
+\subsection{Action Space}
+Defining the action space of my problem is also a very important task. Having too many actions can lead to greatly increased training times, due to the increased number of actions to explore in each state, but having too few can lead to an ineffective agent.
+\subsubsection{Buttons}
+As my agent will not be using items, I removed the 'L' Button from the available inputs. Also, as 'R' and 'B' perform the same actions, I chose to only use one of them, that being 'B'. This leaves us with 3 available buttons ('A', 'B' and 'Up'), each having 2 states, either pressed (\textit{True}) or not pressed (\textit{False}). As I always want the agent to progress forwards, I set the accelerate (A) button to always be held down. 
+\subsubsection{Analog Stick}
+The analog stick allows for a combination of horizontal and vertical inputs, however for my application only the horizontal component is required. This leaves a range between 0 (full left) and 255 (full right). To simplify this, I defined 5 stick angles equally spread apart, representing soft/hard left, neutral and soft/hard right. 
+\\
+From the remaining inputs I defined a set of specific permutations that perform common desirable actions (\ref{fig:action-space}).
+%As mentioned earlier, the fastest way around the track is to mostly perform drifts and wheelies, so including only those actions would intuitively be best. However during the training progress, I found that the agent would sometimes get stuck drifting in the incorrect direction, without a way to quickly exit the drift and turn in the opposite direction. Including the last 3 actions allows this to happen, allowing the agent to recover from a previous mistake, or perform a slight change in direction, without receiving the penalty for cancelling a drift.
+
+% ------------------------------
+% IMPLEMENTATION
+% ------------------------------
+\section{Implementation}
+In order to perform RL in my chosen environment, I needed to run code synchronously with the emulation. With this in mind I designed the following architecture, an augmentation of the Agent-Environment interface and Dolphin Emulator:\\At each time step $t$:
+\begin{itemize}
+    \item Use an epsilon-greedy policy to choose an action \ref{sec:eps-greedy}
+    \item Perform the action using the \textit{Controller} endpoint and move to the next state
+    \item Observe the new state information using the \textit{Memory} endpoint
+    \item Calculate the reward earned by performing the action
+    \item Update the Q-table for the previous state
+\end{itemize}
+\begin{figure}[hb]
+    \centering
+    \includegraphics[width=0.6\textwidth]{Figures/Q-learning-arch.png}
+    \caption{Q-learning system architecture}
+    \label{fig:q-learning-arch}
+\end{figure}
+% \begin{figure}[hb]
+%     \centering
+%     \includegraphics[width=0.6\textwidth]{Figures/env_script.png}
+%     \caption{Code snippet of environment script}
+%     \label{fig:env-script}
+% \end{figure}
+\subsection{State Space}
+My implementation of the state space involved reading the required values from memory and performing some slight processing. This is then stored as a python tuple to be used as part of the key for the Q-table.
+\begin{itemize}
+    \item \textbf{Speed} was rounded to the nearest Integer,
+    \item \textbf{Position} was rounded to the nearest Integer,
+    \item \textbf{MT} was converted to a tuple where the first element was an Integer in the range [0,2] which indicates the direction of the drift \begin{itemize}
+        \item 0 = not drifting
+        \item 1 = drifting left
+        \item 2 = drifting right
+    \end{itemize}
+    , and the second component was a Boolean indicating whether the miniturbo was fully charged,
+    \item \textbf{Wheelie} was converted to a Boolean.
+\end{itemize}
+\subsection{Reward Function}
+The implementation of my reward function involves checking various conditions on the different components of the previous and current states and returning the appropriate reward. These components are summed and weighted to give the final reward for that step. I also return each component individually in order to track and tune the weights of each. 
+\subsection{Action Space}
+To represent the available actions I used a list of Python dictionaries, where the name of the button was the key, and the state of the button was the value. This is the representation used in the API, so choosing to use this prevented the need for conversion when calling the endpoint. This action is converted to a tuple, containing only the values from this dictionary, when used in the key for the Q-table.
+\begin{figure}[hbt]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Figures/action-space.png}
+    \caption{Available action permutations}
+    \label{fig:action-space}
+\end{figure}
+\subsubsection{Action Selection Policy}
+\label{sec:eps-greedy}
+For my implementation of Q-Learning, I decided to use an $\epsilon$-greedy action selection policy, providing a balance between exploitation and exploration when an appropriate $\epsilon$ is selected. The policy states that, at any time step $t$, we pick a random action with probability $\epsilon$ or pick the best action with probability $1-\epsilon$. To implement this, I uniformly sample a number $x$ in the range $\{0,1\}$ and take a random action if $x < \epsilon$, or take the best action if $x > \epsilon$
+\subsection{Time Step}
+Dolphin Emulator runs Mariokart Wii at 60 fps (frames per second). My first implementation used a time step of 1, performing Q-learning at every frame. This experimental training run gave very ineffective results. After observing the agent during training, I found that one of the main reasons for this is that performing an action doesn't have an instantaneous effect in the context of the game. For example, performing a wheelie takes a few frames for the wheelie animation to play, and then a few more to accelerate to the new top speed. It is for this reason that the chosen time step has a substantial impact on the agent. Setting it too high could lead to the agent missing opportunities to take the optimal action at the optimal time, but setting it too low  could lead to a greatly increased training time and erratic movement. To choose an appropriate time step for my environment I experimented with a few different values, eventually finding that 20 frames (0.333... seconds) was a good middle ground between accuracy of inputs and episode length.
+\section{Environment}
+\begin{figure}[bht]
+    \centering
+    \includegraphics{Figures/track-layout-mc3.png}
+    \caption{Track layout}
+    \label{fig:track-layout}
+\end{figure}
+To aid the agent in its training process, I made choices when designing the environment that focused on simplicity, aiming to minimise the search space.
+\subsection{Game Mode}
+As mentioned earlier, Mariokart Wii supports many game modes, however a full race with 11 other racers is a complex stochastic environment, with many unknown factors. To aid an untrained agent, I chose to use the 'Time Trial' mode. In a time trial, the player tries to set the fastest time possible around the track with no other racers, thus removing this stochastic element from the environment.  
+\subsection{Track}
+The wide range of tracks in Mariokart Wii have varying difficulties. These start off with simple, wide tracks with few turns, but some of the more complex ones include 3-dimensional looping and twisting courses. The track that I chose (Called SNES Mario Circuit 3 \ref{fig:track-layout}) is a simple in comparison to these, but as a pure racetrack it is relatively complex. Differing tightnesses and lengths of corners along with a few on-track obstacles make this track surprisingly difficult to navigate, despite its flat layout. These features, in my opinion, provide enough simplicity to aid learning, and enough complexity for an interesting learning process.
+\subsection{Character/Vehicle}
+Out of all characters and vehicles in Mariokart Wii, one character-vehicle combination is by far the most widely used, that being Funky Kong on the Flame Runner bike. (\ref{fig:funky-flame}).This is because of its high values in the 3 most important characteristics (speed, weight and miniturbo). Choosing this allows for the highest degree of comparison between the agent and human players by reducing the external factors on lap time.
+%normal top speed = 84, wheelie speed= 96 mt top speed = 113, floor boost top speed = 120
+\subsection{Items}
+In a standard 'Time Trial' race, the player is given 3 mushroom items to use. These provide a large speed boost to the kart. I decided to remove the ability to use these in order to help simplify the state and action spaces. 
+\section{Parameter Tuning}
+The three parameters to Q-Learning $\epsilon, \alpha$ and $\gamma$ have a great effect on the learning process, so to tune them I researched appropriate ranges through literature and then conducted a series of short experimental runs to tune them further. After approximately 250 episodes, I observed both the agent's progress around the track, and Q-values in various states. Tuning $\epsilon$ was a rather simple process: Literature such as Sudharsan Ravichandaran's book \textit{Hands-on reinforcement learning with Python} (2018) \cite{ravichandiran2018hands} suggests a low epsilon  $(<0.01)$ due to the fact that it is used at each time step, repeatedly increasing the probability that a random action has occurred during the episode. In my observations, I found the agent performed better on average with a low epsilon, this was completely as expected as with a lower value, the best action is chosen more often.
+\\For my problem, using a high $\gamma$ ($>0.9$) gave me the best results, due to the ultimate long-term goal of completing a lap and the relative simplicity of my reward function.
+\\When tuning $\alpha$ I found that the instability introduced by a high value was sometimes useful when states had been fully explored but the best action was not being exploited, however it also meant that the agent would not converge to an optimal policy. Ultimately, I found a learning rate of $0.6$ to give best results.
+\section{Data Collection}
+During the training process I collected 2 key pieces of data at the end of each episode. The total reward earned and the sequence of controller inputs. This data allows me to plot the progress of the agent during the training process, and keep a record of how the agent achieved that progress. Keeping the controller inputs also allows for playing against the agent after different amounts of training time, allowing for direct comparison to human performance.

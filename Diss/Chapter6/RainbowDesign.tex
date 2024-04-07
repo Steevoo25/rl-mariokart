@@ -1,0 +1,39 @@
+% !TEX root =  ../Dissertation.tex
+\chapter{Design - Deep-RL}
+\section{Formulation}
+For the Deep-Learning implementation, I needed to adapt my formulation slightly. The reward function and action space remained the same, but the state space instead consisted of pixel data. At this stage I did consider including the information from my Q-learning state representation as well as the pixel data, but I chose not to as keeping them separate would give a fairer comparison. Accessing the pixel data was the main challenge of this implementation, as there was no direct programmatic access through the API. Ben Middleton's implementation \cite{BenJMiddleton} used an older version of Dolphin which did have API access to the pixel data, however this feature has since been removed due to bugs. For my implementation, I made use of the frame-dump functionality built in to Dolphin. This feature causes Dolphin's emulation to slow down significantly, but was the only method I had to access the required pixel data.
+\section{Rainbow Agent}
+The Rainbow Agent implements a combination of improvements to DQN. Many of these are complicated and require lots of background knowledge outside the scope of this paper. Regardless, here is a short summary of each:
+\begin{enumerate}
+    \item \textbf{Double Q-learning}\cite{van2016doubleq} addresses the overestimation in the maximisation step ($\max_{a'} Q(s', a')$) of the Q-learning update rule, in some stochastic environments. Double Q-learning maintains 2 Q-tables, each taking the maximising value from the other, giving an unbiased estimate of the best value in the next state. In DQN, the \textit{online} and \textit{target} networks are used for this purpose.
+    \item \textbf{Prioritized Experience Replay}\cite{schaul2015prioritized} is a variation of Experience Replay\cite{lin1992self} which prioritises transitions\footnote{In this case a state $s_{t-1}$, an action $a_{t-1}$, a reward $R_{t}$, and a next state $s_t$} from which an agent can learn more efficiently from. The higher priority a transition has, the higher likelihood it will be replayed, allowing the agent to learn efficiently.
+    \item \textbf{Duelling Networks} \cite{wang2016dueling} is a D-RL architecture which splits a Q network into its separate components, giving a value network, which estimates the value of states, and an advantage network, which estimates the value of actions. These are then combined in an aggregating layer, giving a final value. When combined with double Q-learning, this gives a \textit{target} and \textit{online} network for both the value and advantage components.
+    \item \textbf{Multi-step learning} considers the rewards earned $n$ steps into the future during the maximisation step in Q-learning. Allowing the agent to consider the further future effects of the action. This helps to deal with sparse or long term rewards, that would previously take many iterations to have an effect on the update. Sutton and Barto (2018) \cite{sutton2018reinforcement} found that a well-tuned $n$ lead to faster training.
+    \item \textbf{Distributional RL} learns to approximate the distribution of returns, rather than the expected return. It does this by minimising the Kullbeck-Liebler divergence between the current distribution and a newly-constructed target distribution. Bellemere \textit{et al.} (2017)\cite{bellemare2017distributional} found that it surpassed the performance of other approaches at the time, when applied to the ALE.
+    \item \textbf{Noisy Nets} (Fortunato \textit{et al.} (2017)) \cite{DBLP:journals/corr/FortunatoAPMOGM17} introduces additional exploration capabilities by including a noisy layer. Over time, the network learns to ignore the noise at different rates through the search space. Allowing for different levels of exploration depending on the current state. 
+\end{enumerate}
+\section{Implementation}
+To effectively implement the rainbow agent, I designed this architecture.
+\begin{itemize}
+    \item Using the time step of the emulation as a reference, the corresponding frame is read from the framedumps directory,
+    \item The frame is pre-processed and sent as input to Rainbow, along with the previous frame's reward,
+    \item Rainbow selects an action epsilon-greedily,
+    \item The action is performed using the \textit{Controller} endpoint,
+    \item Calculate the reward earned by performing the action.
+\end{itemize}
+Due to the limitations of Dolphin's embedded Python interpreter, the rainbow agent was run in a separate terminal. To allow for the required information to be sent between the two, I used a local socket bound to a specific port. This allowed use of all required external libraries for both rainbow and the image processing. \footnote{This method would be an appropriate workaround for the issue I encountered with Tesseract OCR, however by this stage in the project I had fully implemented the memory access functionality, which I chose to continue using as to not discard my work.}
+\subsection{Input Processing}
+Pixel data is given as input to Rainbow, which is fed into a CNN and then the Rainbow DQN. To improve the efficiency of the CNN this input data is preprocessed through cropping to only the middle part of the screen (containing the kart and the track), down-sampling to 84x84 resolution and grey-scaling. This preprocessing is essential in providing an input of the correct shape and with minimal size, while maintaining required data. 
+\begin{figure}[hbt]
+    \centering
+    \subfloat[Screenshot of game before preprocessing\\ (1080p, 263kb)]{\includegraphics[width=0.5\textwidth]{Figures/raw-frame.png}\label{fig:preprocess-raw}}
+    \hfill
+    \subfloat[Screenshot of game after preprocessing\\ (84x84, 4kb)]{\includegraphics[width=0.25\textwidth]{Figures/rainbow-input.png}\label{fig:preprocess-final}}
+    \caption{Screenshot of game before and after processing}
+\end{figure}
+\begin{figure}[hbt]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Figures/Deep-RL.png}
+    \caption{D-RL system architecture}
+    \label{fig:rainbow-arch}
+\end{figure}
