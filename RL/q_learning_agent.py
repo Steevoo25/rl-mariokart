@@ -18,11 +18,12 @@ q_file = f'{PROJECT_DIR}RL\\q_table.pkl'
 def save_q():
     pkl.dump(q, open(q_file, "wb"))
 # Reset q
-#q = {}
-#save_q()
-
-print("Loading q table")
-q = pkl.load(open(q_file, 'rb'))
+try:
+    q = pkl.load(open(q_file, 'rb'))
+    print("Loading q table")
+except FileNotFoundError:
+    q = {}
+    save_q()
 print("table size:", len(q))
 
 def handle_unassigned_q_index(state, x):
