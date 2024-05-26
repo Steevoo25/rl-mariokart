@@ -23,3 +23,5 @@ RL/Rainbow/rainbow_venv/
 RL/Rainbow/__pycache__/
 Diss/Figures/
 Literature/
+# diss tex source
+Diss/
